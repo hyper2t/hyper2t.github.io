@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>goroutine on Hyper Container</title>
+    <link>https://peterliao96.github.io/zh-cn/tags/goroutine/</link>
+    <description>Recent content in goroutine on Hyper Container</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2021, HYPER CONTAINER; all rights reserved.</copyright>
+    <lastBuildDate>Fri, 28 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://peterliao96.github.io/zh-cn/tags/goroutine/index.xml" rel="self" type="application/rss+xml" />
+  </channel>
+</rss>

@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Kubernetes on Hyper Container</title>
+    <link>https://peterliao96.github.io/zh-cn/categories/kubernetes/</link>
+    <description>Recent content in Kubernetes on Hyper Container</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2021, HYPER CONTAINER; all rights reserved.</copyright>
+    <lastBuildDate>Mon, 29 Nov 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://peterliao96.github.io/zh-cn/categories/kubernetes/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes CKAD 考试: kubectl 命令行总结</title>
+      <link>https://peterliao96.github.io/zh-cn/post/k8s/ckad/</link>
+      <pubDate>Mon, 29 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://peterliao96.github.io/zh-cn/post/k8s/ckad/</guid>
+      <description>
+        
+          &lt;p&gt;文章总结了关于 &lt;code&gt;kubectl&lt;/code&gt; 在 Kubernetes CKAD 考试中的快捷命令以及需要注意的地方。&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;p&gt;趁着今年黑色星期五的 Linux CNCF 社区报名有&lt;strong&gt;三五折优惠&lt;/strong&gt;，我打算报考 CKAD 认证考试。在学习 Kubernetes 相关知识的同时，我也不忘总结一波有关 &lt;code&gt;kubectl&lt;/code&gt; 的快捷命令。&lt;/p&gt;
+&lt;h2 id=&#34;pod-生命周期管理&#34;&gt;Pod 生命周期管理&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 命令行创建 nginx pod&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;kubectl run nginx --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never --dry-run&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;client -n mynamespace -o yaml &amp;gt; pod.yaml
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 获取所有命名空间的 pod&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;kubectl get po --all-namespaces
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 运行 busybox 的同时打印 hello world&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;kubectl run busybox --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;busybox -it --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never -- &lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;hello world&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 进入容器&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;kubectl &lt;span class=&#34;nb&#34;&gt;exec&lt;/span&gt; -it podName -n nsName /bin/sh
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 列出 pod container 里面的 env variable&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;kubectl &lt;span class=&#34;nb&#34;&gt;exec&lt;/span&gt; podName -- printenv
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 创建 pod 同时为 pod 添加标签&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;kubectl run nginx1 --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never --labels&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nv&#34;&gt;app&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;v1
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 列出所有添加标签的 pods&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;kubectl get po --show-labels
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 列出标有 app=v2 的 pods&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;kubectl get po -l &lt;span class=&#34;nv&#34;&gt;app&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;v2
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 更改 nginx2 的标签为 app=v2&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;kubectl label po nginx2 &lt;span class=&#34;nv&#34;&gt;app&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;v2 --overwrite
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 移除 nginx1 标有app的标签&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;kubectl label po nginx1 app-
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;暴露-service-或-deployment&#34;&gt;暴露 service 或 deployment&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 输出为yaml文件（推荐）&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;kubectl expose deployment nginx --port&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;80&lt;/span&gt; --type&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;NodePort --target-port&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;80&lt;/span&gt; --name&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;web1 -o yaml &amp;gt; web1.yaml
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 暴露端口&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;kubectl expose deployment nginx -n bigdata --port&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;80&lt;/span&gt; --type&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;NodePort
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;版本更新&#34;&gt;版本更新&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 更新 nginx 版本&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;kubectl &lt;span class=&#34;nb&#34;&gt;set&lt;/span&gt; image deployment/nginx &lt;span class=&#34;nv&#34;&gt;nginx&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx:1.15
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 滚动更新&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;kubectl rolling-update frontend --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;image:v2
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 扩缩容&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;kubectl scale deployment nginx --replicas&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;回滚&#34;&gt;回滚&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 查看更新过程&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;kubectl rollout status deployment/nginx --namespace&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nsName
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 如果更新成功, 返回值为0 &lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;kubectl rollout status deployment nginx-deployment --watch&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;false&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep -ic waiting
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 查看变更历史版本信息&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;kubectl rollout &lt;span class=&#34;nb&#34;&gt;history&lt;/span&gt; deployment/nginx
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;kubectl rollout &lt;span class=&#34;nb&#34;&gt;history&lt;/span&gt; deployment/nginx --revision&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;3&lt;/span&gt; --namespace&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nsName
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 终止升级&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;kubectl rollout pause deployment/nginx --namespace&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nsName
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 继续升级&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;kubectl rollout resume deployment/review-demo --namespace&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nsName
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 回滚版本&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;kubectl rollout undo deployment/nginx --namespace&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nsName
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;kubectl rollout undo deployment/nginx --to-revision&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;3&lt;/span&gt;  --namespace&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nsName
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;探针-livenessprobe-和-readinessprobe&#34;&gt;探针 livenessProbe 和 readinessProbe&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;kubectl run nginx --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never --dry-run&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;client -o yaml &amp;gt; pod.yaml
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 然后编辑 pod.yaml 下的(containers -&amp;gt; livenessProbe -&amp;gt; exec -&amp;gt; command -&amp;gt; - 命令) 并保存&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;kubectl describe pod nginx &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt; grep -i liveness &lt;span class=&#34;c1&#34;&gt;# 检测是否 nginx 存活&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;kubernetes-configuration-配置&#34;&gt;Kubernetes configuration 配置&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 创建 secret&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;kubectl create secret generic test-secret --from-literal&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;username=my-app&amp;#39;&lt;/span&gt; --from-literal&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;password=39528$vdg7Jb&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 创建 configMap&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;nb&#34;&gt;echo&lt;/span&gt; -e &lt;span class=&#34;s2&#34;&gt;&amp;#34;DB_URL=localhost:3306\nDB_USERNAME=postgres&amp;#34;&lt;/span&gt; &amp;gt; config.txt
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;kubectl create cm db-config --from-env-file&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;config.txt
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 创建 UID = 101&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;kubectl run nginx --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never --dry-run&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;client -o yaml &amp;gt; pod.yaml
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;vi pod.yaml
+&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# spec -&amp;gt; securityContext -&amp;gt; runAsUser -&amp;gt; 101&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# requests 和 limits&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;kubectl run nginx --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never --requests&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;cpu=100m,memory=256Mi&amp;#39;&lt;/span&gt; --limits&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;cpu=200m,memory=512Mi&amp;#39;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 创建名字为 myuser 的 serviceAccount 并将它用在 nginx pod 上&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;kubectl create sa myuser
+&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;kubectl run nginx --image&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;nginx --restart&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;Never --serviceaccount&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;myuser -o yaml --dry-run&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;client &amp;gt; pod.yaml
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;kubectl apply -f pod.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;资源存储和分配&#34;&gt;资源存储和分配&lt;/h2&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# pv 模板&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;apiVersion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;v1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;kind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;PersistentVolume&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;metadata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;task-pv-volume&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;labels&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;local&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;spec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storageClassName&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;manual&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;capacity&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;10Gi&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;accessModes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;ReadWriteOnce&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;hostPath&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;path&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;/mnt/data&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;--&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# pvc 模板&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;apiVersion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;v1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;kind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;PersistentVolumeClaim&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;metadata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;task-pv-claim&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;spec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storageClassName&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;manual&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;accessModes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;ReadWriteOnce&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;resources&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;requests&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;3Gi&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 区别在于:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# pv: spec -&amp;gt; capacity -&amp;gt; storage 和 spec -&amp;gt; hostPath -&amp;gt; path&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# pvc: spec -&amp;gt; resources -&amp;gt; requests -&amp;gt; storage&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;表格汇总&#34;&gt;表格汇总&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;strong&gt;类型&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;命令&lt;/strong&gt;&lt;/th&gt;
+&lt;th&gt;&lt;strong&gt;描述&lt;/strong&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;基础命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;create&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;通过文件名或标准输入创建资源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;expose&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;将一个资源公开为一个新的Service&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;run&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;在集群中运行一个特定的镜像&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;set&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;在对象上设置特定的功能&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;get&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;显示一个或多个资源&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;explain&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;文档参考资料&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;edit&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;使用默认的编辑器编辑资源&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;delete&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;通过文件名、标准输入、资源名称或标签选择器来删除资源&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;部署命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;rollout&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;管理资源的发布&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;rolling-update&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;对给定的复制控制器滚动更新&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;scale&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;扩容或缩容Pod、Deployment、ReplicaSet、RC或Job&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;autoscale&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;创建一个自动选择扩容或缩容并设置Pod数量&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;集群管理命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;certificate&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;修改证书资源&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;cluster-info&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;显示集群信息&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;top&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;显示资源（CPU、Memory、Storage）使用。需要Heapster运行&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;cordon&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;标记节点不可调度&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;uncordon&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;标记节点可调度&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;drain&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;维护期间排除节点（驱除节点上的应用，准备下线维护）&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;taint&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;设置污点属性&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;故障诊断和调试命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;describe&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;显示特定资源或资源组的详细信息&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;logs&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;在一个Pod中打印一个容器日志。如果Pod只有一个容器，容器名称是可选的&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;attach&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;附加到一个运行的容器&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;exec&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;执行命令到容器&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;port-forward&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;转发一个或多个本地端口到一个Pod&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;proxy&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;运行一个proxy到Kubernetes API Server&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;cp&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;拷贝文件或目录到容器&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;auth&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;检查授权&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;高级命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;apply&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;通过文件名或标准输入对资源应用配置&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;patch&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;使用补丁修改、更新资源的字段&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;replace&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;通过文件名或标准输入替换一个资源&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;convert&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;不同的API版本之间转换配置文件&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;设置命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;label&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;更新资源上的标签&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;annotate&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;更新资源上的注释&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;completion&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;用于实现kubectl工具自动补全&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;其他命令&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;strong&gt;api-versions&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;打印支持的API版本&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;config&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;修改kubeconfig文件（用于访问API，比如配置认证信息）&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;help&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;所有命令帮助&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;plugin&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;运行一个命令行插件&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;version&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;打印客户端和服务版本信息&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Kubernetes 网络: 关于k8s的 ingress 的工作流程</title>
+      <link>https://peterliao96.github.io/zh-cn/post/k8s/network/ingress/</link>
+      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://peterliao96.github.io/zh-cn/post/k8s/network/ingress/</guid>
+      <description>
+        
+          &lt;p&gt;文章讲解了关于 ingress 和 ingress-controller 在k8s中的工作流程以及 nginx 配置修改后如何实现动态更新 nginx pod。&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;h2 id=&#34;ingress-和-ingress-controller&#34;&gt;Ingress 和 Ingress-Controller&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Ingress: 指的是k8s中的一个 api 对象，一般用 yaml 配置。作用是定义请求如何转发到 service 的规则，可以理解为配置模板。&lt;/li&gt;
+&lt;li&gt;Ingress-Controller: 具体实现反向代理及负载均衡的程序，对 ingress 定义的规则进行解析，根据配置的规则来实现请求转发。ingress-controller的形式都是一个 pod，里面跑着 daemon 程序和反向代理程序。daemon 负责不断监控集群的变化，根据 ingress 对象生成配置并应用新配置到反向代理，比如 nginx-ingress 就是动态生成 nginx 配置，动态更新 upstream，并在需要的时候 reload 程序应用新配置。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因此，ingress-controller 才是实现请求转发的组件，通过各种方式将它暴露在集群入口，外部对集群的请求流量会先到 ingress-controller，而 ingress 对象是用来告诉 ingress-controller 该如何转发请求，比如哪些域名哪些 path 要转发到哪些服务等等。&lt;/p&gt;
+&lt;h2 id=&#34;ingress-controller-工作流程分析&#34;&gt;Ingress-Controller 工作流程分析&lt;/h2&gt;
+&lt;p&gt;整体工作模式架构图如下（只关注配置同步更新）：&lt;/p&gt;
+&lt;center style=&#34;font-size:14px;color:#C0C0C0;text-decoration:underline&#34;&gt;
+&lt;image src=&#34;https://peterliao96.github.io/images/screenshot1.png&#34;&gt;
+&lt;/image&gt;
+Figure 1. Ingress 和 Ingress Controller
+&lt;/center&gt;
+&lt;p&gt;不考虑 nginx 状态收集等附件功能，nginx-ingress 模块在运行时主要包括三个主体：NginxController、Store、SyncQueue。其中，Store 主要负责从 kubernetes APIServer 收集运行时信息，感知各类资源（如 ingress、service等）的变化，并及时将更新事件消息（event）写入一个环形管道；SyncQueue 协程定期扫描 syncQueue 队列，发现有任务就执行更新操作，即借助 Store 完成最新运行数据的拉取，然后根据一定的规则产生新的 nginx 配置，（有些更新必须 reload，就本地写入新配置，执行 reload），然后执行动态更新操作，即构造 POST 数据，向本地 Nginx Lua 服务模块发送 post 请求，实现配置更新；NginxController 作为中间的联系者，监听 updateChannel，一旦收到配置更新事件，就向同步队列 syncQueue 里写入一个更新请求。&lt;/p&gt;
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Kubernetes CRD 控制器开发系列 Part 2: CRD controller 实现原理</title>
+      <link>https://peterliao96.github.io/zh-cn/post/k8s/crd/crdpart2/</link>
+      <pubDate>Thu, 17 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://peterliao96.github.io/zh-cn/post/k8s/crd/crdpart2/</guid>
+      <description>
+        
+          &lt;p&gt;文章主要讲解了关于 CRD controller 实现原理以及 &lt;code&gt;client-go&lt;/code&gt; 源码实现过程。&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;p&gt;我们自定义的资源 CRD 创建完成以后，其实如果没有一个 controller 运行它的话，它并没有起到任何用处。于是，我们需要通过创建 controller 来运行 CRD。
+要想了解 controller 的实现原理和方式，我们就需要了解下 &lt;code&gt;client-go&lt;/code&gt; 这个库的实现，Kubernetes 部分代码也是基于这个库实现的，也包含了开发自定义控制器时可以使用的各种机制。
+下图显示了 &lt;code&gt;client-go&lt;/code&gt; 中的各个组件是如何公众的以及与我们要编写的自定义控制器代码的交互入口：&lt;/p&gt;
+&lt;center&gt;
+&lt;image src=&#34;https://peterliao96.github.io/images/client-go-controller-interaction.jpeg&#34; width=600px height=400px&gt;
+&lt;/image&gt;
+&lt;/center&gt;
+&lt;center style=&#34;font-size:14px;color:#C0C0C0;text-decoration:underline&#34;&gt;
+Figure 1.client-go 实现流程图
+&lt;/center&gt;
+&lt;p&gt;&lt;code&gt;client-go&lt;/code&gt; 组件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Reflector&lt;/code&gt;：通过 Kubernetes API 监控 Kubernetes 的资源类型 采用 List/Watch 机制, 可以 Watch 任何资源包括 CRD 添加 object 对象到 FIFO 队列，然后 Informer 会从队列里面取数据&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Informer&lt;/code&gt;：controller 机制的基础，循环处理 object 对象 从 Reflector 取出数据，然后将数据给到 Indexer 去缓存，提供对象事件的 &lt;code&gt;handler&lt;/code&gt; 接口，只要给 Informer 添加 &lt;code&gt;ResourceEventHandler&lt;/code&gt; 实例的回调函数，去实现 &lt;code&gt;OnAdd(obj interface{})&lt;/code&gt;、 &lt;code&gt;OnUpdate(oldObj, newObj interface{})&lt;/code&gt; 和 &lt;code&gt;OnDelete(obj interface{})&lt;/code&gt; 这三个方法，就可以处理好资源的创建、更新和删除操作了。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Indexer&lt;/code&gt;：提供 object 对象的索引，是线程安全的，缓存对象信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;code&gt;controller&lt;/code&gt; 组件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Informer reference&lt;/code&gt;: controller 需要创建合适的 Informer 才能通过 Informer reference 操作资源对象&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Indexer reference&lt;/code&gt;: controller 创建 Indexer reference 然后去利用索引做相关处理&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Resource Event Handlers&lt;/code&gt;：Informer 会回调这些 handlers&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Work queue&lt;/code&gt;: Resource Event Handlers 被回调后将 key 写到工作队列，这里的 key 相当于事件通知，后面根据取出事件后，做后续的处理&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Process Item&lt;/code&gt;：从工作队列中取出 key 后进行后续处理，具体处理可以通过 Indexer reference controller 可以直接创建上述两个引用对象去处理，也可以采用工厂模式，官方都有相关示例&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;自定义 Controller 的控制流:&lt;/p&gt;
+&lt;center&gt;
+&lt;image src=&#34;https://peterliao96.github.io/images/client-go-controller-workflow.png&#34; width=600px height=300px&gt;
+&lt;/image&gt;
+&lt;/center&gt;
+&lt;center style=&#34;font-size:14px;color:#C0C0C0;text-decoration:underline&#34;&gt;
+Figure 2.controller 的控制流
+&lt;/center&gt;
+&lt;p&gt;如上图所示主要有两个部分，一个是发生在 &lt;code&gt;SharedIndexInformer&lt;/code&gt; 中，另外一个是在自定义控制器中。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Reflector&lt;/code&gt; 通过 Kubernetes APIServer 执行对象（比如 Pod）的 &lt;code&gt;ListAndWatch&lt;/code&gt; 查询，记录和对象相关的三种事件类型 &lt;code&gt;Added、Updated、Deleted&lt;/code&gt;，然后将它们传递到 &lt;code&gt;DeltaFIFO&lt;/code&gt; 中去。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;DeltaFIFO&lt;/code&gt; 接收到事件和 &lt;code&gt;watch&lt;/code&gt; 事件对应的对象，然后将他们转换为 &lt;code&gt;Delta&lt;/code&gt; 对象，这些 &lt;code&gt;Delta&lt;/code&gt; 对象被附加到队列中去等待处理，对于已经删除的，会检查线程安全的 &lt;code&gt;store&lt;/code&gt; 中是否已经存在该文件，从而可以避免在不存在某些内容时排队执行删除操作。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Cache&lt;/code&gt; 控制器（不要和自定义控制器混淆）调用 &lt;code&gt;Pop()&lt;/code&gt; 方法从 &lt;code&gt;DeltaFIFO&lt;/code&gt; 队列中出队列，&lt;code&gt;Delta&lt;/code&gt; 对象将传递到 &lt;code&gt;SharedIndexInformer&lt;/code&gt; 的 &lt;code&gt;HandleDelta()&lt;/code&gt; 方法中以进行进一步处理。&lt;/li&gt;
+&lt;li&gt;根据 &lt;code&gt;Delta&lt;/code&gt; 对象的操作（事件）类型，首先在 &lt;code&gt;HandleDeltas&lt;/code&gt; 方法中通过 indexer 的方法将对对象保存到线程安全的 &lt;code&gt;Store&lt;/code&gt; 中，然后，通过 &lt;code&gt;SharedIndexInformer&lt;/code&gt; 中的 &lt;code&gt;sharedProcessor&lt;/code&gt; 的 &lt;code&gt;distribution()&lt;/code&gt; 方法将这些对象发送到事件 &lt;code&gt;handlers&lt;/code&gt;，这些事件处理器由自定义控制器通过 &lt;code&gt;SharedInformer&lt;/code&gt; 的方法比如 &lt;code&gt;AddEventHandlerWithResyncPeriod()&lt;/code&gt; 进行注册。&lt;/li&gt;
+&lt;li&gt;已注册的事件处理器通过添加或更新时间的 &lt;code&gt;MetaNamespaceKeyFunc()&lt;/code&gt; 或删除事件的 &lt;code&gt;DeletionHandingMetaNamespaceKeyFunc()&lt;/code&gt; 将对象转换为格式为 &lt;code&gt;namespace/name&lt;/code&gt; 或只是 &lt;code&gt;name&lt;/code&gt; 的 &lt;code&gt;key&lt;/code&gt;，然后将这个 &lt;code&gt;key&lt;/code&gt; 添加到自定义控制器的 &lt;code&gt;workqueue&lt;/code&gt; 中，&lt;code&gt;workqueues&lt;/code&gt; 的实现可以在 &lt;code&gt;util/workqueue&lt;/code&gt; 中找到。&lt;/li&gt;
+&lt;li&gt;自定义的控制器通过调用定义的 &lt;code&gt;handlers&lt;/code&gt; 处理器从 &lt;code&gt;workqueue&lt;/code&gt; 中 &lt;code&gt;pop&lt;/code&gt; 一个 &lt;code&gt;key&lt;/code&gt; 出来进行处理，&lt;code&gt;handlers&lt;/code&gt; 将调用 &lt;code&gt;indexer&lt;/code&gt; 的 &lt;code&gt;GetByKey()&lt;/code&gt; 从线程安全的 &lt;code&gt;store&lt;/code&gt; 中获取对象，我们的业务逻辑就是在这个 &lt;code&gt;handlers&lt;/code&gt; 里面实现。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;本文摘录于 Kubernetes 文档中的 &lt;a href=&#34;https://www.qikqiak.com/k3s/controller/crd/#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3&#34;&gt;CRD controller 原理实现&lt;/a&gt;。&lt;/p&gt;
+        
+      </description>
+    </item>
+    
+    <item>
+      <title>Kubernetes CRD 控制器开发系列 Part 1: 初识 CRD 和 Operator 框架</title>
+      <link>https://peterliao96.github.io/zh-cn/post/k8s/crd/crdpart1/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://peterliao96.github.io/zh-cn/post/k8s/crd/crdpart1/</guid>
+      <description>
+        
+          &lt;p&gt;文章介绍了关于 CRD controller 开发的目的、框架以及开源 &lt;code&gt;kubebuilder&lt;/code&gt; 脚手架的简单使用。&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;h2 id=&#34;1custom-resource-define&#34;&gt;1.Custom Resource Define&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;Custom Resource Define&lt;/code&gt; 简称 CRD，是 Kubernetes（v1.7+）为提高可扩展性，让开发者去自定义资源的一种方式。CRD 资源可以动态注册到集群中，注册完毕后，用户可以通过 kubectl 来创建访问这个自定义的资源对象，类似于操作 Pod 一样。不过需要注意的是 CRD 仅仅是资源的定义而已，需要一个对应的控制器去监听 CRD 的各种事件来添加自定义的业务逻辑。&lt;/p&gt;
+&lt;h2 id=&#34;2yaml-文件格式&#34;&gt;2.YAML 文件格式&lt;/h2&gt;
+&lt;p&gt;我们可以定义一个如下所示的 CRD 资源清单文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# crd-demo.yaml&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;apiVersion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;apiextensions.k8s.io/v1&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;kind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;CustomResourceDefinition&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;metadata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# name 必须匹配下面的spec字段：&amp;lt;plural&amp;gt;.&amp;lt;group&amp;gt;  &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;crontabs.stable.example.com&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;spec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# group 名用于 REST API 中的定义：/apis/&amp;lt;group&amp;gt;/&amp;lt;version&amp;gt;  &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;group&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;stable.example.com&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 列出自定义资源的所有 API 版本  &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;versions&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;- &lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;v1beta1 &lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 版本名称，比如 v1、v2beta1 等等    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;served&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 是否开启通过 REST APIs 访问 `/apis/&amp;lt;group&amp;gt;/&amp;lt;version&amp;gt;/...`    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;storage&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kc&#34;&gt;true&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 必须将一个且只有一个版本标记为存储版本    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;schema&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 定义自定义对象的声明规范      &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;openAPIV3Schema&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;description&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;Define CronTab YAML Spec&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;object&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;properties&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;          &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;spec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;object&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;            &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;properties&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;cronSpec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;                &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;                &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;string&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;              &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;replicas&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;                &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;type&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;integer&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 定义作用范围：Namespaced（命名空间级别）或者 Cluster（整个集群）  &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;scope&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;Namespaced&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;names&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# kind 是 singular 的一个驼峰形式定义，在资源清单中会使用    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;kind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;CronTab&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;34&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# plural 名字用于 REST API 中的定义：/apis/&amp;lt;group&amp;gt;/&amp;lt;version&amp;gt;/&amp;lt;plural&amp;gt;    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;35&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;plural&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;crontabs&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;36&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# singular 名称用于 CLI 操作或显示的一个别名    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;37&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;singular&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;crontab&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;38&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# shortNames 相当于缩写形式    &lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;39&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;shortNames&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;40&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;ct&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我们在创建资源的时候，肯定不是任由我们随意去编写 YAML 文件的，当我们把上面的 CRD 文件提交给 Kubernetes 之后，Kubernetes 会对我们提交的声明文件进行校验，从定义可以看出 CRD 是基于 &lt;a href=&#34;https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#schemaObject&#34;&gt;OpenAPI v3 schem&lt;/a&gt; 进行规范的。&lt;/p&gt;
+&lt;p&gt;使用 &lt;code&gt;kubectl&lt;/code&gt; 来创建这个 CRD 资源清单：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-Shell&#34; data-lang=&#34;Shell&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;root@master ~&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# kubectl apply -f crd-demo.yaml&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;customresourcedefinition.apiextensions.k8s.io/crontabs.stable.example.com created
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;然后我们就可以使用这个 API 端点来创建和管理自定义的对象，这些对象的类型就是上面创建的 CRD 对象规范中的 &lt;code&gt;CronTab&lt;/code&gt;。
+现在在 Kubernetes 集群中我们就多了一种新的资源叫 &lt;code&gt;crontabs.stable.example.com&lt;/code&gt;，我们就可以使用它来定义一个 &lt;code&gt;CronTab&lt;/code&gt; 资源对象了，这个自定义资源对象里面可以包含的字段我们在定义的时候通过 &lt;code&gt;schema&lt;/code&gt; 进行了规范，比如现在我们来创建一个如下所示的资源清单：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# crd-crontab-demo.yaml&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;apiVersion&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;stable.example.com/v1beta1&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;kind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;CronTab&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;metadata&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;my-new-cron-object&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;spec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;cronSpec&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;* * * * */5&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;my-awesome-cron-image&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;直接创建这个对象：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;root@master ~&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# kubectl apply -f crd-crontab-demo.yaml&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;crontab.stable.example.com/my-new-cron-object created
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;我们就可以用 &lt;code&gt;kubectl&lt;/code&gt; 来管理我们这里创建 &lt;code&gt;CronTab&lt;/code&gt; 对象了，比如：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;root@master ~&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# kubectl get ct  # 简写&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;NAME                 AGE
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;my-new-cron-object   42s
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;root@master ~&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# kubectl get crontab&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;NAME                 AGE
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;my-new-cron-object   88s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;3kubebuilder-脚手架使用&#34;&gt;3.kubebuilder 脚手架使用&lt;/h2&gt;
+&lt;p&gt;创建一个目录，然后在里面运行 &lt;code&gt;kubebuilder init&lt;/code&gt; 命令，初始化一个新项目。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;ln&#34;&gt;1&lt;/span&gt;$ &lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; go/src/github.com/peterliao96
+&lt;span class=&#34;ln&#34;&gt;2&lt;/span&gt;$ mkdir builder-demo
+&lt;span class=&#34;ln&#34;&gt;3&lt;/span&gt;$ &lt;span class=&#34;nb&#34;&gt;cd&lt;/span&gt; builder-demo
+&lt;span class=&#34;ln&#34;&gt;4&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 开启 go modules&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;5&lt;/span&gt;$ &lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;GO111MODULE&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;on
+&lt;span class=&#34;ln&#34;&gt;6&lt;/span&gt;$ &lt;span class=&#34;nb&#34;&gt;export&lt;/span&gt; &lt;span class=&#34;nv&#34;&gt;GOPROXY&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;https://goproxy.cn
+&lt;span class=&#34;ln&#34;&gt;7&lt;/span&gt;$ kubebuilder init --domain ydzs.io --owner peterliao96 --repo github.com/peterliao96/builder-demo
+&lt;span class=&#34;ln&#34;&gt;8&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;# 创建一个新的 API（组/版本）为 “webapp/v1”，并在上面创建新的 Kind(CRD) “Guestbook”&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;9&lt;/span&gt;$ kubebuilder create api --group webapp --version v1 --kind Guestbook
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;上面的命令会创建文件 &lt;code&gt;api/v1/guestbook_types.go&lt;/code&gt;，该文件中定义相关 API ，而针对于这一类型 (CRD) 的业务逻辑生成在 &lt;code&gt;controller/guestbook_controller.go&lt;/code&gt; 文件中。
+我们可以根据自己的需求去修改资源对象的定义结构，修改 &lt;code&gt;api/v1/guestbook_types.go&lt;/code&gt; 文件：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span class=&#34;ln&#34;&gt; 1&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// api/v1/guestbook_types.go
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 2&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;package&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;v1&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 3&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 4&lt;/span&gt;&lt;span class=&#34;kn&#34;&gt;import&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 5&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;metav1&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;k8s.io/apimachinery/pkg/apis/meta/v1&amp;#34;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 6&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 7&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt; 8&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt; 9&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;11&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// GuestbookSpec defines the desired state of Guestbook
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;12&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GuestbookSpec&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;13&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;14&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// Important: Run &amp;#34;make&amp;#34; to regenerate code after modifying this file
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;15&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;16&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// Foo is an example field of Guestbook. Edit guestbook_types.go to remove/update
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;17&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;Foo&lt;/span&gt; &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;foo,omitempty&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;18&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;19&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// GuestbookStatus defines the observed state of Guestbook
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;21&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GuestbookStatus&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;22&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;23&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;	&lt;span class=&#34;c1&#34;&gt;// Important: Run &amp;#34;make&amp;#34; to regenerate code after modifying this file
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;24&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;25&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;26&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//+kubebuilder:object:root=true
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;27&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//+kubebuilder:subresource:status
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;28&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;29&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// Guestbook is the Schema for the guestbooks API
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;30&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;Guestbook&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;31&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;metav1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;TypeMeta&lt;/span&gt;   &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;,inline&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;32&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;metav1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ObjectMeta&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;metadata,omitempty&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;33&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;34&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;Spec&lt;/span&gt;   &lt;span class=&#34;nx&#34;&gt;GuestbookSpec&lt;/span&gt;   &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;spec,omitempty&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;35&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;Status&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GuestbookStatus&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;status,omitempty&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;36&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;37&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;38&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//+kubebuilder:object:root=true
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;39&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;40&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;// GuestbookList contains a list of Guestbook
+&lt;/span&gt;&lt;span class=&#34;ln&#34;&gt;41&lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;type&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GuestbookList&lt;/span&gt; &lt;span class=&#34;kd&#34;&gt;struct&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;42&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;metav1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;TypeMeta&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;,inline&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;43&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;metav1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;ListMeta&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;metadata,omitempty&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;44&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;Items&lt;/span&gt;           &lt;span class=&#34;p&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Guestbook&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;`json:&amp;#34;items&amp;#34;`&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;45&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;46&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;47&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;func&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;init&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;48&lt;/span&gt;	&lt;span class=&#34;nx&#34;&gt;SchemeBuilder&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;Register&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;Guestbook&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{},&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;GuestbookList&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{})&lt;/span&gt;
+&lt;span class=&#34;ln&#34;&gt;49&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;本文摘录于 Kubernetes 开发课文档中的 &lt;a href=&#34;https://www.notion.so/CRD-133b377c4b5e408ea2ede4d40bb31108&#34;&gt;CRD介绍&lt;/a&gt; 和 &lt;a href=&#34;https://www.notion.so/kubebuilder-3cbdc53796044a939a58eaaba67f415b&#34;&gt;kubebuilder 介绍&lt;/a&gt;。&lt;/p&gt;
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>

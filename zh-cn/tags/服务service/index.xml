@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>服务service on Hyper Container</title>
+    <link>https://peterliao96.github.io/zh-cn/tags/%E6%9C%8D%E5%8A%A1service/</link>
+    <description>Recent content in 服务service on Hyper Container</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright © 2021, HYPER CONTAINER; all rights reserved.</copyright>
+    <lastBuildDate>Fri, 11 Jun 2021 00:00:00 +0000</lastBuildDate><atom:link href="https://peterliao96.github.io/zh-cn/tags/%E6%9C%8D%E5%8A%A1service/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kubernetes 网络: 关于k8s的 ingress 的工作流程</title>
+      <link>https://peterliao96.github.io/zh-cn/post/k8s/network/ingress/</link>
+      <pubDate>Fri, 11 Jun 2021 00:00:00 +0000</pubDate>
+      
+      <guid>https://peterliao96.github.io/zh-cn/post/k8s/network/ingress/</guid>
+      <description>
+        
+          &lt;p&gt;文章讲解了关于 ingress 和 ingress-controller 在k8s中的工作流程以及 nginx 配置修改后如何实现动态更新 nginx pod。&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;h2 id=&#34;ingress-和-ingress-controller&#34;&gt;Ingress 和 Ingress-Controller&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Ingress: 指的是k8s中的一个 api 对象，一般用 yaml 配置。作用是定义请求如何转发到 service 的规则，可以理解为配置模板。&lt;/li&gt;
+&lt;li&gt;Ingress-Controller: 具体实现反向代理及负载均衡的程序，对 ingress 定义的规则进行解析，根据配置的规则来实现请求转发。ingress-controller的形式都是一个 pod，里面跑着 daemon 程序和反向代理程序。daemon 负责不断监控集群的变化，根据 ingress 对象生成配置并应用新配置到反向代理，比如 nginx-ingress 就是动态生成 nginx 配置，动态更新 upstream，并在需要的时候 reload 程序应用新配置。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;因此，ingress-controller 才是实现请求转发的组件，通过各种方式将它暴露在集群入口，外部对集群的请求流量会先到 ingress-controller，而 ingress 对象是用来告诉 ingress-controller 该如何转发请求，比如哪些域名哪些 path 要转发到哪些服务等等。&lt;/p&gt;
+&lt;h2 id=&#34;ingress-controller-工作流程分析&#34;&gt;Ingress-Controller 工作流程分析&lt;/h2&gt;
+&lt;p&gt;整体工作模式架构图如下（只关注配置同步更新）：&lt;/p&gt;
+&lt;center style=&#34;font-size:14px;color:#C0C0C0;text-decoration:underline&#34;&gt;
+&lt;image src=&#34;https://peterliao96.github.io/images/screenshot1.png&#34;&gt;
+&lt;/image&gt;
+Figure 1. Ingress 和 Ingress Controller
+&lt;/center&gt;
+&lt;p&gt;不考虑 nginx 状态收集等附件功能，nginx-ingress 模块在运行时主要包括三个主体：NginxController、Store、SyncQueue。其中，Store 主要负责从 kubernetes APIServer 收集运行时信息，感知各类资源（如 ingress、service等）的变化，并及时将更新事件消息（event）写入一个环形管道；SyncQueue 协程定期扫描 syncQueue 队列，发现有任务就执行更新操作，即借助 Store 完成最新运行数据的拉取，然后根据一定的规则产生新的 nginx 配置，（有些更新必须 reload，就本地写入新配置，执行 reload），然后执行动态更新操作，即构造 POST 数据，向本地 Nginx Lua 服务模块发送 post 请求，实现配置更新；NginxController 作为中间的联系者，监听 updateChannel，一旦收到配置更新事件，就向同步队列 syncQueue 里写入一个更新请求。&lt;/p&gt;
+        
+      </description>
+    </item>
+    
+  </channel>
+</rss>
