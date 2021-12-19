@@ -1,7 +1,7 @@
 {
 	"version": 3,
 	"file": "style.min.css",
-	"sourceRoot": "/Users/peterliao96/hyper2t",
+	"sourceRoot": "/home/runner/work/hyper2t.github.io.source/hyper2t.github.io.source",
 	"sources": [
 		"assets/css/style.scss",
 		"assets/css/_variables.scss",
