@@ -5,5 +5,5 @@ $(function () {
         "/background8.jpeg",
         "/background10.jpeg",
         "/background1.jpeg"
-    ], { duration: 60000, fade: 1500 });
+    ], { duration: 30000, fade: 1500 });
 });
