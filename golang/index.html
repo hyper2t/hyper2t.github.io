@@ -9,7 +9,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hyper2t.github.io/golang/"><meta property="og:image" content="https://hyper2t.github.io/golang/featured-image.jpeg"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2020-08-02T21:57:40+08:00">
-<meta property="article:modified_time" content="2021-12-23T00:01:26+08:00">
+<meta property="article:modified_time" content="2021-12-29T14:06:14+08:00">
 <meta name=twitter:card content="summary_large_image">
 <meta name=twitter:image content="https://hyper2t.github.io/golang/featured-image.jpeg">
 <meta name=twitter:title content="Golang 基础知识与框架体系">
@@ -17,7 +17,7 @@
 <meta name=application-name content="LoveIt">
 <meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
 <link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/golang/><link rel=prev href=https://hyper2t.github.io/basic-markdown-syntax/><link rel=next href=https://hyper2t.github.io/k8s/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Golang 基础知识与框架体系","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/golang\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/golang\/featured-image.jpeg","width":1420,"height":720}],"genre":"posts","keywords":"Golang, goroutine, channel","wordcount":7420,"url":"https:\/\/hyper2t.github.io\/golang\/","datePublished":"2020-08-02T21:57:40+08:00","dateModified":"2021-12-23T00:01:26+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter (廖隽祺)"},"description":"这篇文章总结了 Golang 的知识体系和实际应用中用到的框架，包括其中的底层实现等等。"}</script></head>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/golang/><link rel=next href=https://hyper2t.github.io/crd/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Golang 基础知识与框架体系","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/golang\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/golang\/featured-image.jpeg","width":1420,"height":720}],"genre":"posts","keywords":"Golang, goroutine, channel","wordcount":10282,"url":"https:\/\/hyper2t.github.io\/golang\/","datePublished":"2020-08-02T21:57:40+08:00","dateModified":"2021-12-29T14:06:14+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter (廖隽祺)"},"description":"这篇文章总结了 Golang 的知识体系和实际应用中用到的框架，包括其中的底层实现等等。"}</script></head>
 <body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
@@ -144,7 +144,13 @@
 <ul>
 <li><a href=#1-内部结构>1. 内部结构</a></li>
 <li><a href=#2-map-初始化>2. map 初始化</a></li>
-<li><a href=#3-hash-grow-扩容和迁移>3. hash grow 扩容和迁移</a></li>
+<li><a href=#3-map-存值>3. map 存值</a></li>
+<li><a href=#4-hash-grow-扩容和迁移>4. hash grow 扩容和迁移</a></li>
+</ul>
+</li>
+<li><a href=#9-mutex-互斥锁>9 mutex 互斥锁</a>
+<ul>
+<li><a href=#1-mutex-底层结构>1. mutex 底层结构</a></li>
 </ul>
 </li>
 </ul>
@@ -1274,12 +1280,304 @@
 </div>
 </div>
 <h3 id=2-map-初始化>2. map 初始化</h3>
-<h3 id=3-hash-grow-扩容和迁移>3. hash grow 扩容和迁移</h3></div><div class=post-footer id=post-footer>
+<p>B的初始大小是0，若指定了map的大小hint且hint大于8，那么buckets会在make时就通过newarray分配好，否则buckets会在第一次put的时候分配。随着hashmap中key/value对的增多，buckets需要重新分配，每一次都要<strong>重新hash并进行元素拷贝</strong>，所以最好在初始化时就给map指定一个合适的大小。</p>
+<p><code>makemap</code> 有<code>h</code>和<code>bucket</code>这两个参数，是留给编译器的。如果编译器决定<code>hmap</code>结构体和第一个<code>bucket</code>可以在栈上创建，这两个入参可能不是<code>nil</code>的。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// makemap implemments a Go map creation make(map[k]v, hint)
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>makemap</span><span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>maptype</span><span class=p>,</span> <span class=nx>hint</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>h</span> <span class=o>*</span><span class=nx>hmap</span><span class=p>,</span> <span class=nx>bucket</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>)</span> <span class=o>*</span><span class=nx>hmap</span><span class=p>{</span>
+  <span class=nx>B</span> <span class=o>:=</span> <span class=nb>uint8</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+  <span class=k>for</span> <span class=p>;</span> <span class=nx>hint</span> <span class=p>&gt;</span> <span class=nx>bucketCnt</span> <span class=o>&amp;&amp;</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>hint</span><span class=p>)</span> <span class=p>&gt;</span> <span class=nx>loadFactor</span><span class=o>*</span><span class=nb>float32</span><span class=p>(</span><span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span><span class=o>&lt;&lt;</span><span class=nx>B</span><span class=p>);</span> <span class=nx>B</span><span class=o>++</span> <span class=p>{</span>
+  <span class=p>}</span>
+  <span class=c1>// 确定初始B的初始值 这里hint是指kv对的数目 而每个buckets中可以保存8个kv对
+</span><span class=c1></span>  <span class=c1>// 因此上式是要找到满足不等式 hint &gt; loadFactor*(2^B) 最小的B
+</span><span class=c1></span>  <span class=k>if</span> <span class=nx>B</span> <span class=o>!=</span> <span class=mi>0</span> <span class=p>{</span>
+    <span class=nx>buckets</span> <span class=p>=</span> <span class=nf>newarray</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>bucket</span><span class=p>,</span> <span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span><span class=o>&lt;&lt;</span><span class=nx>B</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=nx>h</span> <span class=p>=</span> <span class=p>(</span><span class=o>*</span><span class=nx>hmap</span><span class=p>)(</span><span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>hmap</span><span class=p>))</span>
+  <span class=k>return</span> <span class=nx>h</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id=3-map-存值>3. map 存值</h3>
+<p>存储的步骤和第一部分的分析一致。首先用<code>key</code>的<code>hash</code>值低8位找到<code>bucket</code>，然后在<code>bucket</code>内部比对<code>tophash</code>和高8位与其对应的<code>key</code>值与入参<code>key</code>是否相等，若找到则更新这个值。若<code>key</code>不存在，则<code>key</code>优先存入在查找的过程中遇到的空的<code>tophash</code>数组位置。若当前的<code>bucket</code>已满则需要另外分配空间给这个<code>key</code>，新分配的<code>bucket</code>将挂在<code>overflow</code>链表后。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>mapassign1</span><span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>maptype</span><span class=p>,</span> <span class=nx>h</span> <span class=o>*</span><span class=nx>hmap</span><span class=p>,</span> <span class=nx>key</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>,</span> <span class=nx>val</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>)</span> <span class=p>{</span>
+  <span class=nx>hash</span> <span class=o>:=</span> <span class=nx>alg</span><span class=p>.</span><span class=nf>hash</span><span class=p>(</span><span class=nx>key</span><span class=p>,</span> <span class=nb>uintptr</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>hash0</span><span class=p>))</span>
+  <span class=k>if</span> <span class=nx>h</span><span class=p>.</span><span class=nx>buckets</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+    <span class=nx>h</span><span class=p>.</span><span class=nx>buckets</span> <span class=p>=</span> <span class=nf>newarray</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>bucket</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+  <span class=p>}</span>
+<span class=nx>again</span><span class=p>:</span>
+  <span class=c1>//根据低8位hash值找到对应的buckets
+</span><span class=c1></span>  <span class=nx>bucket</span> <span class=o>:=</span> <span class=nx>hash</span> <span class=o>&amp;</span> <span class=p>(</span><span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)&lt;&gt;</span> <span class=p>(</span><span class=nx>sys</span><span class=p>.</span><span class=nx>PtrSize</span><span class=o>*</span><span class=mi>8</span> <span class=o>-</span> <span class=mi>8</span><span class=p>))</span>
+  <span class=k>for</span> <span class=p>{</span>
+    <span class=c1>//遍历每一个bucket 对比所有tophash是否与top相等
+</span><span class=c1></span>    <span class=c1>//若找到空tophash位置则标记为可插入位置
+</span><span class=c1></span>    <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=nb>uintptr</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>bucketCnt</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+      <span class=k>if</span> <span class=nx>b</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>!=</span> <span class=nx>top</span> <span class=p>{</span>
+        <span class=k>if</span> <span class=nx>b</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>==</span> <span class=nx>empty</span> <span class=o>&amp;&amp;</span> <span class=nx>inserti</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+          <span class=nx>inserti</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>b</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+        <span class=p>}</span> 
+        <span class=k>continue</span>
+      <span class=p>}</span>
+      <span class=c1>//当前tophash对应的key位置可以根据bucket的偏移量找到
+</span><span class=c1></span>      <span class=nx>k2</span> <span class=o>:=</span> <span class=nf>add</span><span class=p>(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=nx>b</span><span class=p>),</span> <span class=nx>dataOffset</span><span class=o>+</span><span class=nx>i</span><span class=o>*</span><span class=nb>uintptr</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>keysize</span><span class=p>))</span>
+      <span class=k>if</span> <span class=p>!</span><span class=nx>alg</span><span class=p>.</span><span class=nf>equal</span><span class=p>(</span><span class=nx>key</span><span class=p>,</span> <span class=nx>k2</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>continue</span>
+      <span class=p>}</span>
+      <span class=c1>//找到符合tophash对应的key位置
+</span><span class=c1></span>      <span class=nf>typedmemmove</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>elem</span><span class=p>,</span> <span class=nx>v2</span><span class=p>,</span> <span class=nx>val</span><span class=p>)</span>
+      <span class=k>goto</span> <span class=nx>done</span>
+    <span class=p>}</span>
+    <span class=c1>//若overflow为空则break
+</span><span class=c1></span>    <span class=nx>ovf</span> <span class=o>:=</span> <span class=nx>b</span><span class=p>.</span><span class=nf>overflow</span><span class=p>(</span><span class=nx>t</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=c1>// did not find mapping for key.  Allocate new cell &amp; add entry.
+</span><span class=c1></span>  <span class=k>if</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>count</span><span class=p>)</span> <span class=o>&gt;=</span> <span class=nx>loadFactor</span><span class=o>*</span><span class=nb>float32</span><span class=p>((</span><span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span><span class=o>&lt;=</span> <span class=nx>bucketCnt</span> <span class=p>{</span>
+    <span class=nf>hashGrow</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=nx>h</span><span class=p>)</span>
+    <span class=k>goto</span> <span class=nx>again</span> <span class=c1>// Growing the table invalidates everything, so try again
+</span><span class=c1></span>  <span class=p>}</span>
+  <span class=c1>// all current buckets are full, allocate a new one.
+</span><span class=c1></span>  <span class=k>if</span> <span class=nx>inserti</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+    <span class=nx>newb</span> <span class=o>:=</span> <span class=p>(</span><span class=o>*</span><span class=nx>bmap</span><span class=p>)(</span><span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>bucket</span><span class=p>))</span>
+    <span class=nx>h</span><span class=p>.</span><span class=nf>setoverflow</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=nx>b</span><span class=p>,</span> <span class=nx>newb</span><span class=p>)</span>
+    <span class=nx>inserti</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>newb</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>
+  <span class=p>}</span>
+  <span class=c1>// store new key/value at insert position
+</span><span class=c1></span>  <span class=nx>kmem</span> <span class=o>:=</span> <span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>key</span><span class=p>)</span>
+  <span class=nx>vmem</span> <span class=o>:=</span> <span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>elem</span><span class=p>)</span>
+  <span class=nf>typedmemmove</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>key</span><span class=p>,</span> <span class=nx>insertk</span><span class=p>,</span> <span class=nx>key</span><span class=p>)</span> 
+  <span class=nf>typedmemmove</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>elem</span><span class=p>,</span> <span class=nx>insertv</span><span class=p>,</span> <span class=nx>val</span><span class=p>)</span>
+  <span class=o>*</span><span class=nx>inserti</span> <span class=p>=</span> <span class=nx>top</span>
+  <span class=nx>h</span><span class=p>.</span><span class=nx>count</span><span class=o>++</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id=4-hash-grow-扩容和迁移>4. hash grow 扩容和迁移</h3>
+<p>在往map中存值时若所有的bucket已满，需要在堆中new新的空间时需要计算是否需要扩容。扩容的时机是<code>count > loadFactor(2^B)</code>。这里的<code>loadfactor</code>选择为6.5。</p>
+<div class="details admonition question open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-question-circle fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>为什么选取<code>loadfactor</code>为6.5呢？</div>
+</div>
+</div>
+<p>这是因为<code>loadfactor</code>和<code>overflow</code>溢出率、<code>bytes/entry</code>、<code>hitprobe</code>、<code>missprobe</code>相关。</p>
+<ul>
+<li><code>overflow</code>溢出率是指平均一个bucket有多少个kv的时候会溢出。</li>
+<li><code>bytes/entry</code>是指平均存一个kv需要额外存储多少字节的数据。</li>
+<li><code>hitprobe</code>是指找到一个存在的key平均需要找多少次。</li>
+<li><code>missprobe</code>是指找到一个不存在的key平均需要找多少次。选取6.5是为了平衡这组数据。</li>
+</ul>
+<p>在没有溢出时hashmap总共可以存储<code>8(2^B)</code>个KV对，当hashmap已经存储到<code>6.5(2^B)</code>个KV对时表示hashmap已经趋于溢出，即很有可能在存值时用到<code>overflow</code>链表，这样会增加<code>hitprobe</code>和<code>missprobe</code>。</p>
+<table>
+<thead>
+<tr>
+<th><strong>loadfactor</strong></th>
+<th><strong>%overflow</strong></th>
+<th><strong>bytes/entry</strong></th>
+<th><strong>hitprobe</strong></th>
+<th><strong>missprobe</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.00</td>
+<td>2.13</td>
+<td>20.77</td>
+<td>3.00</td>
+<td>4.00</td>
+</tr>
+<tr>
+<td>4.50</td>
+<td>4.05</td>
+<td>17.30</td>
+<td>3.25</td>
+<td>4.50</td>
+</tr>
+<tr>
+<td>5.00</td>
+<td>6.85</td>
+<td>14.77</td>
+<td>3.50</td>
+<td>5.00</td>
+</tr>
+<tr>
+<td>5.50</td>
+<td>10.55</td>
+<td>12.94</td>
+<td>3.75</td>
+<td>5.50</td>
+</tr>
+<tr>
+<td>6.00</td>
+<td>15.27</td>
+<td>11.67</td>
+<td>4.00</td>
+<td>6.00</td>
+</tr>
+<tr>
+<td>6.50</td>
+<td>20.90</td>
+<td>10.79</td>
+<td>4.25</td>
+<td>6.50</td>
+</tr>
+<tr>
+<td>7.00</td>
+<td>27.14</td>
+<td>10.15</td>
+<td>4.50</td>
+<td>7.00</td>
+</tr>
+<tr>
+<td>7.50</td>
+<td>34.03</td>
+<td>9.73</td>
+<td>4.50</td>
+<td>7.50</td>
+</tr>
+<tr>
+<td>8.00</td>
+<td>41.10</td>
+<td>9.40</td>
+<td>5.00</td>
+<td>8.00</td>
+</tr>
+</tbody>
+</table>
+<p>但这个迁移并没有在扩容之后一次性完成，而是逐步完成的，每一次insert或remove时迁移1到2个pair，即<strong>增量扩容</strong>。</p>
+<p><strong>增量扩容的原因</strong>:主要是缩短map容器的响应时间。若hashmap很大扩容时很容易导致系统停顿无响应。</p>
+<p><strong>增量扩容本质上</strong>就是将总的扩容时间分摊到了每一次hash操作上。由于这个工作是逐渐完成的，导致数据一部分在old table中一部分在new table中。old的bucket不会删除，只是加上一个已删除的标记。只有当所有的bucket都从old table里迁移后才会将其释放掉。(摘录于<a href=https://studygolang.com/articles/11979 target=_blank rel="noopener noreffer">Golang中文社区</a>)</p>
+<h2 id=9-mutex-互斥锁>9 mutex 互斥锁</h2>
+<h3 id=1-mutex-底层结构>1. mutex 底层结构</h3>
+<p>mutex 底层结构如下：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Mutex</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>state</span> <span class=kt>int32</span>
+	<span class=nx>sema</span> <span class=kt>uint32</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>零值就是一个有效的互斥锁，处于Unlocked状态。</li>
+<li><code>state</code>存储的是互斥锁的状态，加锁和解锁，都是通过<code>atomic</code>包提供的函数原子性，操作该字段。</li>
+<li><code>sema</code>用作一个信号量，主要用于等待队列。</li>
+</ul>
+<p>Mutex有两种模式，在正常模式下，一个尝试加锁的goroutine会先自旋四次，自旋锁(如果不成功就一直尝试)，尝试通过原子操作获得锁，若几次自旋之后仍不能获得锁，则通过信号量排队等待。其中，所有等待者会按照先入先出FIFO的顺序排队。</p>
+<p><figure><a class=lightgallery href=/mutex.png title=mutex data-thumbnail=/mutex.png data-sub-html="<h2>图8：mutex正常模式</h2><p>mutex</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/mutex.png data-srcset="/mutex.png, /mutex.png 1.5x, /mutex.png 2x" data-sizes=auto alt=/mutex.png>
+</a><figcaption class=image-caption>图8：mutex正常模式</figcaption>
+</figure></p>
+<p>但是当锁被释放，第一个等待者被唤醒后并不会直接拥有锁，而是需要和后来者竞争，也就是那些处于自旋阶段，尚未排队等待的goroutine。这种情况下后来者更有优势，一方面，它们正在CPU上运行，自然比刚被唤醒的goroutine更有优势，另一方面处于自旋状态的goroutine可以有很多，而被唤醒的goroutine每次只有一个，所以被唤醒的goroutine有很大概率拿不到锁。这种情况下<strong>它会被重新插入到队列的头部，而不是尾部</strong>。</p>
+<p><figure><a class=lightgallery href=/mutex2.png title=mutex2 data-thumbnail=/mutex2.png data-sub-html="<h2>图9：mutex饥饿模式</h2><p>mutex2</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/mutex2.png data-srcset="/mutex2.png, /mutex2.png 1.5x, /mutex2.png 2x" data-sizes=auto alt=/mutex2.png>
+</a><figcaption class=image-caption>图9：mutex饥饿模式</figcaption>
+</figure></p>
+<p>而当一个goroutine本次加锁等待时间超过了1ms后，它会把当前Mutex从正常模式切换至“饥饿模式”。</p>
+<p>在饥饿模式下，Mutex的所有权从执行Unlock的goroutine，直接传递给等待队列头部的goroutine，后来者不会自旋，也不会尝试获得锁，即使Mutex处于Unlocked的状态。它们会直接到队列的尾部排队等待。</p>
+<p><figure><a class=lightgallery href=/mutex3.png title=mutex3 data-thumbnail=/mutex3.png data-sub-html="<h2>图10：mutex饥饿模式下的goroutine队列</h2><p>mutex3</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/mutex3.png data-srcset="/mutex3.png, /mutex3.png 1.5x, /mutex3.png 2x" data-sizes=auto alt=/mutex3.png>
+</a><figcaption class=image-caption>图10：mutex饥饿模式下的goroutine队列</figcaption>
+</figure></p>
+<p>当一个等待者获得锁之后，它会在以下两种情况时，将Mutex由饥饿模式切换回正常模式。</p>
+<ul>
+<li>第一种情况是它的等待时间小于1ms，也就是它刚来不久</li>
+<li>第二种情况是它是最后一个等待者，等待队列已经空了，后面自然就没有饥饿的goroutine了</li>
+</ul>
+<div class="details admonition note open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-pencil-alt fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>综上所述，在正常模式下自旋和排队是同时存在的，执行lock的goroutine会先一边自旋，尝试4次后如果还没拿到锁，就需要去排队等待了，这种排队之前先让大家来抢的模式，能够有更高的吞吐量，因为频繁的挂起，唤醒goroutine会带来较多的开销。但是又不能无限制的自旋，要把自旋的开销控制在较小的范围内，所以在正常模式下，Mutex有更好的性能。 但是可能会出现队列尾端的goroutine迟迟抢不到锁(尾端延迟)的情况。</div>
+</div>
+</div>
+<p><figure><a class=lightgallery href=/mutex4.png title=mutex4 data-thumbnail=/mutex4.png data-sub-html="<h2>图11：mutex饥饿模式下的goroutine不再自旋</h2><p>mutex4</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/mutex4.png data-srcset="/mutex4.png, /mutex4.png 1.5x, /mutex4.png 2x" data-sizes=auto alt=/mutex4.png>
+</a><figcaption class=image-caption>图11：mutex饥饿模式下的goroutine不再自旋</figcaption>
+</figure></p>
+<p>而饥饿模式不再尝试自旋，所有goroutine都要排队，严格的FIFO，对于防止出现尾端延迟来讲特别重要。</p></div><div class=post-footer id=post-footer>
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
-<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/e72341a56d4f57b92ca640812e47c9b9b1483640 target=_blank title="commit by hyper2t(1244240338@qq.com) e72341a56d4f57b92ca640812e47c9b9b1483640: change duration of background">
-<i class="fas fa-hashtag fa-fw"></i>e72341a</a></span>
+<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/fce288f054be9ffa760129778474538bfbad1deb target=_blank title="commit by hyper2t(1244240338@qq.com) fce288f054be9ffa760129778474538bfbad1deb: update folder name">
+<i class="fas fa-hashtag fa-fw"></i>fce288f</a></span>
 </div>
 <div class=post-info-license></div>
 </div>
@@ -1298,8 +1596,8 @@
 <span><a href=javascript:void(0); onclick=window.history.back()></a></span>&nbsp;|&nbsp;<span><a href=/></a></span>
 </section>
 </div>
-<div class=post-nav><a href=/basic-markdown-syntax/ class=prev rel=prev title="Markdown 基本语法"><i class="fas fa-angle-left fa-fw"></i>Markdown 基本语法</a>
-<a href=/k8s/ class=next rel=next title="Kubernetes CRD Operator 开发系列">Kubernetes CRD Operator 开发系列<i class="fas fa-angle-right fa-fw"></i></a></div>
+<div class=post-nav>
+<a href=/crd/ class=next rel=next title="Kubernetes CRD Operator 开发系列">Kubernetes CRD Operator 开发系列<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id=comments><div id=waline></div>
 <script src=https://cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js></script>

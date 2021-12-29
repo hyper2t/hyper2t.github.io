@@ -657,5 +657,157 @@ bucket map 的数据结构中，`tophash` 是个大小为 8(bucketCnt) 的数组
 {{< /admonition  >}}
 
 ### 2. map 初始化
-### 3. hash grow 扩容和迁移
 
+B的初始大小是0，若指定了map的大小hint且hint大于8，那么buckets会在make时就通过newarray分配好，否则buckets会在第一次put的时候分配。随着hashmap中key/value对的增多，buckets需要重新分配，每一次都要**重新hash并进行元素拷贝**，所以最好在初始化时就给map指定一个合适的大小。
+
+`makemap` 有`h`和`bucket`这两个参数，是留给编译器的。如果编译器决定`hmap`结构体和第一个`bucket`可以在栈上创建，这两个入参可能不是`nil`的。
+
+```go
+// makemap implemments a Go map creation make(map[k]v, hint)
+func makemap(t *maptype, hint int64, h *hmap, bucket unsafe.Pointer) *hmap{
+  B := uint8(0)
+  for ; hint > bucketCnt && float32(hint) > loadFactor*float32(uintptr(1)<<B); B++ {
+  }
+  // 确定初始B的初始值 这里hint是指kv对的数目 而每个buckets中可以保存8个kv对
+  // 因此上式是要找到满足不等式 hint > loadFactor*(2^B) 最小的B
+  if B != 0 {
+    buckets = newarray(t.bucket, uintptr(1)<<B)
+  }
+  h = (*hmap)(newobject(t.hmap))
+  return h
+}
+```
+### 3. map 存值
+
+存储的步骤和第一部分的分析一致。首先用`key`的`hash`值低8位找到`bucket`，然后在`bucket`内部比对`tophash`和高8位与其对应的`key`值与入参`key`是否相等，若找到则更新这个值。若`key`不存在，则`key`优先存入在查找的过程中遇到的空的`tophash`数组位置。若当前的`bucket`已满则需要另外分配空间给这个`key`，新分配的`bucket`将挂在`overflow`链表后。
+
+```go
+func mapassign1(t *maptype, h *hmap, key unsafe.Pointer, val unsafe.Pointer) {
+  hash := alg.hash(key, uintptr(h.hash0))
+  if h.buckets == nil {
+    h.buckets = newarray(t.bucket, 1)
+  }
+again:
+  //根据低8位hash值找到对应的buckets
+  bucket := hash & (uintptr(1)<> (sys.PtrSize*8 - 8))
+  for {
+    //遍历每一个bucket 对比所有tophash是否与top相等
+    //若找到空tophash位置则标记为可插入位置
+    for i := uintptr(0); i < bucketCnt; i++ {
+      if b.tophash[i] != top {
+        if b.tophash[i] == empty && inserti == nil {
+          inserti = &b.tophash[i]
+        } 
+        continue
+      }
+      //当前tophash对应的key位置可以根据bucket的偏移量找到
+      k2 := add(unsafe.Pointer(b), dataOffset+i*uintptr(t.keysize))
+      if !alg.equal(key, k2) {
+        continue
+      }
+      //找到符合tophash对应的key位置
+      typedmemmove(t.elem, v2, val)
+      goto done
+    }
+    //若overflow为空则break
+    ovf := b.overflow(t)
+  }
+  // did not find mapping for key.  Allocate new cell & add entry.
+  if float32(h.count) >= loadFactor*float32((uintptr(1)<= bucketCnt {
+    hashGrow(t, h)
+    goto again // Growing the table invalidates everything, so try again
+  }
+  // all current buckets are full, allocate a new one.
+  if inserti == nil {
+    newb := (*bmap)(newobject(t.bucket))
+    h.setoverflow(t, b, newb)
+    inserti = &newb.tophash[0]
+  }
+  // store new key/value at insert position
+  kmem := newobject(t.key)
+  vmem := newobject(t.elem)
+  typedmemmove(t.key, insertk, key) 
+  typedmemmove(t.elem, insertv, val)
+  *inserti = top
+  h.count++
+}
+```
+
+### 4. hash grow 扩容和迁移
+
+在往map中存值时若所有的bucket已满，需要在堆中new新的空间时需要计算是否需要扩容。扩容的时机是`count > loadFactor(2^B)`。这里的`loadfactor`选择为6.5。
+
+{{< admonition type=question >}}
+为什么选取`loadfactor`为6.5呢？
+{{< /admonition >}}
+
+这是因为`loadfactor`和`overflow`溢出率、`bytes/entry`、`hitprobe`、`missprobe`相关。
+
+- `overflow`溢出率是指平均一个bucket有多少个kv的时候会溢出。
+- `bytes/entry`是指平均存一个kv需要额外存储多少字节的数据。
+- `hitprobe`是指找到一个存在的key平均需要找多少次。
+- `missprobe`是指找到一个不存在的key平均需要找多少次。选取6.5是为了平衡这组数据。
+
+在没有溢出时hashmap总共可以存储`8(2^B)`个KV对，当hashmap已经存储到`6.5(2^B)`个KV对时表示hashmap已经趋于溢出，即很有可能在存值时用到`overflow`链表，这样会增加`hitprobe`和`missprobe`。
+
+| **loadfactor** | **%overflow** | **bytes/entry** | **hitprobe** | **missprobe** |
+|----------------|---------------|-----------------|--------------|---------------|
+| 4.00           | 2.13          | 20.77           | 3.00         | 4.00          |
+| 4.50           | 4.05          | 17.30           | 3.25         | 4.50          |
+| 5.00           | 6.85          | 14.77           | 3.50         | 5.00          |
+| 5.50           | 10.55         | 12.94           | 3.75         | 5.50          |
+| 6.00           | 15.27         | 11.67           | 4.00         | 6.00          |
+| 6.50           | 20.90         | 10.79           | 4.25         | 6.50          |
+| 7.00           | 27.14         | 10.15           | 4.50         | 7.00          |
+| 7.50           | 34.03         | 9.73            | 4.50         | 7.50          |
+| 8.00           | 41.10         | 9.40            | 5.00         | 8.00          |
+
+但这个迁移并没有在扩容之后一次性完成，而是逐步完成的，每一次insert或remove时迁移1到2个pair，即**增量扩容**。
+
+**增量扩容的原因**:主要是缩短map容器的响应时间。若hashmap很大扩容时很容易导致系统停顿无响应。
+
+**增量扩容本质上**就是将总的扩容时间分摊到了每一次hash操作上。由于这个工作是逐渐完成的，导致数据一部分在old table中一部分在new table中。old的bucket不会删除，只是加上一个已删除的标记。只有当所有的bucket都从old table里迁移后才会将其释放掉。(摘录于[Golang中文社区](https://studygolang.com/articles/11979))
+
+## 9 mutex 互斥锁
+
+### 1. mutex 底层结构
+
+mutex 底层结构如下：
+
+```go
+type Mutex struct {
+	state int32
+	sema uint32
+}
+```
+
+- 零值就是一个有效的互斥锁，处于Unlocked状态。
+- `state`存储的是互斥锁的状态，加锁和解锁，都是通过`atomic`包提供的函数原子性，操作该字段。
+- `sema`用作一个信号量，主要用于等待队列。
+
+Mutex有两种模式，在正常模式下，一个尝试加锁的goroutine会先自旋四次，自旋锁(如果不成功就一直尝试)，尝试通过原子操作获得锁，若几次自旋之后仍不能获得锁，则通过信号量排队等待。其中，所有等待者会按照先入先出FIFO的顺序排队。
+
+![mutex](/mutex.png "图8：mutex正常模式")
+
+但是当锁被释放，第一个等待者被唤醒后并不会直接拥有锁，而是需要和后来者竞争，也就是那些处于自旋阶段，尚未排队等待的goroutine。这种情况下后来者更有优势，一方面，它们正在CPU上运行，自然比刚被唤醒的goroutine更有优势，另一方面处于自旋状态的goroutine可以有很多，而被唤醒的goroutine每次只有一个，所以被唤醒的goroutine有很大概率拿不到锁。这种情况下**它会被重新插入到队列的头部，而不是尾部**。
+
+![mutex2](/mutex2.png "图9：mutex饥饿模式")
+
+而当一个goroutine本次加锁等待时间超过了1ms后，它会把当前Mutex从正常模式切换至“饥饿模式”。
+
+在饥饿模式下，Mutex的所有权从执行Unlock的goroutine，直接传递给等待队列头部的goroutine，后来者不会自旋，也不会尝试获得锁，即使Mutex处于Unlocked的状态。它们会直接到队列的尾部排队等待。
+
+![mutex3](/mutex3.png "图10：mutex饥饿模式下的goroutine队列")
+
+当一个等待者获得锁之后，它会在以下两种情况时，将Mutex由饥饿模式切换回正常模式。
+
+- 第一种情况是它的等待时间小于1ms，也就是它刚来不久
+- 第二种情况是它是最后一个等待者，等待队列已经空了，后面自然就没有饥饿的goroutine了
+
+{{< admonition type=note >}}
+综上所述，在正常模式下自旋和排队是同时存在的，执行lock的goroutine会先一边自旋，尝试4次后如果还没拿到锁，就需要去排队等待了，这种排队之前先让大家来抢的模式，能够有更高的吞吐量，因为频繁的挂起，唤醒goroutine会带来较多的开销。但是又不能无限制的自旋，要把自旋的开销控制在较小的范围内，所以在正常模式下，Mutex有更好的性能。 但是可能会出现队列尾端的goroutine迟迟抢不到锁(尾端延迟)的情况。
+{{< /admonition >}}
+
+![mutex4](/mutex4.png "图11：mutex饥饿模式下的goroutine不再自旋")
+
+而饥饿模式不再尝试自旋，所有goroutine都要排队，严格的FIFO，对于防止出现尾端延迟来讲特别重要。

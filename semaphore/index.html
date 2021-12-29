@@ -1,0 +1,1223 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=robots content="noodp">
+<meta http-equiv=x-ua-compatible content="IE=edge, chrome=1">
+<title>Golang 并发包 sync 系列 - Hyper Twister</title><meta name=Description content="这篇文章总结了 Golang 的 sync 包，包括`sync.Map`、`sync.Once`、`sync.Pool`、其中 sync.Mutex 的底层实现等等。"><meta property="og:title" content="Golang 并发包 sync 系列">
+<meta property="og:description" content="这篇文章总结了 Golang 的 sync 包，包括`sync.Map`、`sync.Once`、`sync.Pool`、其中 sync.Mutex 的底层实现等等。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hyper2t.github.io/semaphore/"><meta property="og:image" content="https://hyper2t.github.io/semaphore/featured-image.jpeg"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2020-08-09T21:57:40+08:00">
+<meta property="article:modified_time" content="2021-12-29T14:06:14+08:00">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://hyper2t.github.io/semaphore/featured-image.jpeg">
+<meta name=twitter:title content="Golang 并发包 sync 系列">
+<meta name=twitter:description content="这篇文章总结了 Golang 的 sync 包，包括`sync.Map`、`sync.Once`、`sync.Pool`、其中 sync.Mutex 的底层实现等等。">
+<meta name=application-name content="LoveIt">
+<meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
+<link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/semaphore/><link rel=prev href=https://hyper2t.github.io/kubectl/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Golang 并发包 sync 系列","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/semaphore\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/semaphore\/featured-image.jpeg","width":1280,"height":720}],"genre":"posts","keywords":"Golang, mutex, sync, semaphore","wordcount":7663,"url":"https:\/\/hyper2t.github.io\/semaphore\/","datePublished":"2020-08-09T21:57:40+08:00","dateModified":"2021-12-29T14:06:14+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter (廖隽祺)"},"description":"这篇文章总结了 Golang 的 sync 包，包括`sync.Map`、`sync.Once`、`sync.Pool`、其中 sync.Mutex 的底层实现等等。"}</script></head>
+<body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
+<div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
+<div class=header-wrapper>
+<div class=header-title>
+<a href=/ title="Hyper Twister"><span class=header-title-pre><i class="fas fa-home"></i></span>Hyper Twister</a>
+</div>
+<div class=menu>
+<div class=menu-inner><a class=menu-item href=/posts/> 所有文章 </a><a class=menu-item href=/tags/> 标签 </a><a class=menu-item href=/categories/> 分类 </a><a class=menu-item href=/categories/documentation/> 文档 </a><a class=menu-item href=/about/> 关于 </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/semaphore/>English</option><option value=/semaphore/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop>
+<input type=text placeholder id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title>
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title>
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id=search-loading-desktop>
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title>
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class=mobile id=header-mobile>
+<div class=header-container>
+<div class=header-wrapper>
+<div class=header-title>
+<a href=/ title="Hyper Twister"><span class=header-title-pre><i class="fas fa-home"></i></span>Hyper Twister</a>
+</div>
+<div class=menu-toggle id=menu-toggle-mobile>
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class=menu id=menu-mobile><div class=search-wrapper>
+<div class="search mobile" id=search-mobile>
+<input type=text placeholder id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title>
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title>
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id=search-loading-mobile>
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
+</a>
+</div><a class=menu-item href=/posts/ title>所有文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/categories/documentation/ title>文档</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title>
+<i class="fas fa-adjust fa-fw"></i>
+</a><a href=javascript:void(0); class=menu-item title>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value"><option value=/en/semaphore/>English</option><option value=/semaphore/ selected>简体中文</option></select>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id=search-dropdown-desktop></div>
+</div>
+<div class="search-dropdown mobile">
+<div id=search-dropdown-mobile></div>
+</div>
+<main class=main>
+<div class=container><div class=toc id=toc-auto>
+<h2 class=toc-title></h2>
+<div class=toc-content id=toc-content-auto></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">Golang 并发包 sync 系列</h1><div class=post-meta>
+<div class=post-meta-line><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter (廖隽祺)</a></span>&nbsp;<span class=post-category></span></div>
+<div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-08-09>2020-08-09</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;&nbsp;</div>
+</div><div class=featured-image><img class=lazyload src=/svg/loading.min.svg data-src=/semaphore/featured-image.jpeg data-srcset="/semaphore/featured-image.jpeg, /semaphore/featured-image.jpeg 1.5x, /semaphore/featured-image.jpeg 2x" data-sizes=auto alt=/semaphore/featured-image.jpeg title="这篇文章总结了 Golang 的 sync 包，包括`sync.Map`、`sync.Once`、`sync.Pool`、其中 sync.Mutex 的底层实现等等。"></div><div class="details toc" id=toc-static kept>
+<div class="details-summary toc-title">
+<span></span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents>
+<ul>
+<li><a href=#1-syncmap>1 sync.Map</a>
+<ul>
+<li><a href=#1-syncmap-用法>1. sync.Map 用法</a></li>
+<li><a href=#2-原理结构>2. 原理结构</a>
+<ul>
+<li><a href=#load>Load</a></li>
+<li><a href=#store>Store</a></li>
+<li><a href=#delete>Delete</a></li>
+<li><a href=#range>Range</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href=#2-syncpool>2 sync.Pool</a>
+<ul>
+<li><a href=#1-syncpool-用法>1. sync.Pool 用法</a></li>
+<li><a href=#2-单元测试>2. 单元测试</a></li>
+<li><a href=#3-原理结构>3. 原理结构</a></li>
+</ul>
+</li>
+<li><a href=#3-semaphore>3. semaphore</a>
+<ul>
+<li><a href=#1-数据结构>1. 数据结构</a></li>
+</ul>
+</li>
+<li><a href=#4-synconce>4 sync.Once</a>
+<ul>
+<li><a href=#1-synconce-用法>1. sync.Once 用法</a></li>
+<li><a href=#2-原理结构-1>2. 原理结构</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
+</div><div class=content id=content><p>这篇文章总结了 Golang 的<code>sync</code>包，包括<code>sync.Map</code>、<code>sync.Once</code>、<code>sync.Pool</code>、其中<code>sync.Mutex</code>的底层通过<code>semaphore</code>机制实现等等。</p>
+<p>Go语言里对同步的支持主要有五类应用场景：</p>
+<ol>
+<li>资源独占：当多个线程依赖同一份资源（比如数据），需要同时读/写同一个内存地址时，<code>runtime</code>需要保证只有一个修改这份数据，并且保证该修改对其他线程可见。锁和变量的原子操作为此而设计</li>
+<li>生产者-消费者：在生产者-消费者模型中，消费者依赖生产者产出数据。 channel（管道）为此而设计</li>
+<li>懒加载：一个资源，当且仅当第一次执行一个操作时，该操作执行过程中其他的同类操作都会被阻塞，直到该操作完成。<code>sync.Once</code>为此而设计</li>
+<li>fork-join：一个任务首先创建出$N$个子任务，$N$个子任务全部执行完成以后，主任务搜集结果，执行后续操作。<code>sync.WaitGroup</code>为此而设计</li>
+<li>条件变量：条件变量是一个同步原语，可以同时阻塞多个线程，直到另一个线程 1) 修改了条件; 2)通知一个（或所有）等待的线程。<code>sync.Cond</code>为此而设计</li>
+</ol>
+<div class="details admonition note open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-pencil-alt fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>注意：这里当我说"线程"时，了解Go的同学可以自动映射到 &ldquo;goroutine&rdquo;(协程)。</div>
+</div>
+</div>
+<h2 id=1-syncmap>1 sync.Map</h2>
+<h3 id=1-syncmap-用法>1. sync.Map 用法</h3>
+<p><code>sync.Map</code>是一个线程安全的map结构，一般用于多读少写的并发操作，下图是<code>sync.Map</code>的数据结构:</p>
+<p><figure><a class=lightgallery href=/syncMap.png title=syncMap data-thumbnail=/syncMap.png data-sub-html="<h2>图1：sync.Map的数据结构</h2><p>syncMap</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/syncMap.png data-srcset="/syncMap.png, /syncMap.png 1.5x, /syncMap.png 2x" data-sizes=auto alt=/syncMap.png>
+</a><figcaption class=image-caption>图1：sync.Map的数据结构</figcaption>
+</figure></p>
+<p>代码结构是：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Map</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>mu</span> <span class=nx>Mutex</span>
+	<span class=nx>read</span> <span class=nx>atomic</span><span class=p>.</span><span class=nx>Value</span> <span class=c1>// readOnly
+</span><span class=c1></span>	<span class=nx>dirty</span> <span class=kd>map</span><span class=p>[</span><span class=kd>interface</span><span class=p>{}]</span><span class=o>*</span><span class=nx>entry</span>
+	<span class=nx>misses</span> <span class=kt>int</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>mu</code>是<code>Map</code>的互斥锁用于对并发操作进行加锁保护</li>
+<li><code>read</code>是用于存储只读内容的，可以提供高并发的读操作</li>
+<li><code>dirty</code>是一个原始的<code>map</code>结构体，对<code>dirty</code>的操作需要加锁，<code>dirty</code>包涵了全量的数据，在读数据的时候会先读取<code>read</code>，<code>read</code>读取不到再读<code>dirty</code></li>
+<li><code>misses</code> 是<code>read</code>读取失败的次数，当多次读取失败后 <code>misses</code> 累计特定值，<code>dirty</code>就会升级成<code>read</code></li>
+</ul>
+<p><code>sync.Map</code>这里采用的策略类似数据库常用的”读写分离”，技术都是相通的。具体例子如下：</p>
+<div class="details admonition example open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-list-ol fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content><div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+	<span class=kd>var</span> <span class=nx>value</span> <span class=nx>sync</span><span class=p>.</span><span class=nx>Map</span>
+	<span class=c1>// 写入
+</span><span class=c1></span>	<span class=nx>value</span><span class=p>.</span><span class=nf>Store</span><span class=p>(</span><span class=s>&#34;your name&#34;</span><span class=p>,</span> <span class=s>&#34;shi&#34;</span><span class=p>)</span>
+	<span class=nx>value</span><span class=p>.</span><span class=nf>Store</span><span class=p>(</span><span class=s>&#34;her name&#34;</span><span class=p>,</span> <span class=s>&#34;kanon&#34;</span><span class=p>)</span>
+	<span class=c1>// 读取
+</span><span class=c1></span>	<span class=nx>name</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>value</span><span class=p>.</span><span class=nf>Load</span><span class=p>(</span><span class=s>&#34;your name&#34;</span><span class=p>)</span>
+	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=p>{</span>
+		<span class=nb>println</span><span class=p>(</span><span class=s>&#34;can&#39;t find name&#34;</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span>
+	<span class=c1>// 遍历
+</span><span class=c1></span>	<span class=nx>value</span><span class=p>.</span><span class=nf>Range</span><span class=p>(</span><span class=kd>func</span><span class=p>(</span><span class=nx>ki</span><span class=p>,</span> <span class=nx>vi</span> <span class=kd>interface</span><span class=p>{})</span> <span class=kt>bool</span> <span class=p>{</span>
+		<span class=nx>k</span><span class=p>,</span> <span class=nx>v</span> <span class=o>:=</span> <span class=nx>ki</span><span class=p>.(</span><span class=kt>string</span><span class=p>),</span> <span class=nx>vi</span><span class=p>.(</span><span class=kt>string</span><span class=p>)</span>
+		<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>k</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+		<span class=k>return</span> <span class=kc>true</span>
+	<span class=p>})</span>
+	<span class=c1>// 删除
+</span><span class=c1></span>	<span class=nx>value</span><span class=p>.</span><span class=nf>Delete</span><span class=p>(</span><span class=s>&#34;your name&#34;</span><span class=p>)</span>
+	<span class=c1>// 读取，如果不存在则写入
+</span><span class=c1></span>	<span class=nx>activename</span><span class=p>,</span> <span class=nx>loaded</span> <span class=o>:=</span> <span class=nx>value</span><span class=p>.</span><span class=nf>LoadOrStore</span><span class=p>(</span><span class=s>&#34;his name&#34;</span><span class=p>,</span> <span class=s>&#34;baba&#34;</span><span class=p>)</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=nx>activename</span><span class=p>.(</span><span class=kt>string</span><span class=p>),</span> <span class=nx>loaded</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div></div>
+</div>
+</div>
+<h3 id=2-原理结构>2. 原理结构</h3>
+<h4 id=load>Load</h4>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=o>*</span><span class=nx>Map</span><span class=p>)</span> <span class=nf>Load</span><span class=p>(</span><span class=nx>key</span> <span class=kd>interface</span><span class=p>{})</span> <span class=p>(</span><span class=nx>value</span> <span class=kd>interface</span><span class=p>{},</span> <span class=nx>ok</span> <span class=kt>bool</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// 首先从只读字段读取内容
+</span><span class=c1></span>	<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+  <span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span>
+  <span class=c1>// 如果没读到，并且dirty有read没有数据则从dirty中读取
+</span><span class=c1></span>	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=o>&amp;&amp;</span> <span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Lock</span><span class=p>()</span>
+		<span class=c1>// 在从dirty读取前需要加锁后再做一次验证，防止期间read突然有数据，也就是double check
+</span><span class=c1></span>		<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+		<span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=p>=</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span>
+		<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=o>&amp;&amp;</span> <span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+			<span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span>
+      <span class=c1>// 将此次记录记录添加到miss中，可以看到这里没对dirty的取值做判断，也就是说不管是否
+</span><span class=c1></span>      <span class=c1>// 取到miss都会添加一次
+</span><span class=c1></span>			<span class=nx>m</span><span class=p>.</span><span class=nf>missLocked</span><span class=p>()</span>
+		<span class=p>}</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Unlock</span><span class=p>()</span>
+	<span class=p>}</span>
+	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=p>{</span>
+		<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=kc>false</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=nx>e</span><span class=p>.</span><span class=nf>load</span><span class=p>()</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Load方法讲解：首先从只读字段<code>read</code>中读取键值的内容，如果没读到，并且<code>amended</code>为<code>true</code>(<code>dirty</code>有<code>read</code>没有数据)则尝试从<code>dirty</code>中读取，不过这里要做 double check， 然后将此次缓存穿透记录一次到<code>miss</code>字段。</p>
+<h4 id=store>Store</h4>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=o>*</span><span class=nx>Map</span><span class=p>)</span> <span class=nf>Store</span><span class=p>(</span><span class=nx>key</span><span class=p>,</span> <span class=nx>value</span> <span class=kd>interface</span><span class=p>{})</span> <span class=p>{</span>
+  <span class=c1>// 存储之前先从只读字段读取要存储的值，如果存在，则用CAS的方式将新的值存储进去
+</span><span class=c1></span>  <span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+  <span class=c1>// tryStore 会检查dirty的keys值是否已经删除，
+</span><span class=c1></span>  <span class=c1>// 如果没有删除标记，则直接采用CAS方式存储entry
+</span><span class=c1></span>	<span class=k>if</span> <span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>[</span><span class=nx>key</span><span class=p>];</span> <span class=nx>ok</span> <span class=o>&amp;&amp;</span> <span class=nx>e</span><span class=p>.</span><span class=nf>tryStore</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>value</span><span class=p>)</span> <span class=p>{</span>
+		<span class=k>return</span>
+	<span class=p>}</span>
+
+  <span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Lock</span><span class=p>()</span>
+  <span class=c1>// double check
+</span><span class=c1></span>	<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>[</span><span class=nx>key</span><span class=p>];</span> <span class=nx>ok</span> <span class=p>{</span>
+    <span class=c1>// double check 如果read存在，调用 unexpungeLocked 将 expunged 设置为 nil，
+</span><span class=c1></span>    <span class=c1>// 然后更新dirty，expunged 表示dirty中记录的删除标识（read没同步），由于有新的值存储需要
+</span><span class=c1></span>    <span class=c1>// 将删除标识更新。
+</span><span class=c1></span>		<span class=k>if</span> <span class=nx>e</span><span class=p>.</span><span class=nf>unexpungeLocked</span><span class=p>()</span> <span class=p>{</span>
+			<span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span> <span class=p>=</span> <span class=nx>e</span>
+		<span class=p>}</span>
+		<span class=nx>e</span><span class=p>.</span><span class=nf>storeLocked</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>value</span><span class=p>)</span>
+	<span class=p>}</span> <span class=k>else</span> <span class=k>if</span> <span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span><span class=p>[</span><span class=nx>key</span><span class=p>];</span> <span class=nx>ok</span> <span class=p>{</span>
+    <span class=c1>// 如果read中没有对应的键，从dirty中有则直接更新dirty中的键
+</span><span class=c1></span>		<span class=nx>e</span><span class=p>.</span><span class=nf>storeLocked</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>value</span><span class=p>)</span>
+	<span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+    <span class=c1>// dirty 和 read 都不存在这个键的情况
+</span><span class=c1></span>		<span class=k>if</span> <span class=p>!</span><span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+      <span class=c1>// amended为true标识dirty包含read没有的key，由于dirty是最全的数据，amend为false只有两种
+</span><span class=c1></span>      <span class=c1>// 情况，一种就是 dirty 的键值等于 read 的键值，一种是dirty为空的时候，所以这里只有可能是
+</span><span class=c1></span>			<span class=c1>// 第二种，也就是dirty为空，因此再store 之前先判断一下 dirty map 是否为空，如果为空，就把 read map 浅拷贝一次。
+</span><span class=c1></span>			<span class=nx>m</span><span class=p>.</span><span class=nf>dirtyLocked</span><span class=p>()</span>
+			<span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Store</span><span class=p>(</span><span class=nx>readOnly</span><span class=p>{</span><span class=nx>m</span><span class=p>:</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>,</span> <span class=nx>amended</span><span class=p>:</span> <span class=kc>true</span><span class=p>})</span>
+    <span class=p>}</span>
+    <span class=c1>// 如果dirty数据和read的key不同步数据，直接将值写入dirty
+</span><span class=c1></span>		<span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span> <span class=p>=</span> <span class=nf>newEntry</span><span class=p>(</span><span class=nx>value</span><span class=p>)</span>
+	<span class=p>}</span>
+	<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Unlock</span><span class=p>()</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Store方法讲解：存储之前先从只读字段<code>read</code>中读取要存储的值，在<code>read</code>中存在键值对的时候，则用 CAS 的方式将新的值存储进去，如果不存在则加锁做个 double check，将新数据写入<code>dirty</code>中。如果<code>dirty</code>和<code>read</code>中都没数据，<code>dirty</code>和<code>read</code>的键值不同步，则将数据直接写入<code>dirty</code>， 如果<code>dirty</code>键值数据和<code>read</code>一样，同时<code>dirty</code>为<code>nil</code>，将<code>read</code>浅拷贝一份到<code>dirty</code>，为后面赋值可以同时写入<code>dirty</code>和<code>read</code>。</p>
+<h4 id=delete>Delete</h4>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=o>*</span><span class=nx>Map</span><span class=p>)</span> <span class=nf>Delete</span><span class=p>(</span><span class=nx>key</span> <span class=kd>interface</span><span class=p>{})</span> <span class=p>{</span>
+	<span class=nx>m</span><span class=p>.</span><span class=nf>LoadAndDelete</span><span class=p>(</span><span class=nx>key</span><span class=p>)</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=o>*</span><span class=nx>Map</span><span class=p>)</span> <span class=nf>LoadAndDelete</span><span class=p>(</span><span class=nx>key</span> <span class=kd>interface</span><span class=p>{})</span> <span class=p>(</span><span class=nx>value</span> <span class=kd>interface</span><span class=p>{},</span> <span class=nx>loaded</span> <span class=kt>bool</span><span class=p>)</span> <span class=p>{</span>
+	<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+	<span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span>
+	<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=o>&amp;&amp;</span> <span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Lock</span><span class=p>()</span>
+		<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+		<span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=p>=</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span>
+		<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=o>&amp;&amp;</span> <span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+			<span class=nx>e</span><span class=p>,</span> <span class=nx>ok</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span><span class=p>[</span><span class=nx>key</span><span class=p>]</span>
+			<span class=nx>m</span><span class=p>.</span><span class=nf>missLocked</span><span class=p>()</span>
+		<span class=p>}</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Unlock</span><span class=p>()</span>
+	<span class=p>}</span>
+	<span class=k>if</span> <span class=nx>ok</span> <span class=p>{</span>
+		<span class=k>return</span> <span class=nx>e</span><span class=p>.</span><span class=nb>delete</span><span class=p>()</span>
+	<span class=p>}</span>
+	<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=kc>false</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=p>(</span><span class=nx>e</span> <span class=o>*</span><span class=nx>entry</span><span class=p>)</span> <span class=nb>delete</span><span class=p>()</span> <span class=p>(</span><span class=nx>value</span> <span class=kd>interface</span><span class=p>{},</span> <span class=nx>ok</span> <span class=kt>bool</span><span class=p>)</span> <span class=p>{</span>
+	<span class=k>for</span> <span class=p>{</span>
+		<span class=nx>p</span> <span class=o>:=</span> <span class=nx>atomic</span><span class=p>.</span><span class=nf>LoadPointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>e</span><span class=p>.</span><span class=nx>p</span><span class=p>)</span>
+		<span class=k>if</span> <span class=nx>p</span> <span class=o>==</span> <span class=kc>nil</span> <span class=o>||</span> <span class=nx>p</span> <span class=o>==</span> <span class=nx>expunged</span> <span class=p>{</span>
+			<span class=k>return</span> <span class=kc>nil</span><span class=p>,</span> <span class=kc>false</span>
+		<span class=p>}</span>
+		<span class=k>if</span> <span class=nx>atomic</span><span class=p>.</span><span class=nf>CompareAndSwapPointer</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>e</span><span class=p>.</span><span class=nx>p</span><span class=p>,</span> <span class=nx>p</span><span class=p>,</span> <span class=kc>nil</span><span class=p>)</span> <span class=p>{</span>
+			<span class=k>return</span> <span class=o>*</span><span class=p>(</span><span class=o>*</span><span class=kd>interface</span><span class=p>{})(</span><span class=nx>p</span><span class=p>),</span> <span class=kc>true</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Delete方法讲解:<code>sync.Map</code>的 Delete 方法本质是用的读取和删除，也就是先读取到数据再对数据进行删除，读的方法和 Load 的方法是一样的。</p>
+<h4 id=range>Range</h4>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>m</span> <span class=o>*</span><span class=nx>Map</span><span class=p>)</span> <span class=nf>Range</span><span class=p>(</span><span class=nx>f</span> <span class=kd>func</span><span class=p>(</span><span class=nx>key</span><span class=p>,</span> <span class=nx>value</span> <span class=kd>interface</span><span class=p>{})</span> <span class=kt>bool</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// 如果amend为ture，说明dirty包含了read所有的key，将dirty提升为read，
+</span><span class=c1></span>  <span class=c1>// 并将dirty设置为nil，之后用Store存储新的值的时候再拷贝回来
+</span><span class=c1></span>  <span class=c1>// 最后对read进行遍历即可
+</span><span class=c1></span>	<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=o>:=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+	<span class=k>if</span> <span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Lock</span><span class=p>()</span>
+		<span class=nx>read</span><span class=p>,</span> <span class=nx>_</span> <span class=p>=</span> <span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Load</span><span class=p>().(</span><span class=nx>readOnly</span><span class=p>)</span>
+		<span class=k>if</span> <span class=nx>read</span><span class=p>.</span><span class=nx>amended</span> <span class=p>{</span>
+			<span class=nx>read</span> <span class=p>=</span> <span class=nx>readOnly</span><span class=p>{</span><span class=nx>m</span><span class=p>:</span> <span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span><span class=p>}</span>
+			<span class=nx>m</span><span class=p>.</span><span class=nx>read</span><span class=p>.</span><span class=nf>Store</span><span class=p>(</span><span class=nx>read</span><span class=p>)</span>
+			<span class=nx>m</span><span class=p>.</span><span class=nx>dirty</span> <span class=p>=</span> <span class=kc>nil</span>
+			<span class=nx>m</span><span class=p>.</span><span class=nx>misses</span> <span class=p>=</span> <span class=mi>0</span>
+		<span class=p>}</span>
+		<span class=nx>m</span><span class=p>.</span><span class=nx>mu</span><span class=p>.</span><span class=nf>Unlock</span><span class=p>()</span>
+	<span class=p>}</span>
+
+	<span class=k>for</span> <span class=nx>k</span><span class=p>,</span> <span class=nx>e</span> <span class=o>:=</span> <span class=k>range</span> <span class=nx>read</span><span class=p>.</span><span class=nx>m</span> <span class=p>{</span>
+		<span class=nx>v</span><span class=p>,</span> <span class=nx>ok</span> <span class=o>:=</span> <span class=nx>e</span><span class=p>.</span><span class=nf>load</span><span class=p>()</span>
+		<span class=k>if</span> <span class=p>!</span><span class=nx>ok</span> <span class=p>{</span>
+			<span class=k>continue</span>
+		<span class=p>}</span>
+		<span class=k>if</span> <span class=p>!</span><span class=nf>f</span><span class=p>(</span><span class=nx>k</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span> <span class=p>{</span>
+			<span class=k>break</span>
+		<span class=p>}</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Range原理讲解：Range 本质是通过遍历只读字段<code>read</code>得到，为了让只读字段包含所有数据，当<code>dirty</code>和<code>read</code>不相等的时候，将<code>dirty</code>升级为<code>read</code>， 最后再对<code>read</code>进行遍历即可。</p>
+<h2 id=2-syncpool>2 sync.Pool</h2>
+<h3 id=1-syncpool-用法>1. sync.Pool 用法</h3>
+<p><code>sync.Pool</code>是一个用来缓存大量重复对象，减少大量对象创建给GC压力，是<code>sync</code>异步包中很重要的一种数据结构，看其基本数据结构：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Pool</span> <span class=kd>struct</span> <span class=p>{</span>
+  <span class=c1>// noCopy 表示不支持值拷贝，如果出现值拷贝用 go vet 编译检查的时候会报错
+</span><span class=c1></span>	<span class=nx>noCopy</span> <span class=nx>noCopy</span>
+
+  <span class=c1>// [P]poolLocal，表示每个local的P池
+</span><span class=c1></span>	<span class=nx>local</span>     <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span>
+  <span class=c1>// local的长度
+</span><span class=c1></span>	<span class=nx>localSize</span> <span class=kt>uintptr</span>
+
+  <span class=c1>// 也是[P]poolLocal，表示上一个生命周期的local
+</span><span class=c1></span>	<span class=nx>victim</span>     <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span>
+  <span class=c1>// victim的长度
+</span><span class=c1></span>	<span class=nx>victimSize</span> <span class=kt>uintptr</span>
+
+  <span class=c1>// 用于创建新对象方法，get获取不到就会调用创建一个新对象，一般由用户传入
+</span><span class=c1></span>	<span class=nx>New</span> <span class=kd>func</span><span class=p>()</span> <span class=kd>interface</span><span class=p>{}</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><figure><a class=lightgallery href=/syncPool.png title=syncPool data-thumbnail=/syncPool.png data-sub-html="<h2>图2：sync.Pool的数据结构</h2><p>syncPool</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/syncPool.png data-srcset="/syncPool.png, /syncPool.png 1.5x, /syncPool.png 2x" data-sizes=auto alt=/syncPool.png>
+</a><figcaption class=image-caption>图2：sync.Pool的数据结构</figcaption>
+</figure></p>
+<p><code>sync.Pool</code>用法有三种方法，如下：</p>
+<div class="details admonition example open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-list-ol fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content><div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>//初始化pool对象
+</span><span class=c1></span><span class=kd>var</span> <span class=nx>pool</span> <span class=nx>sync</span><span class=p>.</span><span class=nx>Pool</span>
+
+<span class=kd>type</span> <span class=nx>peter</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>num</span> <span class=kt>int</span>
+<span class=p>}</span>
+
+<span class=c1>// 创建新对象创建方法
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>initPool</span><span class=p>()</span> <span class=p>{</span>
+	<span class=nx>pool</span> <span class=p>=</span> <span class=nx>sync</span><span class=p>.</span><span class=nx>Pool</span><span class=p>{</span>
+		<span class=nx>New</span><span class=p>:</span> <span class=kd>func</span><span class=p>()</span> <span class=kd>interface</span><span class=p>{}</span> <span class=p>{</span>
+			<span class=k>return</span> <span class=o>&amp;</span><span class=nx>peter</span><span class=p>{</span><span class=nx>num</span><span class=p>:</span> <span class=nx>rand</span><span class=p>.</span><span class=nf>Int</span><span class=p>()}</span>
+		<span class=p>},</span>
+	<span class=p>}</span>
+<span class=p>}</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+  <span class=nf>initPool</span><span class=p>()</span>
+  <span class=c1>// 从pool对象池中取对象
+</span><span class=c1></span>	<span class=nx>p1</span> <span class=o>:=</span> <span class=nx>pool</span><span class=p>.</span><span class=nf>Get</span><span class=p>().(</span><span class=o>*</span><span class=nx>peter</span><span class=p>)</span>
+	<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;p1&#34;</span><span class=p>,</span> <span class=nx>p1</span><span class=p>.</span><span class=nx>num</span><span class=p>)</span>
+
+  <span class=c1>// 将对象放入pool对象池
+</span><span class=c1></span>	<span class=nx>pool</span><span class=p>.</span><span class=nf>Put</span><span class=p>(</span><span class=nx>p1</span><span class=p>)</span>
+
+	<span class=nx>p2</span> <span class=o>:=</span> <span class=nx>pool</span><span class=p>.</span><span class=nf>Get</span><span class=p>().(</span><span class=o>*</span><span class=nx>peter</span><span class=p>)</span>
+  <span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;p2&#34;</span><span class=p>,</span> <span class=nx>p2</span><span class=p>.</span><span class=nx>num</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div></div>
+</div>
+</div>
+<p>首先，需要初始化<code>Pool</code>，唯一需要的就是设置好<code>New</code>函数。当调用<code>Get</code>方法时，如果池子里缓存了对象，就直接返回缓存的对象。如果没有存货，则调用<code>New</code>函数创建一个新的对象。</p>
+<p>另外，我们发现<code>Get</code>方法取出来的对象和上次<code>Put</code>进去的对象实际上是同一个，<code>Pool</code>没有做任何“清空”的处理。但我们不应当对此有任何假设，因为在实际的并发使用场景中，无法保证这种顺序，最好的做法是在<code>Put</code>前，将对象清空。</p>
+<h3 id=2-单元测试>2. 单元测试</h3>
+<p>为了测试<code>Get/Put</code>的功能。我们来看下<code>TestPoolNew</code>：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>TestPoolNew</span><span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>testing</span><span class=p>.</span><span class=nx>T</span><span class=p>)</span> <span class=p>{</span>
+    <span class=c1>// disable GC so we can control when it happens.
+</span><span class=c1></span>    <span class=k>defer</span> <span class=nx>debug</span><span class=p>.</span><span class=nf>SetGCPercent</span><span class=p>(</span><span class=nx>debug</span><span class=p>.</span><span class=nf>SetGCPercent</span><span class=p>(</span><span class=o>-</span><span class=mi>1</span><span class=p>))</span>
+
+    <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span>
+    <span class=nx>p</span> <span class=o>:=</span> <span class=nx>Pool</span><span class=p>{</span>
+        <span class=nx>New</span><span class=p>:</span> <span class=kd>func</span><span class=p>()</span> <span class=kd>interface</span><span class=p>{}</span> <span class=p>{</span>
+            <span class=nx>i</span><span class=o>++</span>
+            <span class=k>return</span> <span class=nx>i</span>
+        <span class=p>},</span>
+    <span class=p>}</span>
+    <span class=k>if</span> <span class=nx>v</span> <span class=o>:=</span> <span class=nx>p</span><span class=p>.</span><span class=nf>Get</span><span class=p>();</span> <span class=nx>v</span> <span class=o>!=</span> <span class=mi>1</span> <span class=p>{</span>
+        <span class=nx>t</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;got %v; want 1&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+    <span class=p>}</span>
+    <span class=k>if</span> <span class=nx>v</span> <span class=o>:=</span> <span class=nx>p</span><span class=p>.</span><span class=nf>Get</span><span class=p>();</span> <span class=nx>v</span> <span class=o>!=</span> <span class=mi>2</span> <span class=p>{</span>
+        <span class=nx>t</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;got %v; want 2&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+    <span class=p>}</span>
+
+    <span class=c1>// Make sure that the goroutine doesn&#39;t migrate to another P
+</span><span class=c1></span>    <span class=c1>// between Put and Get calls.
+</span><span class=c1></span>    <span class=nf>Runtime_procPin</span><span class=p>()</span>
+    <span class=nx>p</span><span class=p>.</span><span class=nf>Put</span><span class=p>(</span><span class=mi>42</span><span class=p>)</span>
+    <span class=k>if</span> <span class=nx>v</span> <span class=o>:=</span> <span class=nx>p</span><span class=p>.</span><span class=nf>Get</span><span class=p>();</span> <span class=nx>v</span> <span class=o>!=</span> <span class=mi>42</span> <span class=p>{</span>
+        <span class=nx>t</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;got %v; want 42&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+    <span class=p>}</span>
+    <span class=nf>Runtime_procUnpin</span><span class=p>()</span>
+
+    <span class=k>if</span> <span class=nx>v</span> <span class=o>:=</span> <span class=nx>p</span><span class=p>.</span><span class=nf>Get</span><span class=p>();</span> <span class=nx>v</span> <span class=o>!=</span> <span class=mi>3</span> <span class=p>{</span>
+        <span class=nx>t</span><span class=p>.</span><span class=nf>Fatalf</span><span class=p>(</span><span class=s>&#34;got %v; want 3&#34;</span><span class=p>,</span> <span class=nx>v</span><span class=p>)</span>
+    <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="details admonition question open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-question-circle fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>首先设置了<code>GC=-1</code>，作用就是停止<code>GC</code>。函数都跑完了，那为啥要用<code>defer</code>？</div>
+</div>
+</div>
+<p>注意到，<code>debug.SetGCPercent</code>这个函数被调用了两次，而且这个函数返回的是上一次<code>GC</code>的值。因此，<code>defer</code>在这里的用途是还原到调用此函数之前的<code>GC</code>设置，也就是恢复现场。</p>
+<ul>
+<li>调置了<code>Pool</code>的<code>New</code>函数：直接返回一个<code>int</code>，变且每次调用<code>New</code>，都会自增 1。然后，连续调用了两次<code>Get</code>函数，因为这个时候<code>Pool</code>里没有缓存的对象，因此每次都会调用<code>New</code>创建一个，所以第一次返回 1，第二次返回 2。</li>
+<li>调用<code>Runtime_procPin()</code>防止 <code>goroutine</code> 被强占，目的是保护接下来的一次<code>Put</code>和<code>Get</code>操作，使得它们操作的对象都是同一个 P 的“池子”。并且，这次调用<code>Get</code>的时候并没有调用<code>New</code>，因为之前有一次<code>Put</code>的操作。</li>
+<li>再次调用<code>Get</code>操作，因为没有“存货”，因此还是会再次调用<code>New</code>创建一个对象。</li>
+</ul>
+<p>其他<code>TestPool</code>函数:</p>
+<ul>
+<li><code>TestPoolGC</code>和<code>TestPoolRelease</code>则主要测试<code>GC</code>对<code>Pool</code>里对象的影响。这里用了一个函数，用于计数有多少对象会被<code>GC</code>回收：</li>
+</ul>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=nx>runtime</span><span class=p>.</span><span class=nf>SetFinalizer</span><span class=p>(</span><span class=nx>v</span><span class=p>,</span> <span class=kd>func</span><span class=p>(</span><span class=nx>vv</span> <span class=o>*</span><span class=kt>string</span><span class=p>)</span> <span class=p>{</span>
+    <span class=nx>atomic</span><span class=p>.</span><span class=nf>AddUint32</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>fin</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+<span class=p>})</span>
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>TestPoolStress</code>从名字看，主要是想测一下“压力”，具体操作就是起了 10 个 goroutine 不断地向<code>Pool</code>里<code>Put</code>对象，然后又<code>Get</code>对象，看是否会出错。</li>
+<li><code>TestPoolDequeue</code>和<code>TestPoolChain</code>，都调用了<code>testPoolDequeue</code>，这是具体干活的。它需要传入一个<code>PoolDequeue</code>接口：</li>
+</ul>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// poolDequeue testing.
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>PoolDequeue</span> <span class=kd>interface</span> <span class=p>{</span>
+    <span class=nf>PushHead</span><span class=p>(</span><span class=nx>val</span> <span class=kd>interface</span><span class=p>{})</span> <span class=kt>bool</span>
+    <span class=nf>PopHead</span><span class=p>()</span> <span class=p>(</span><span class=kd>interface</span><span class=p>{},</span> <span class=kt>bool</span><span class=p>)</span>
+    <span class=nf>PopTail</span><span class=p>()</span> <span class=p>(</span><span class=kd>interface</span><span class=p>{},</span> <span class=kt>bool</span><span class=p>)</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>PoolDequeue</code>是一个双端队列，可以从头部入队元素，从头部和尾部出队元素。调用函数时，前者传入<code>NewPoolDequeue(16)</code>，后者传入<code>NewPoolChain()</code>，底层其实都是<code>poolDequeue</code>这个结构体。</p>
+<p>具体<code>testPoolDequeue</code>工作过程如下：</p>
+<p><figure><a class=lightgallery href=/testPoolDequeue.png title=testPoolDequeue data-thumbnail=/testPoolDequeue.png data-sub-html="<h2>图3：testPoolDequeue工作流程</h2><p>testPoolDequeue</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/testPoolDequeue.png data-srcset="/testPoolDequeue.png, /testPoolDequeue.png 1.5x, /testPoolDequeue.png 2x" data-sizes=auto alt=/testPoolDequeue.png>
+</a><figcaption class=image-caption>图3：testPoolDequeue工作流程</figcaption>
+</figure></p>
+<p>总共起了 10 个 goroutine：1 个生产者，9 个消费者。生产者不断地从队列头<code>pushHead</code>元素到双端队列里去，并且每 push 10 次，就<code>popHead</code>一次；消费者则一直从队列尾取元素。不论是从队列头还是从队列尾取元素，都会在<code>map</code>里做标记，最后检验每个元素是不是只被取出过一次。</p>
+<h3 id=3-原理结构>3. 原理结构</h3>
+<p>当<code>Pool</code>没有缓存的对象时，调用<code>New</code>方法生成一个新的对象。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>poolLocal</span> <span class=kd>struct</span> <span class=p>{</span>
+    <span class=nx>poolLocalInternal</span>
+
+    <span class=c1>// 将 poolLocal 补齐至两个缓存行的倍数，防止 false sharing,
+</span><span class=c1></span>    <span class=c1>// 每个缓存行具有 64 bytes，即 512 bit
+</span><span class=c1></span>    <span class=c1>// 目前我们的处理器一般拥有 32 * 1024 / 64 = 512 条缓存行
+</span><span class=c1></span>    <span class=c1>// 伪共享，仅占位用，防止在 cache line 上分配多个 poolLocalInternal
+</span><span class=c1></span>    <span class=nx>pad</span> <span class=p>[</span><span class=mi>128</span> <span class=o>-</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nf>Sizeof</span><span class=p>(</span><span class=nx>poolLocalInternal</span><span class=p>{})</span><span class=o>%</span><span class=mi>128</span><span class=p>]</span><span class=kt>byte</span>
+<span class=p>}</span>
+
+<span class=c1>// Local per-P Pool appendix.
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>poolLocalInternal</span> <span class=kd>struct</span> <span class=p>{</span>
+    <span class=c1>// P 的私有缓存区，使用时无需要加锁
+</span><span class=c1></span>    <span class=nx>private</span> <span class=kd>interface</span><span class=p>{}</span>
+    <span class=c1>// 公共缓存区。本地 P 可以 pushHead/popHead；其他 P 则只能 popTail
+</span><span class=c1></span>    <span class=nx>shared</span>  <span class=nx>poolChain</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>如果没有<code>pad</code>字段，那么当需要访问 0 号索引的<code>poolLocal</code>时，CPU 同时会把 0 号和 1 号索引同时加载到 cpu cache。在只修改 0 号索引的情况下，会让 1 号索引的<code>poolLocal</code>失效。这样，当其他线程想要读取 1 号索引时，发生 cache miss，还得重新再加载，对性能有损。增加一个<code>pad</code>，补齐缓存行，让相关的字段能独立地加载到缓存行就不会出现 false sharding 了。</p>
+<p>关于<code>poolChain</code>结构体，是双端队列的实现：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>poolChain</span> <span class=kd>struct</span> <span class=p>{</span>
+    <span class=c1>// 只有生产者会 push to，不用加锁
+</span><span class=c1></span>    <span class=nx>head</span> <span class=o>*</span><span class=nx>poolChainElt</span>
+
+    <span class=c1>// 读写需要原子控制。 pop from
+</span><span class=c1></span>    <span class=nx>tail</span> <span class=o>*</span><span class=nx>poolChainElt</span>
+<span class=p>}</span>
+
+<span class=kd>type</span> <span class=nx>poolChainElt</span> <span class=kd>struct</span> <span class=p>{</span>
+    <span class=nx>poolDequeue</span>
+
+    <span class=c1>// next 被 producer 写，consumer 读。所以只会从 nil 变成 non-nil
+</span><span class=c1></span>    <span class=c1>// prev 被 consumer 写，producer 读。所以只会从 non-nil 变成 nil
+</span><span class=c1></span>    <span class=nx>next</span><span class=p>,</span> <span class=nx>prev</span> <span class=o>*</span><span class=nx>poolChainElt</span>
+<span class=p>}</span>
+
+<span class=kd>type</span> <span class=nx>poolDequeue</span> <span class=kd>struct</span> <span class=p>{</span>
+    <span class=c1>// The head index is stored in the most-significant bits so
+</span><span class=c1></span>    <span class=c1>// that we can atomically add to it and the overflow is
+</span><span class=c1></span>    <span class=c1>// harmless.
+</span><span class=c1></span>    <span class=c1>// headTail 包含一个 32 位的 head 和一个 32 位的 tail 指针。这两个值都和 len(vals)-1 取模过。
+</span><span class=c1></span>    <span class=c1>// tail 是队列中最老的数据，head 指向下一个将要填充的 slot
+</span><span class=c1></span>    <span class=c1>// slots 的有效范围是 [tail, head)，由 consumers 持有。
+</span><span class=c1></span>    <span class=nx>headTail</span> <span class=kt>uint64</span>
+
+    <span class=c1>// vals 是一个存储 interface{} 的环形队列，它的 size 必须是 2 的幂
+</span><span class=c1></span>    <span class=c1>// 如果 slot 为空，则 vals[i].typ 为空；否则，非空。
+</span><span class=c1></span>    <span class=c1>// 一个 slot 在这时宣告无效：tail 不指向它了，vals[i].typ 为 nil
+</span><span class=c1></span>    <span class=c1>// 由 consumer 设置成 nil，由 producer 读
+</span><span class=c1></span>    <span class=nx>vals</span> <span class=p>[]</span><span class=nx>eface</span>
+<span class=p>}</span>
+
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>poolDequeue</code> 被实现为单生产者、多消费者的固定大小的无锁（<code>atomic</code>实现） <code>Ring</code>式队列（底层存储使用数组，使用两个指针标记<code>head、tail</code>）。生产者可以从<code>head</code>插入、<code>head</code>删除，而消费者仅可从<code>tail</code>删除。</li>
+<li><code>headTail</code>指向队列的头和尾，通过位运算将<code>head</code>和<code>tail</code>存入<code>headTail</code>变量中。</li>
+</ul>
+<p>对于<strong>双端队列</strong>的理解：</p>
+<p><figure><a class=lightgallery href=/%e5%8f%8c%e7%ab%af%e9%98%9f%e5%88%97.png title=双端队列 data-thumbnail=/双端队列.png data-sub-html="<h2>图4：双端队列</h2><p>双端队列</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/%e5%8f%8c%e7%ab%af%e9%98%9f%e5%88%97.png data-srcset="/%e5%8f%8c%e7%ab%af%e9%98%9f%e5%88%97.png, /%e5%8f%8c%e7%ab%af%e9%98%9f%e5%88%97.png 1.5x, /%e5%8f%8c%e7%ab%af%e9%98%9f%e5%88%97.png 2x" data-sizes=auto alt=/双端队列.png>
+</a><figcaption class=image-caption>图4：双端队列</figcaption>
+</figure></p>
+<p>我们看到<code>Pool</code>并没有直接使用<code>poolDequeue</code>，原因是它的大小是固定的，而<code>Pool</code>的大小是没有限制的。因此，在<code>poolDequeue</code>之上包装了一下，变成了一个<code>poolChainElt</code>的双向链表，可以动态增长。(摘录于<a href=https://segmentfault.com/a/1190000023878185 target=_blank rel="noopener noreffer">segmentFault</a>)</p>
+<h2 id=3-semaphore>3. semaphore</h2>
+<h3 id=1-数据结构>1. 数据结构</h3>
+<p><code>sema.go</code>中定义了一个全局变量，<code>semtable</code>数组。大小为251，元素为一个匿名结构体。这里为了避免伪共享问题做了一下内存填充。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// Prime to not correlate with any user patterns.
+</span><span class=c1></span><span class=kd>const</span> <span class=nx>semTabSize</span> <span class=p>=</span> <span class=mi>251</span>
+
+<span class=kd>var</span> <span class=nx>semtable</span> <span class=p>[</span><span class=nx>semTabSize</span><span class=p>]</span><span class=kd>struct</span> <span class=p>{</span>
+ <span class=nx>root</span> <span class=nx>semaRoot</span>
+ <span class=nx>pad</span>  <span class=p>[</span><span class=nx>cpu</span><span class=p>.</span><span class=nx>CacheLinePadSize</span> <span class=o>-</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nf>Sizeof</span><span class=p>(</span><span class=nx>semaRoot</span><span class=p>{})]</span><span class=kt>byte</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>每个元素持有的<code>semaRoot</code>为这个数据结构的核心。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// 为sync.Mutex准备的异步信号量
+</span><span class=c1>// golang.org/issue/17953 可以查看引入二级列表之前性能较差的程序示例test/locklinear.go
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>semaRoot</span> <span class=kd>struct</span> <span class=p>{</span>
+ <span class=nx>lock</span>  <span class=nx>mutex</span>
+ <span class=nx>treap</span> <span class=o>*</span><span class=nx>sudog</span> <span class=c1>// 平衡树的根节点
+</span><span class=c1></span> <span class=nx>nwait</span> <span class=kt>uint32</span> <span class=c1>// Number of waiters. Read w/o the lock.
+</span><span class=c1></span><span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><code>semaRoot</code>的结构看上去并不复杂，每个<code>semaRoot</code>持有一个具有不同地址<code>(sudog.elem)</code>的<code>sudog</code>平衡树，每个<code>sudog</code>都可以通过<code>s.waitlink</code>依次指向一个相同地址等待的<code>sudog</code>列表， 在具有相同等待地址的<code>sudog</code>内部列表上的操作时间复杂度都是$O(1)$。顶层<code>semaRoot</code>列表的扫描为$O(\log n)$,其中$n$是阻止<code>goroutines</code>的不同信号量地址的数量。</p>
+<div class="details admonition question open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-question-circle fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>既然节点都是<code>sudog</code>,那它是如何定义的？</div>
+</div>
+</div>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>sudog</span> <span class=kd>struct</span> <span class=p>{</span>
+ <span class=nx>g</span> <span class=o>*</span><span class=nx>g</span>
+ <span class=nx>next</span> <span class=o>*</span><span class=nx>sudog</span>
+ <span class=nx>prev</span> <span class=o>*</span><span class=nx>sudog</span>
+ <span class=nx>elem</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span> <span class=c1>//数据元素 (可能指向栈)
+</span><span class=c1></span> <span class=c1>// 下面的字段不会并发访问
+</span><span class=c1></span> <span class=c1>// 对于channels, waitlink 只被g访问
+</span><span class=c1></span>  <span class=c1>// 对于semaphores, 所有自动(包括上面的)只有获取semaRoot的锁才能被访问
+</span><span class=c1></span> <span class=nx>acquiretime</span> <span class=kt>int64</span>
+ <span class=nx>releasetime</span> <span class=kt>int64</span>
+ <span class=nx>ticket</span>      <span class=kt>uint32</span>
+  <span class=c1>//isSelect表示g正在参与一个select，因此必须对g.selectDone进行CAS才能赢得唤醒竞争
+</span><span class=c1></span> <span class=nx>isSelect</span> <span class=kt>bool</span>
+  <span class=c1>//success表示channel c上的通信是否成功。如果goroutine因为在通道c上传递了一个值而被唤醒，则为true；
+</span><span class=c1></span>  <span class=c1>//如果因为channel c关闭而被唤醒，则为false
+</span><span class=c1></span> <span class=nx>success</span> <span class=kt>bool</span>
+  
+ <span class=nx>parent</span>   <span class=o>*</span><span class=nx>sudog</span> <span class=c1>// semaRoot binary tree
+</span><span class=c1></span> <span class=nx>waitlink</span> <span class=o>*</span><span class=nx>sudog</span> <span class=c1>// g.waiting list or semaRoot
+</span><span class=c1></span> <span class=nx>waittail</span> <span class=o>*</span><span class=nx>sudog</span> <span class=c1>// semaRoot
+</span><span class=c1></span> <span class=nx>c</span>        <span class=o>*</span><span class=nx>hchan</span> <span class=c1>// channel
+</span><span class=c1></span><span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>这里可能就涉及到了Go的运行时调度的知识:</p>
+<div class="details admonition note open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-pencil-alt fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content><ul>
+<li><code>sudog</code>是对goroutine的一种封装，比如当你使用channel时，goroutine在sending/receiving阻塞时是被封装成<code>sudog</code>放进阻塞队列进行等待。<code>sudog</code>是必需的，因为<code>g</code>和同步对象的关系是多对多的。一个g可以出现在许多等待列表上，因此一个g可能有很多个<code>sudog</code>。并且许多g可能正在等待同一个同步对象，因此一个对象可能有许多<code>sudog</code></li>
+<li><code>sudog</code>是从一个特殊的<code>pool</code>中分配。使用<code>acquireSudog</code>和<code>releaseSudog</code>来分配和释放他们。</li>
+</ul>
+</div>
+</div>
+</div>
+<p>其中的<code>next、prev、parent</code>字段构成了平衡树，<code>waitlink</code>和<code>waittail</code>构成了相同信号量地址的链表结构。</p>
+<p><figure><a class=lightgallery href=/sudog.png title=sudog data-thumbnail=/sudog.png data-sub-html="<h2>图5：sudog涉及的链表结构</h2><p>sudog</p>">
+<img class=lazyload src=/svg/loading.min.svg data-src=/sudog.png data-srcset="/sudog.png, /sudog.png 1.5x, /sudog.png 2x" data-sizes=auto alt=/sudog.png>
+</a><figcaption class=image-caption>图5：sudog涉及的链表结构</figcaption>
+</figure></p>
+<p>关于源码分析，我会在另一篇文章提到。</p>
+<h2 id=4-synconce>4 sync.Once</h2>
+<h3 id=1-synconce-用法>1. sync.Once 用法</h3>
+<p><code>sync.Once</code>是 Golang package 中使方法只执行一次的对象实现，作用与<code>init</code>函数类似。但也有所不同。</p>
+<ul>
+<li><code>init</code>函数是在文件包首次被加载的时候执行，且只执行一次</li>
+<li><code>sync.Once</code> 是在代码运行中需要的时候执行，且只执行一次</li>
+</ul>
+<p>当一个函数不希望程序在一开始的时候就被执行的时候，我们可以使用<code>sync.Once</code>。</p>
+<p>例如：
+<div class="details admonition example open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-list-ol fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content><div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kn>package</span> <span class=nx>main</span>
+
+<span class=kn>import</span> <span class=p>(</span>
+<span class=s>&#34;fmt&#34;</span>
+<span class=s>&#34;sync&#34;</span>
+<span class=p>)</span>
+
+<span class=kd>func</span> <span class=nf>main</span><span class=p>()</span> <span class=p>{</span>
+<span class=kd>var</span> <span class=nx>once</span> <span class=nx>sync</span><span class=p>.</span><span class=nx>Once</span>
+<span class=nx>onceBody</span> <span class=o>:=</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+<span class=nx>fmt</span><span class=p>.</span><span class=nf>Println</span><span class=p>(</span><span class=s>&#34;Only once&#34;</span><span class=p>)</span>
+<span class=p>}</span>
+<span class=nx>done</span> <span class=o>:=</span> <span class=nb>make</span><span class=p>(</span><span class=kd>chan</span> <span class=kt>bool</span><span class=p>)</span>
+<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=mi>10</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+<span class=k>go</span> <span class=kd>func</span><span class=p>()</span> <span class=p>{</span>
+<span class=nx>once</span><span class=p>.</span><span class=nf>Do</span><span class=p>(</span><span class=nx>onceBody</span><span class=p>)</span>
+<span class=nx>done</span> <span class=o>&lt;-</span> <span class=kc>true</span>
+<span class=p>}()</span>
+<span class=p>}</span>
+<span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=mi>0</span><span class=p>;</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=mi>10</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+<span class=o>&lt;-</span><span class=nx>done</span>
+<span class=p>}</span>
+<span class=p>}</span>
+
+<span class=err>#</span> <span class=nx>Output</span><span class=p>:</span>
+<span class=nx>Only</span> <span class=nx>once</span>
+</code></pre></td></tr></table>
+</div>
+</div></div>
+</div>
+</div></p>
+<p>在多数情况下，<code>sync.Once</code>被用于控制变量的初始化，这个变量的读写通常遵循单例模式，满足这三个条件：</p>
+<ol>
+<li>当且仅当第一次读某个变量时，进行初始化（写操作）</li>
+<li>变量被初始化过程中，所有读都被阻塞（读操作；当变量初始化完成后，读操作继续进行</li>
+<li>变量仅初始化一次，初始化完成后驻留在内存里</li>
+</ol>
+<p>需要注意的点：
+<div class="details admonition note open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-pencil-alt fa-fw"></i><i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content><ul>
+<li><code>Once</code>常常用来初始化单例资源，或者并发访问只需初始化一次的共享资源，或者在测试的时候初始化一次测试资源。</li>
+<li><code>sync.Once</code>只暴露了一个方法<code>Do</code>，你可以多次调用<code>Do</code>方法，但是只有第一次调用<code>Do</code>方法时<code>f</code>参数才会执行，这里的<code>f</code>是一个无参数无返回值的函数。</li>
+</ul>
+</div>
+</div>
+</div></p>
+<h3 id=2-原理结构-1>2. 原理结构</h3>
+<p><code>Once</code>的结构体：</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>type</span> <span class=nx>Once</span> <span class=kd>struct</span> <span class=p>{</span>
+   <span class=nx>done</span> <span class=kt>uint32</span> <span class=c1>// 初始值为0表示还未执行过，1表示已经执行过
+</span><span class=c1></span>   <span class=nx>m</span>    <span class=nx>Mutex</span> 
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>其中，<code>done</code>成员变量:</p>
+<ul>
+<li>1 表示资源未初始化，需要进一步初始化</li>
+<li>0 表示资源已初始化，无需初始化，直接返回即可</li>
+</ul>
+<p><code>m</code>成员变量:</p>
+<ul>
+<li>为了防止多个goroutine调用<code>doSlow()</code>初始化资源时，造成资源多次初始化，因此采用<code>Mutex</code>锁机制来保证有且仅初始化一次</li>
+</ul>
+<p><code>Once</code>所拥有的方法<code>Do</code>和<code>doSlow</code>:</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=p>(</span><span class=nx>o</span> <span class=o>*</span><span class=nx>Once</span><span class=p>)</span> <span class=nf>Do</span><span class=p>(</span><span class=nx>f</span> <span class=kd>func</span><span class=p>())</span> <span class=p>{</span>
+   <span class=c1>// 判断done是否为0，若为0，表示未执行过，调用doSlow()方法初始化
+</span><span class=c1></span>   <span class=k>if</span> <span class=nx>atomic</span><span class=p>.</span><span class=nf>LoadUint32</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>o</span><span class=p>.</span><span class=nx>done</span><span class=p>)</span> <span class=o>==</span> <span class=mi>0</span> <span class=p>{</span>
+      <span class=c1>// Outlined slow-path to allow inlining of the fast-path.
+</span><span class=c1></span>      <span class=nx>o</span><span class=p>.</span><span class=nf>doSlow</span><span class=p>(</span><span class=nx>f</span><span class=p>)</span>
+   <span class=p>}</span>
+<span class=p>}</span>
+
+
+<span class=c1>// 加载资源
+</span><span class=c1></span><span class=kd>func</span> <span class=p>(</span><span class=nx>o</span> <span class=o>*</span><span class=nx>Once</span><span class=p>)</span> <span class=nf>doSlow</span><span class=p>(</span><span class=nx>f</span> <span class=kd>func</span><span class=p>())</span> <span class=p>{</span>
+   <span class=nx>o</span><span class=p>.</span><span class=nx>m</span><span class=p>.</span><span class=nf>Lock</span><span class=p>()</span>
+   <span class=k>defer</span> <span class=nx>o</span><span class=p>.</span><span class=nx>m</span><span class=p>.</span><span class=nf>Unlock</span><span class=p>()</span>
+   <span class=c1>// 采用双重检测机制 加锁判断done是否为零
+</span><span class=c1></span>   <span class=k>if</span> <span class=nx>o</span><span class=p>.</span><span class=nx>done</span> <span class=o>==</span> <span class=mi>0</span> <span class=p>{</span>
+      <span class=c1>// 执行完f()函数后，将done值设置为1
+</span><span class=c1></span>      <span class=k>defer</span> <span class=nx>atomic</span><span class=p>.</span><span class=nf>StoreUint32</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>o</span><span class=p>.</span><span class=nx>done</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+      <span class=c1>// 执行传入的f()函数
+</span><span class=c1></span>      <span class=nf>f</span><span class=p>()</span>
+   <span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>调用<code>Do</code>函数时，首先判断<code>done</code>值是否为0，若为1，表示传入的匿名函数<code>f()</code>已执行过，无需再次执行；若为0，表示传入的匿名函数<code>f()</code>还未执行过，则调用<code>doSlow()</code>函数进行初始化。</p>
+<p>在<code>doSlow()</code>函数中，若并发的goroutine进入该函数中，为了保证仅有一个goroutine执行<code>f()</code>匿名函数。为此，需要加互斥锁保证只有一个goroutine进行初始化，同时采用了<strong>双检查的机制(double-checking)</strong>，再次判断<code>o.done</code>是否为0，如果为0，则是第一次执行，执行完毕后，就将<code>o.done</code>设置为 1，然后释放锁。</p>
+<p>即使此时有多个 goroutine 同时进入了<code>doSlow</code>方法，因为双检查的机制，后续的 goroutine 会看到<code>o.done</code>的值为 1，也不会再次执行<code>f</code>。</p>
+<p>这样既保证了并发的 goroutine 会等待<code>f</code>完成，而且还不会多次执行<code>f</code>。</p></div><div class=post-footer id=post-footer>
+<div class=post-info>
+<div class=post-info-line>
+<div class=post-info-mod>
+<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/fce288f054be9ffa760129778474538bfbad1deb target=_blank title="commit by hyper2t(1244240338@qq.com) fce288f054be9ffa760129778474538bfbad1deb: update folder name">
+<i class="fas fa-hashtag fa-fw"></i>fce288f</a></span>
+</div>
+<div class=post-info-license></div>
+</div>
+<div class=post-info-line>
+<div class=post-info-md><span>
+<a class=link-to-markdown href=/semaphore/index.md target=_blank></a>
+</span></div>
+<div class=post-info-share>
+<span><a href=javascript:void(0); title=" Twitter" data-sharer=twitter data-url=https://hyper2t.github.io/semaphore/ data-title="Golang 并发包 sync 系列" data-hashtags=Golang,mutex,sync,semaphore><i class="fab fa-twitter fa-fw"></i></a><a href=javascript:void(0); title=" Facebook" data-sharer=facebook data-url=https://hyper2t.github.io/semaphore/ data-hashtag=Golang><i class="fab fa-facebook-square fa-fw"></i></a><a href=javascript:void(0); title=" Hacker News" data-sharer=hackernews data-url=https://hyper2t.github.io/semaphore/ data-title="Golang 并发包 sync 系列"><i class="fab fa-hacker-news fa-fw"></i></a><a href=javascript:void(0); title=" Line" data-sharer=line data-url=https://hyper2t.github.io/semaphore/ data-title="Golang 并发包 sync 系列"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg></i></a><a href=javascript:void(0); title=" 微博" data-sharer=weibo data-url=https://hyper2t.github.io/semaphore/ data-title="Golang 并发包 sync 系列" data-ralateuid="7289413661/profile?topnav=1&wvr=6&is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+</div>
+</div>
+</div>
+<div class=post-info-more>
+<section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a>,&nbsp;<a href=/tags/mutex/>mutex</a>,&nbsp;<a href=/tags/sync/>sync</a>,&nbsp;<a href=/tags/semaphore/>semaphore</a></section>
+<section>
+<span><a href=javascript:void(0); onclick=window.history.back()></a></span>&nbsp;|&nbsp;<span><a href=/></a></span>
+</section>
+</div>
+<div class=post-nav><a href=/kubectl/ class=prev rel=prev title="Kubernetes kubectl 命令行总结"><i class="fas fa-angle-left fa-fw"></i>Kubernetes kubectl 命令行总结</a></div>
+</div>
+<div id=comments><div id=waline></div>
+<script src=https://cdn.jsdelivr.net/npm/@waline/client/dist/Waline.min.js></script>
+<script>new Waline({el:'#waline',meta:["nick","mail","link"],placeholder:"提交评论较慢，请等待几秒~",serverURL:"",avatarCDN:"https://sdn.geekzu.org/avatar/",requiredFields:["nick","mail"],pageSize:10,avatar:"retro",lang:"zh-CN",visitor:!0,highlight:!0})</script></div></article></div>
+</main><footer class=footer>
+<div class=footer-container><div class=footer-line>Powered by Hugo with LoveIt</div><div class=footer-line>
+</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2021</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Hyper Twister</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div>
+</div>
+</footer></div>
+<div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title>
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title>
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"",maxShownLines:80},comment:{},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{algoliaAppID:"PASDMWALPK",algoliaIndex:"index.zh-cn",algoliaSearchKey:"b42948e51daaa93df92381c8e2ac0f93",highlightTag:"em",maxResultLength:10,noResultsFound:"",snippetLength:50,type:"algolia"}}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js></script>
+<script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery-backstretch@2.1.18/jquery.backstretch.min.js></script><script type=text/javascript src=/js/custom.js></script></body>
+</html>
