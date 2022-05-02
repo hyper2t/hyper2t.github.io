@@ -9,7 +9,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hyper2t.github.io/crd/"><meta property="og:image" content="https://hyper2t.github.io/crd/featured-image.png"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2020-08-04T21:57:40+08:00">
-<meta property="article:modified_time" content="2022-05-03T02:44:34+08:00">
+<meta property="article:modified_time" content="2022-05-03T02:52:44+08:00">
 <meta name=twitter:card content="summary_large_image">
 <meta name=twitter:image content="https://hyper2t.github.io/crd/featured-image.png">
 <meta name=twitter:title content="Kubernetes CRD Operator 开发系列">
@@ -17,7 +17,7 @@
 <meta name=application-name content="LoveIt">
 <meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
 <link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/crd/><link rel=prev href=https://hyper2t.github.io/golang/><link rel=next href=https://hyper2t.github.io/kubectl/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Kubernetes CRD Operator 开发系列","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/crd\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/crd\/featured-image.png","width":1420,"height":708}],"genre":"posts","keywords":"Golang, Kubernetes, CRD","wordcount":2690,"url":"https:\/\/hyper2t.github.io\/crd\/","datePublished":"2020-08-04T21:57:40+08:00","dateModified":"2022-05-03T02:44:34+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中的底层实现等等。"}</script></head>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/crd/><link rel=prev href=https://hyper2t.github.io/golang/><link rel=next href=https://hyper2t.github.io/kubectl/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Kubernetes CRD Operator 开发系列","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/crd\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/crd\/featured-image.png","width":1420,"height":708}],"genre":"posts","keywords":"Golang, Kubernetes, CRD","wordcount":2690,"url":"https:\/\/hyper2t.github.io\/crd\/","datePublished":"2020-08-04T21:57:40+08:00","dateModified":"2022-05-03T02:52:44+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中的底层实现等等。"}</script></head>
 <body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
@@ -455,8 +455,8 @@ $ kubebuilder create api --group webapp --version v1 --kind Guestbook
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
-<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/1eb5918b76f144b0b87b44c95e517039ae0a0b2a target=_blank title="commit by hyper2t(1244240338@qq.com) 1eb5918b76f144b0b87b44c95e517039ae0a0b2a: 高清图片背景修复">
-<i class="fas fa-hashtag fa-fw"></i>1eb5918</a></span>
+<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/22c04ddb0484570de4c04869d605dc7fd5ab3a57 target=_blank title="commit by hyper2t(1244240338@qq.com) 22c04ddb0484570de4c04869d605dc7fd5ab3a57: 高清修复背景图10">
+<i class="fas fa-hashtag fa-fw"></i>22c04dd</a></span>
 </div>
 <div class=post-info-license></div>
 </div>
