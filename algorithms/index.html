@@ -9,7 +9,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hyper2t.github.io/algorithms/"><meta property="og:image" content="https://hyper2t.github.io/algorithms/featured-image.jpeg"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2020-08-13T21:57:40+08:00">
-<meta property="article:modified_time" content="2022-05-03T02:52:44+08:00">
+<meta property="article:modified_time" content="2022-05-03T14:53:16+08:00">
 <meta name=twitter:card content="summary_large_image">
 <meta name=twitter:image content="https://hyper2t.github.io/algorithms/featured-image.jpeg">
 <meta name=twitter:title content="刷 Leetcode 的算法总结">
@@ -17,7 +17,7 @@
 <meta name=application-name content="LoveIt">
 <meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
 <link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/algorithms/><link rel=prev href=https://hyper2t.github.io/cplusplus/><link rel=next href=https://hyper2t.github.io/generic/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"刷 Leetcode 的算法总结","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/algorithms\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/algorithms\/featured-image.jpeg","width":1400,"height":933}],"genre":"posts","keywords":"动态规划, 二分法, Algorithms","wordcount":612,"url":"https:\/\/hyper2t.github.io\/algorithms\/","datePublished":"2020-08-13T21:57:40+08:00","dateModified":"2022-05-03T02:52:44+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了我刷Leetcode 时候用到的算法模板，包括回溯算法，二分法用到的双指针，动态规划等等。"}</script></head>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/algorithms/><link rel=prev href=https://hyper2t.github.io/cplusplus/><link rel=next href=https://hyper2t.github.io/generic/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"刷 Leetcode 的算法总结","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/algorithms\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/algorithms\/featured-image.jpeg","width":1400,"height":933}],"genre":"posts","keywords":"动态规划, 二分法, Algorithms","wordcount":612,"url":"https:\/\/hyper2t.github.io\/algorithms\/","datePublished":"2020-08-13T21:57:40+08:00","dateModified":"2022-05-03T14:53:16+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了我刷Leetcode 时候用到的算法模板，包括回溯算法，二分法用到的双指针，动态规划等等。"}</script></head>
 <body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
@@ -25,7 +25,12 @@
 <a href=/ title=星夜君麒><span class=header-title-pre><i class="fas fa-home"></i></span>星夜君麒～</a>
 </div>
 <div id=audioBox style=display:flex>
-<script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/theStoryOfUs.mp3","/mp3/InstantEternity.mp3","/mp3/melodyOfNight1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.addEventListener('ended',c,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',c,!1)}}</script>
+<div class=songRollingContainer>
+<a class=songRolling>
+<span id=songName></span>
+</a>
+</div>
+<script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/夜的钢琴曲1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
 </div>
 <div class=menu>
 <div class=menu-inner><a class=menu-item href=/posts/> 所有文章 </a><a class=menu-item href=/tags/> 标签 </a><a class=menu-item href=/categories/> 分类 </a><a class=menu-item href=/categories/documentation/> 文档 </a><a class=menu-item href=/about/> 关于 </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title>简体中文<i class="fas fa-chevron-right fa-fw"></i>
@@ -267,8 +272,8 @@
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
-<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/22c04ddb0484570de4c04869d605dc7fd5ab3a57 target=_blank title="commit by hyper2t(1244240338@qq.com) 22c04ddb0484570de4c04869d605dc7fd5ab3a57: 高清修复背景图10">
-<i class="fas fa-hashtag fa-fw"></i>22c04dd</a></span>
+<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/80a93a15ef7c030b64c0e241f0a0f91cc3f156a8 target=_blank title="commit by hyper2t(1244240338@qq.com) 80a93a15ef7c030b64c0e241f0a0f91cc3f156a8: 添加音乐播放器歌曲滚动条">
+<i class="fas fa-hashtag fa-fw"></i>80a93a1</a></span>
 </div>
 <div class=post-info-license></div>
 </div>
