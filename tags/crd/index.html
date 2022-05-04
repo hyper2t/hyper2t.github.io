@@ -31,7 +31,7 @@
 <script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/夜的钢琴曲1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
 </div>
 <div class=menu>
-<div class=menu-inner><a class=menu-item href=/posts/> 所有文章 </a><a class=menu-item href=/tags/> 标签 </a><a class=menu-item href=/categories/> 分类 </a><a class=menu-item href=/categories/documentation/> 文档 </a><a class=menu-item href=/about/> 关于 </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<div class=menu-inner><a class=menu-item href=/posts/> 所有文章 </a><a class=menu-item href=/tags/> 标签 </a><a class=menu-item href=/categories/> 分类 </a><a class=menu-item href=/categories/catch-the-cat/> 趣味 </a><a class=menu-item href=/about/> 关于 </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title>简体中文<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/tags/crd/>English</option><option value=/tags/crd/ selected>简体中文</option></select>
 </a><span class="menu-item search" id=search-desktop>
 <input type=text placeholder id=search-input-desktop>
@@ -75,7 +75,7 @@
 </div>
 <a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
 </a>
-</div><a class=menu-item href=/posts/ title>所有文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/categories/documentation/ title>文档</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title>
+</div><a class=menu-item href=/posts/ title>所有文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/categories/catch-the-cat/ title>趣味</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title>
 <i class="fas fa-adjust fa-fw"></i>
 </a><a href=javascript:void(0); class=menu-item title>简体中文<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select onchange="location=this.value"><option value=/en/tags/crd/>English</option><option value=/tags/crd/ selected>简体中文</option></select>

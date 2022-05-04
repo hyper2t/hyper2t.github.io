@@ -32,7 +32,7 @@
 <script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/夜的钢琴曲1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
 </div>
 <div class=menu>
-<div class=menu-inner><a class=menu-item href=/en/posts/> Posts </a><a class=menu-item href=/en/tags/> Tags </a><a class=menu-item href=/en/categories/> Categories </a><a class=menu-item href=/en/categories/documentation/> Docs </a><a class=menu-item href=/en/about/> About </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title>English<i class="fas fa-chevron-right fa-fw"></i>
+<div class=menu-inner><a class=menu-item href=/en/posts/> Posts </a><a class=menu-item href=/en/tags/> Tags </a><a class=menu-item href=/en/categories/> Categories </a><a class=menu-item href=/en/categories/catch-the-cat/> Game </a><a class=menu-item href=/en/about/> About </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title>English<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/tags/type-traits/ selected>English</option></select>
 </a><span class="menu-item search" id=search-desktop>
 <input type=text placeholder id=search-input-desktop>
@@ -76,7 +76,7 @@
 </div>
 <a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
 </a>
-</div><a class=menu-item href=/en/posts/ title>Posts</a><a class=menu-item href=/en/tags/ title>Tags</a><a class=menu-item href=/en/categories/ title>Categories</a><a class=menu-item href=/en/categories/documentation/ title>Docs</a><a class=menu-item href=/en/about/ title>About</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title>
+</div><a class=menu-item href=/en/posts/ title>Posts</a><a class=menu-item href=/en/tags/ title>Tags</a><a class=menu-item href=/en/categories/ title>Categories</a><a class=menu-item href=/en/categories/catch-the-cat/ title>Game</a><a class=menu-item href=/en/about/ title>About</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title>
 <i class="fas fa-adjust fa-fw"></i>
 </a><a href=javascript:void(0); class=menu-item title>English<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select onchange="location=this.value"><option value=/en/tags/type-traits/ selected>English</option></select>
