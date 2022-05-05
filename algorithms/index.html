@@ -9,7 +9,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hyper2t.github.io/algorithms/"><meta property="og:image" content="https://hyper2t.github.io/algorithms/featured-image.jpeg"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2020-08-13T21:57:40+08:00">
-<meta property="article:modified_time" content="2022-05-05T08:18:33+08:00">
+<meta property="article:modified_time" content="2022-05-05T08:32:35+08:00">
 <meta name=twitter:card content="summary_large_image">
 <meta name=twitter:image content="https://hyper2t.github.io/algorithms/featured-image.jpeg">
 <meta name=twitter:title content="刷 Leetcode 的算法总结">
@@ -17,7 +17,7 @@
 <meta name=application-name content="LoveIt">
 <meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
 <link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/algorithms/><link rel=prev href=https://hyper2t.github.io/cplusplus/><link rel=next href=https://hyper2t.github.io/generic/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"刷 Leetcode 的算法总结","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/algorithms\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/algorithms\/featured-image.jpeg","width":1400,"height":933}],"genre":"posts","keywords":"动态规划, 二分法, Algorithms","wordcount":612,"url":"https:\/\/hyper2t.github.io\/algorithms\/","datePublished":"2020-08-13T21:57:40+08:00","dateModified":"2022-05-05T08:18:33+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了我刷Leetcode 时候用到的算法模板，包括回溯算法，二分法用到的双指针，动态规划等等。"}</script></head>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/algorithms/><link rel=prev href=https://hyper2t.github.io/cplusplus/><link rel=next href=https://hyper2t.github.io/generic/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"刷 Leetcode 的算法总结","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/algorithms\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/algorithms\/featured-image.jpeg","width":1400,"height":933}],"genre":"posts","keywords":"动态规划, 二分法, Algorithms","wordcount":612,"url":"https:\/\/hyper2t.github.io\/algorithms\/","datePublished":"2020-08-13T21:57:40+08:00","dateModified":"2022-05-05T08:32:35+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了我刷Leetcode 时候用到的算法模板，包括回溯算法，二分法用到的双指针，动态规划等等。"}</script></head>
 <body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
@@ -272,8 +272,8 @@
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
-<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/aa704e9f056c301666035a3811e673d9f4c11d83 target=_blank title="commit by hyper2t(1244240338@qq.com) aa704e9f056c301666035a3811e673d9f4c11d83: waline替换">
-<i class="fas fa-hashtag fa-fw"></i>aa704e9</a></span>
+<span>&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/f7c1af2670f3f526e7869297e24b4e8b2730c3a9 target=_blank title="commit by hyper2t(1244240338@qq.com) f7c1af2670f3f526e7869297e24b4e8b2730c3a9: 加载评论">
+<i class="fas fa-hashtag fa-fw"></i>f7c1af2</a></span>
 </div>
 <div class=post-info-license></div>
 </div>
@@ -297,7 +297,7 @@
 </div>
 <div id=comments><div id=waline class=comment></div>
 <script src=https://cdn.jsdelivr.net/npm/@waline/client@latest></script>
-<script>new Waline({el:'#waline',meta:["nick","mail","link"],placeholder:"提交评论较慢，请等待几秒~",serverURL:"https://waline-comment-psi.vercel.app/",avatarCDN:"https://sdn.geekzu.org/avatar/",requiredFields:["nick","mail"],pageSize:10,avatar:"retro",lang:"zh-CN",visitor:!0,highlight:!0})</script></div></article></div>
+<script>window.onload=function(){loadComments()};function loadComments(){if(typeof Waline=='undefined'){var a=b=>{var a=document.createElement('script');a.defer=!0,a.crossOrigin='anonymous',Object.keys(b).forEach(c=>{a[c]=b[c]}),document.body.appendChild(a)};a({src:'https://cdn.jsdelivr.net/npm/@waline/client@latest',onload:()=>{newWaline()}})}else newWaline()}function newWaline(){new Waline({el:'#waline',meta:["nick","mail","link"],placeholder:"提交评论较慢，请等待几秒~",serverURL:"https://waline-comment-psi.vercel.app/",avatarCDN:"https://sdn.geekzu.org/avatar/",requiredFields:["nick","mail"],pageSize:10,avatar:"retro",lang:"zh-CN",visitor:!0,highlight:!0})}</script></div></article></div>
 </main><footer class=footer>
 <div class=footer-container><div class=footer-line>Powered by Hugo with LoveIt</div><div class=footer-line>
 </div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>星夜君麒</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div>
