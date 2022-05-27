@@ -1,0 +1,470 @@
+<!doctype html><html lang=zh-cn>
+<head>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=robots content="noodp">
+<meta http-equiv=x-ua-compatible content="IE=edge, chrome=1">
+<title>Go 基础知识与框架体系 part 9: hashmap - 星夜君麒</title><meta name=Description content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。"><meta property="og:title" content="Go 基础知识与框架体系 part 9: hashmap">
+<meta property="og:description" content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://hyper2t.github.io/hashmap/"><meta property="og:image" content="https://hyper2t.github.io/hashmap/featured-image.jpeg"><meta property="article:section" content="posts">
+<meta property="article:published_time" content="2020-07-10T21:57:40+08:00">
+<meta property="article:modified_time" content="2022-05-28T00:32:04+08:00">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://hyper2t.github.io/hashmap/featured-image.jpeg">
+<meta name=twitter:title content="Go 基础知识与框架体系 part 9: hashmap">
+<meta name=twitter:description content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。">
+<meta name=application-name content="LoveIt">
+<meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
+<link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/hashmap/><link rel=prev href=https://hyper2t.github.io/mutex/><link rel=next href=https://hyper2t.github.io/crd/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Go 基础知识与框架体系 part 9: hashmap","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/hashmap\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/hashmap\/featured-image.jpeg","width":2048,"height":1366}],"genre":"posts","keywords":"Golang, goroutine, channel","wordcount":2241,"url":"https:\/\/hyper2t.github.io\/hashmap\/","datePublished":"2020-07-10T21:57:40+08:00","dateModified":"2022-05-28T00:32:04+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。"}</script></head>
+<body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
+<div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
+<div class=header-wrapper>
+<div class=header-title>
+<a href=/ title=星夜君麒><span class=header-title-pre><i class="fas fa-home"></i></span>星夜君麒～</a>
+</div>
+<div id=audioBox class=adBox>
+<div class=songRollingContainer>
+<a class=songRolling>
+<span id=songName></span>
+</a>
+</div>
+<script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/夜的钢琴曲1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
+</div>
+<div class=menu>
+<div class=menu-inner><a class=menu-item href=/posts/> 所有文章 </a><a class=menu-item href=/tags/> 标签 </a><a class=menu-item href=/categories/> 分类 </a><a class=menu-item href=/categories/catch-the-cat/> 趣味 </a><a class=menu-item href=/about/> 关于 </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/hashmap/>English</option><option value=/hashmap/ selected>简体中文</option></select>
+</a><span class="menu-item search" id=search-desktop>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索>
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空>
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id=search-loading-desktop>
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i>
+</a>
+</div>
+</div>
+</div>
+</header><header class=mobile id=header-mobile>
+<div class=header-container>
+<div class=header-wrapper>
+<div class=header-title>
+<a href=/ title=星夜君麒><span class=header-title-pre><i class="fas fa-home"></i></span>星夜君麒～</a>
+</div>
+<div class=menu-toggle id=menu-toggle-mobile>
+<span></span><span></span><span></span>
+</div>
+</div>
+<div class=menu id=menu-mobile><div class=search-wrapper>
+<div class="search mobile" id=search-mobile>
+<input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
+<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索>
+<i class="fas fa-search fa-fw"></i>
+</a>
+<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空>
+<i class="fas fa-times-circle fa-fw"></i>
+</a>
+<span class="search-button search-loading" id=search-loading-mobile>
+<i class="fas fa-spinner fa-fw fa-spin"></i>
+</span>
+</div>
+<a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
+取消
+</a>
+</div><a class=menu-item href=/posts/ title>所有文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/categories/catch-the-cat/ title>趣味</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+<i class="fas fa-adjust fa-fw"></i>
+</a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<select class=language-select onchange="location=this.value"><option value=/en/hashmap/>English</option><option value=/hashmap/ selected>简体中文</option></select>
+</a></div>
+</div>
+</header>
+<div class="search-dropdown desktop">
+<div id=search-dropdown-desktop></div>
+</div>
+<div class="search-dropdown mobile">
+<div id=search-dropdown-mobile></div>
+</div>
+<main class=main>
+<div class=container><div class=toc id=toc-auto>
+<h2 class=toc-title>目录</h2>
+<div class=toc-content id=toc-content-auto></div>
+</div><article class="page single"><h1 class="single-title animated flipInX">Go 基础知识与框架体系 part 9: hashmap</h1><div class=post-meta>
+<div class=post-meta-line><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div>
+<div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-07-10>2020-07-10</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2241 字&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 5 分钟&nbsp;<span id=/hashmap/ class=leancloud_visitors data-flag-title="Go 基础知识与框架体系 part 9: hashmap">
+<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
+</span>&nbsp;</div>
+</div><div class=featured-image><img class=lazyload src=/svg/loading.min.svg data-src=/hashmap/featured-image.jpeg data-srcset="/hashmap/featured-image.jpeg, /hashmap/featured-image.jpeg 1.5x, /hashmap/featured-image.jpeg 2x" data-sizes=auto alt=/hashmap/featured-image.jpeg title="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。"></div><div class="details toc" id=toc-static kept>
+<div class="details-summary toc-title">
+<span>目录</span>
+<span><i class="details-icon fas fa-angle-right"></i></span>
+</div>
+<div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents>
+<ul>
+<li><a href=#hashmap>hashmap</a>
+<ul>
+<li><a href=#1-内部结构>1. 内部结构</a></li>
+<li><a href=#2-map-初始化>2. map 初始化</a></li>
+<li><a href=#3-map-存值>3. map 存值</a></li>
+<li><a href=#4-hash-grow-扩容和迁移>4. hash grow 扩容和迁移</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
+</div><div class=content id=content><p>这篇文章总结了 Go 的知识体系: hashmap，包括其中的底层实现等等。</p>
+<h2 id=hashmap>hashmap</h2>
+<div class="details admonition question open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-question-circle fa-fw"></i>问题<i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>Hashmap 的内部结构是如何实现的呢？</div>
+</div>
+</div>
+<h3 id=1-内部结构>1. 内部结构</h3>
+<p>Go的 map 是 unordered map，即无法对 key 值排序遍历。跟传统的 hashmap 的实现方法一样，它通过一个 buckets 数组实现，所有元素被 hash 到数组的 bucket 中，buckets 就是指向了这个内存连续分配的数组。<code>B</code>字段说明 hash 表大小是2的指数，即$2^B$。每次扩容会增加到上次大小的两倍，即 $2^{B+1}$。当 bucket 填满后，将通过 <code>overflow</code> 指针来 <code>mallocgc</code> 一个bucket出来形成链表，也就是为哈希表解决冲突问题。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// A header for a Go map.
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>hmap</span> <span class=kd>struct</span> <span class=p>{</span>
+	<span class=nx>count</span> <span class=kt>int</span> <span class=c1>// len()返回的map的大小 即有多少kv对
+</span><span class=c1></span>	<span class=nx>flags</span> <span class=kt>uint8</span>
+	<span class=nx>B</span>     <span class=kt>uint8</span>  <span class=c1>// 表示hash table总共有2^B个buckets 
+</span><span class=c1></span>	<span class=nx>hash0</span> <span class=kt>uint32</span> <span class=c1>// hash seed
+</span><span class=c1></span>	<span class=nx>buckets</span>    <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span> <span class=c1>// 按照low hash值可查找的连续分配的数组，初始时为16个Buckets.
+</span><span class=c1></span>	<span class=nx>oldbuckets</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span> 
+	<span class=nx>nevacuate</span>  <span class=kt>uintptr</span>      
+	<span class=nx>overflow</span> <span class=o>*</span><span class=p>[</span><span class=mi>2</span><span class=p>]</span><span class=o>*</span><span class=p>[]</span><span class=o>*</span><span class=nx>bmap</span> <span class=c1>//溢出链 当初始buckets都满了之后会使用overflow
+</span><span class=c1></span><span class=p>}</span>
+
+<span class=c1>// A bucket for a Go map.
+</span><span class=c1></span><span class=kd>type</span> <span class=nx>bmap</span> <span class=kd>struct</span> <span class=p>{</span>
+    <span class=nx>tophash</span> <span class=p>[</span><span class=nx>bucketCnt</span><span class=p>]</span><span class=kt>uint8</span>
+<span class=c1>// Followed by bucketCnt keys and then bucketCnt values.
+</span><span class=c1>// NOTE: packing all the keys together and then all the values together makes the
+</span><span class=c1>// code a bit more complicated than alternating key/value/key/value/... but it allows
+</span><span class=c1>// us to eliminate padding which would be needed for, e.g., map[int64]int8.
+</span><span class=c1>// Followed by an overflow pointer.
+</span><span class=c1></span><span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>bucket map 的数据结构中，<code>tophash</code> 是个大小为 8(bucketCnt) 的数组，存储了8个 key 的 hash 值的高八位值。</p>
+<div class="details admonition tip open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-lightbulb fa-fw"></i>技巧<i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>在对 key/value 对增删查的时候，先比较 key 的 hash 值高八位是否相等，然后再比较具体的key值。</div>
+</div>
+</div>
+<h3 id=2-map-初始化>2. map 初始化</h3>
+<p>B的初始大小是0，若指定了map的大小hint且hint大于8，那么buckets会在make时就通过newarray分配好，否则buckets会在第一次put的时候分配。随着hashmap中key/value对的增多，buckets需要重新分配，每一次都要<strong>重新hash并进行元素拷贝</strong>，所以最好在初始化时就给map指定一个合适的大小。</p>
+<p><code>makemap</code> 有<code>h</code>和<code>bucket</code>这两个参数，是留给编译器的。如果编译器决定<code>hmap</code>结构体和第一个<code>bucket</code>可以在栈上创建，这两个入参可能不是<code>nil</code>的。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// makemap implemments a Go map creation make(map[k]v, hint)
+</span><span class=c1></span><span class=kd>func</span> <span class=nf>makemap</span><span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>maptype</span><span class=p>,</span> <span class=nx>hint</span> <span class=kt>int64</span><span class=p>,</span> <span class=nx>h</span> <span class=o>*</span><span class=nx>hmap</span><span class=p>,</span> <span class=nx>bucket</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>)</span> <span class=o>*</span><span class=nx>hmap</span><span class=p>{</span>
+  <span class=nx>B</span> <span class=o>:=</span> <span class=nb>uint8</span><span class=p>(</span><span class=mi>0</span><span class=p>)</span>
+  <span class=k>for</span> <span class=p>;</span> <span class=nx>hint</span> <span class=p>&gt;</span> <span class=nx>bucketCnt</span> <span class=o>&amp;&amp;</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>hint</span><span class=p>)</span> <span class=p>&gt;</span> <span class=nx>loadFactor</span><span class=o>*</span><span class=nb>float32</span><span class=p>(</span><span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span><span class=o>&lt;&lt;</span><span class=nx>B</span><span class=p>);</span> <span class=nx>B</span><span class=o>++</span> <span class=p>{</span>
+  <span class=p>}</span>
+  <span class=c1>// 确定初始B的初始值 这里hint是指kv对的数目 而每个buckets中可以保存8个kv对
+</span><span class=c1></span>  <span class=c1>// 因此上式是要找到满足不等式 hint &gt; loadFactor*(2^B) 最小的B
+</span><span class=c1></span>  <span class=k>if</span> <span class=nx>B</span> <span class=o>!=</span> <span class=mi>0</span> <span class=p>{</span>
+    <span class=nx>buckets</span> <span class=p>=</span> <span class=nf>newarray</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>bucket</span><span class=p>,</span> <span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span><span class=o>&lt;&lt;</span><span class=nx>B</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=nx>h</span> <span class=p>=</span> <span class=p>(</span><span class=o>*</span><span class=nx>hmap</span><span class=p>)(</span><span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>hmap</span><span class=p>))</span>
+  <span class=k>return</span> <span class=nx>h</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id=3-map-存值>3. map 存值</h3>
+<p>存储的步骤和第一部分的分析一致。首先用<code>key</code>的<code>hash</code>值低8位找到<code>bucket</code>，然后在<code>bucket</code>内部比对<code>tophash</code>和高8位与其对应的<code>key</code>值与入参<code>key</code>是否相等，若找到则更新这个值。若<code>key</code>不存在，则<code>key</code>优先存入在查找的过程中遇到的空的<code>tophash</code>数组位置。若当前的<code>bucket</code>已满则需要另外分配空间给这个<code>key</code>，新分配的<code>bucket</code>将挂在<code>overflow</code>链表后。</p>
+<div class=highlight><div class=chroma>
+<table class=lntable><tr><td class=lntd>
+<pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span></code></pre></td>
+<td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=kd>func</span> <span class=nf>mapassign1</span><span class=p>(</span><span class=nx>t</span> <span class=o>*</span><span class=nx>maptype</span><span class=p>,</span> <span class=nx>h</span> <span class=o>*</span><span class=nx>hmap</span><span class=p>,</span> <span class=nx>key</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>,</span> <span class=nx>val</span> <span class=nx>unsafe</span><span class=p>.</span><span class=nx>Pointer</span><span class=p>)</span> <span class=p>{</span>
+  <span class=nx>hash</span> <span class=o>:=</span> <span class=nx>alg</span><span class=p>.</span><span class=nf>hash</span><span class=p>(</span><span class=nx>key</span><span class=p>,</span> <span class=nb>uintptr</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>hash0</span><span class=p>))</span>
+  <span class=k>if</span> <span class=nx>h</span><span class=p>.</span><span class=nx>buckets</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+    <span class=nx>h</span><span class=p>.</span><span class=nx>buckets</span> <span class=p>=</span> <span class=nf>newarray</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>bucket</span><span class=p>,</span> <span class=mi>1</span><span class=p>)</span>
+  <span class=p>}</span>
+<span class=nx>again</span><span class=p>:</span>
+  <span class=c1>//根据低8位hash值找到对应的buckets
+</span><span class=c1></span>  <span class=nx>bucket</span> <span class=o>:=</span> <span class=nx>hash</span> <span class=o>&amp;</span> <span class=p>(</span><span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)&lt;&gt;</span> <span class=p>(</span><span class=nx>sys</span><span class=p>.</span><span class=nx>PtrSize</span><span class=o>*</span><span class=mi>8</span> <span class=o>-</span> <span class=mi>8</span><span class=p>))</span>
+  <span class=k>for</span> <span class=p>{</span>
+    <span class=c1>//遍历每一个bucket 对比所有tophash是否与top相等
+</span><span class=c1></span>    <span class=c1>//若找到空tophash位置则标记为可插入位置
+</span><span class=c1></span>    <span class=k>for</span> <span class=nx>i</span> <span class=o>:=</span> <span class=nb>uintptr</span><span class=p>(</span><span class=mi>0</span><span class=p>);</span> <span class=nx>i</span> <span class=p>&lt;</span> <span class=nx>bucketCnt</span><span class=p>;</span> <span class=nx>i</span><span class=o>++</span> <span class=p>{</span>
+      <span class=k>if</span> <span class=nx>b</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>!=</span> <span class=nx>top</span> <span class=p>{</span>
+        <span class=k>if</span> <span class=nx>b</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span> <span class=o>==</span> <span class=nx>empty</span> <span class=o>&amp;&amp;</span> <span class=nx>inserti</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+          <span class=nx>inserti</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>b</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=nx>i</span><span class=p>]</span>
+        <span class=p>}</span> 
+        <span class=k>continue</span>
+      <span class=p>}</span>
+      <span class=c1>//当前tophash对应的key位置可以根据bucket的偏移量找到
+</span><span class=c1></span>      <span class=nx>k2</span> <span class=o>:=</span> <span class=nf>add</span><span class=p>(</span><span class=nx>unsafe</span><span class=p>.</span><span class=nf>Pointer</span><span class=p>(</span><span class=nx>b</span><span class=p>),</span> <span class=nx>dataOffset</span><span class=o>+</span><span class=nx>i</span><span class=o>*</span><span class=nb>uintptr</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>keysize</span><span class=p>))</span>
+      <span class=k>if</span> <span class=p>!</span><span class=nx>alg</span><span class=p>.</span><span class=nf>equal</span><span class=p>(</span><span class=nx>key</span><span class=p>,</span> <span class=nx>k2</span><span class=p>)</span> <span class=p>{</span>
+        <span class=k>continue</span>
+      <span class=p>}</span>
+      <span class=c1>//找到符合tophash对应的key位置
+</span><span class=c1></span>      <span class=nf>typedmemmove</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>elem</span><span class=p>,</span> <span class=nx>v2</span><span class=p>,</span> <span class=nx>val</span><span class=p>)</span>
+      <span class=k>goto</span> <span class=nx>done</span>
+    <span class=p>}</span>
+    <span class=c1>//若overflow为空则break
+</span><span class=c1></span>    <span class=nx>ovf</span> <span class=o>:=</span> <span class=nx>b</span><span class=p>.</span><span class=nf>overflow</span><span class=p>(</span><span class=nx>t</span><span class=p>)</span>
+  <span class=p>}</span>
+  <span class=c1>// did not find mapping for key.  Allocate new cell &amp; add entry.
+</span><span class=c1></span>  <span class=k>if</span> <span class=nb>float32</span><span class=p>(</span><span class=nx>h</span><span class=p>.</span><span class=nx>count</span><span class=p>)</span> <span class=o>&gt;=</span> <span class=nx>loadFactor</span><span class=o>*</span><span class=nb>float32</span><span class=p>((</span><span class=nb>uintptr</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span><span class=o>&lt;=</span> <span class=nx>bucketCnt</span> <span class=p>{</span>
+    <span class=nf>hashGrow</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=nx>h</span><span class=p>)</span>
+    <span class=k>goto</span> <span class=nx>again</span> <span class=c1>// Growing the table invalidates everything, so try again
+</span><span class=c1></span>  <span class=p>}</span>
+  <span class=c1>// all current buckets are full, allocate a new one.
+</span><span class=c1></span>  <span class=k>if</span> <span class=nx>inserti</span> <span class=o>==</span> <span class=kc>nil</span> <span class=p>{</span>
+    <span class=nx>newb</span> <span class=o>:=</span> <span class=p>(</span><span class=o>*</span><span class=nx>bmap</span><span class=p>)(</span><span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>bucket</span><span class=p>))</span>
+    <span class=nx>h</span><span class=p>.</span><span class=nf>setoverflow</span><span class=p>(</span><span class=nx>t</span><span class=p>,</span> <span class=nx>b</span><span class=p>,</span> <span class=nx>newb</span><span class=p>)</span>
+    <span class=nx>inserti</span> <span class=p>=</span> <span class=o>&amp;</span><span class=nx>newb</span><span class=p>.</span><span class=nx>tophash</span><span class=p>[</span><span class=mi>0</span><span class=p>]</span>
+  <span class=p>}</span>
+  <span class=c1>// store new key/value at insert position
+</span><span class=c1></span>  <span class=nx>kmem</span> <span class=o>:=</span> <span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>key</span><span class=p>)</span>
+  <span class=nx>vmem</span> <span class=o>:=</span> <span class=nf>newobject</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>elem</span><span class=p>)</span>
+  <span class=nf>typedmemmove</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>key</span><span class=p>,</span> <span class=nx>insertk</span><span class=p>,</span> <span class=nx>key</span><span class=p>)</span> 
+  <span class=nf>typedmemmove</span><span class=p>(</span><span class=nx>t</span><span class=p>.</span><span class=nx>elem</span><span class=p>,</span> <span class=nx>insertv</span><span class=p>,</span> <span class=nx>val</span><span class=p>)</span>
+  <span class=o>*</span><span class=nx>inserti</span> <span class=p>=</span> <span class=nx>top</span>
+  <span class=nx>h</span><span class=p>.</span><span class=nx>count</span><span class=o>++</span>
+<span class=p>}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id=4-hash-grow-扩容和迁移>4. hash grow 扩容和迁移</h3>
+<p>在往map中存值时若所有的bucket已满，需要在堆中new新的空间时需要计算是否需要扩容。扩容的时机是<code>count > loadFactor(2^B)</code>。这里的<code>loadfactor</code>选择为6.5。</p>
+<div class="details admonition question open">
+<div class="details-summary admonition-title">
+<i class="icon fas fa-question-circle fa-fw"></i>问题<i class="details-icon fas fa-angle-right fa-fw"></i>
+</div>
+<div class=details-content>
+<div class=admonition-content>为什么选取<code>loadfactor</code>为6.5呢？</div>
+</div>
+</div>
+<p>这是因为<code>loadfactor</code>和<code>overflow</code>溢出率、<code>bytes/entry</code>、<code>hitprobe</code>、<code>missprobe</code>相关。</p>
+<ul>
+<li><code>overflow</code>溢出率是指平均一个bucket有多少个kv的时候会溢出。</li>
+<li><code>bytes/entry</code>是指平均存一个kv需要额外存储多少字节的数据。</li>
+<li><code>hitprobe</code>是指找到一个存在的key平均需要找多少次。</li>
+<li><code>missprobe</code>是指找到一个不存在的key平均需要找多少次。选取6.5是为了平衡这组数据。</li>
+</ul>
+<p>在没有溢出时hashmap总共可以存储<code>8(2^B)</code>个KV对，当hashmap已经存储到<code>6.5(2^B)</code>个KV对时表示hashmap已经趋于溢出，即很有可能在存值时用到<code>overflow</code>链表，这样会增加<code>hitprobe</code>和<code>missprobe</code>。</p>
+<table>
+<thead>
+<tr>
+<th><strong>loadfactor</strong></th>
+<th><strong>%overflow</strong></th>
+<th><strong>bytes/entry</strong></th>
+<th><strong>hitprobe</strong></th>
+<th><strong>missprobe</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.00</td>
+<td>2.13</td>
+<td>20.77</td>
+<td>3.00</td>
+<td>4.00</td>
+</tr>
+<tr>
+<td>4.50</td>
+<td>4.05</td>
+<td>17.30</td>
+<td>3.25</td>
+<td>4.50</td>
+</tr>
+<tr>
+<td>5.00</td>
+<td>6.85</td>
+<td>14.77</td>
+<td>3.50</td>
+<td>5.00</td>
+</tr>
+<tr>
+<td>5.50</td>
+<td>10.55</td>
+<td>12.94</td>
+<td>3.75</td>
+<td>5.50</td>
+</tr>
+<tr>
+<td>6.00</td>
+<td>15.27</td>
+<td>11.67</td>
+<td>4.00</td>
+<td>6.00</td>
+</tr>
+<tr>
+<td>6.50</td>
+<td>20.90</td>
+<td>10.79</td>
+<td>4.25</td>
+<td>6.50</td>
+</tr>
+<tr>
+<td>7.00</td>
+<td>27.14</td>
+<td>10.15</td>
+<td>4.50</td>
+<td>7.00</td>
+</tr>
+<tr>
+<td>7.50</td>
+<td>34.03</td>
+<td>9.73</td>
+<td>4.50</td>
+<td>7.50</td>
+</tr>
+<tr>
+<td>8.00</td>
+<td>41.10</td>
+<td>9.40</td>
+<td>5.00</td>
+<td>8.00</td>
+</tr>
+</tbody>
+</table>
+<p>但这个迁移并没有在扩容之后一次性完成，而是逐步完成的，每一次insert或remove时迁移1到2个pair，即<strong>增量扩容</strong>。</p>
+<p><strong>增量扩容的原因</strong>:主要是缩短map容器的响应时间。若hashmap很大扩容时很容易导致系统停顿无响应。</p>
+<p><strong>增量扩容本质上</strong>就是将总的扩容时间分摊到了每一次hash操作上。由于这个工作是逐渐完成的，导致数据一部分在old table中一部分在new table中。old的bucket不会删除，只是加上一个已删除的标记。只有当所有的bucket都从old table里迁移后才会将其释放掉。(摘录于<a href=https://studygolang.com/articles/11979 target=_blank rel="noopener noreffer">Golang中文社区</a>)</p></div><div class=post-footer id=post-footer>
+<div class=post-info>
+<div class=post-info-line>
+<div class=post-info-mod>
+<span>更新于 2022-05-28&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/bea09fc2531adef8a0ceaf76dfa393e6d4ac9e06 target=_blank title="commit by hyper2t(1244240338@qq.com) bea09fc2531adef8a0ceaf76dfa393e6d4ac9e06: go知识点拆开">
+<i class="fas fa-hashtag fa-fw"></i>bea09fc</a></span>
+</div>
+<div class=post-info-license></div>
+</div>
+<div class=post-info-line>
+<div class=post-info-md><span>
+<a class=link-to-markdown href=/hashmap/index.md target=_blank>阅读原始文档</a>
+</span></div>
+<div class=post-info-share>
+<span><a href=javascript:void(0); title="分享到 Twitter" data-sharer=twitter data-url=https://hyper2t.github.io/hashmap/ data-title="Go 基础知识与框架体系 part 9: hashmap" data-hashtags=Golang,goroutine,channel><i class="fab fa-twitter fa-fw"></i></a><a href=javascript:void(0); title="分享到 Facebook" data-sharer=facebook data-url=https://hyper2t.github.io/hashmap/ data-hashtag=Golang><i class="fab fa-facebook-square fa-fw"></i></a><a href=javascript:void(0); title="分享到 Hacker News" data-sharer=hackernews data-url=https://hyper2t.github.io/hashmap/ data-title="Go 基础知识与框架体系 part 9: hashmap"><i class="fab fa-hacker-news fa-fw"></i></a><a href=javascript:void(0); title="分享到 Line" data-sharer=line data-url=https://hyper2t.github.io/hashmap/ data-title="Go 基础知识与框架体系 part 9: hashmap"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg></i></a><a href=javascript:void(0); title="分享到 微博" data-sharer=weibo data-url=https://hyper2t.github.io/hashmap/ data-title="Go 基础知识与框架体系 part 9: hashmap" data-ralateuid="7289413661/profile?topnav=1&wvr=6&is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+</div>
+</div>
+</div>
+<div class=post-info-more>
+<section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a>,&nbsp;<a href=/tags/goroutine/>goroutine</a>,&nbsp;<a href=/tags/channel/>channel</a></section>
+<section>
+<span><a href=javascript:void(0); onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span>
+</section>
+</div>
+<div class=post-nav><a href=/mutex/ class=prev rel=prev title="Go 基础知识与框架体系 part 8: mutex 互斥锁"><i class="fas fa-angle-left fa-fw"></i>Go 基础知识与框架体系 part 8: mutex 互斥锁</a>
+<a href=/crd/ class=next rel=next title="Kubernetes CRD Operator 开发系列">Kubernetes CRD Operator 开发系列<i class="fas fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id=comments><div id=waline class=comment></div>
+<script src=https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js></script>
+<link href=https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.css rel=stylesheet>
+<script>window.onload=function(){loadComments()};function loadComments(){if(typeof $waline=='undefined'){var a=b=>{var a=document.createElement('script');a.defer=!0,a.crossOrigin='anonymous',Object.keys(b).forEach(c=>{a[c]=b[c]}),document.body.appendChild(a)};a({src:'https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js',onload:()=>{newWaline()}})}else newWaline()}function newWaline(){Waline.init({el:'#waline',meta:["nick","mail","link"],login:"enable",dark:"auto",serverURL:"https://waline-comment-psi.vercel.app/",avatarCDN:"https://sdn.geekzu.org/avatar/",requiredMeta:["nick","mail"],pageSize:10,avatar:"retro",lang:"zh-CN",pageview:!0,emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/norevi/waline-blobcatemojis@1.0/blobs"],highlighter:!0,locale:{placeholder:"提交评论较慢，请等待几秒~",level0:'炼体',level1:'炼气',level2:'筑基',level3:'金丹',level4:'元婴',level5:'化神'}}),Waline.pageviewCount({serverURL:"https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js",update:!0})}</script></div></article></div>
+</main><footer class=footer>
+<div class=footer-container><div class=footer-line>Powered by Hugo with LoveIt</div><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.90.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>星夜君麒</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div>
+</div>
+</footer></div>
+<div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部>
+<i class="fas fa-arrow-up fa-fw"></i>
+</a><a href=# id=view-comments class=fixed-button title=查看评论>
+<i class="fas fa-comment fa-fw"></i>
+</a>
+</div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:80},comment:{},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{algoliaAppID:"76RX3LJOIU",algoliaIndex:"dev_hyper2t",algoliaSearchKey:"0ddf3c3aad0b6d8b914d0f3d2305da67",highlightTag:"em",maxResultLength:10,noResultsFound:"没有找到结果",snippetLength:50,type:"algolia"}}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js></script>
+<script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery-backstretch@2.1.18/jquery.backstretch.min.js></script><script type=text/javascript src=/js/custom.js></script></body>
+</html>
