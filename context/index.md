@@ -1,4 +1,4 @@
-# Golang 基础知识与框架体系 part 5: context包
+# Go 基础知识与框架体系 part 5: context包
 
 
 这篇文章总结了 Go 的知识体系:context包，包括其中的底层实现等等。

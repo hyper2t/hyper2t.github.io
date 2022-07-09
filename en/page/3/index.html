@@ -33,7 +33,17 @@
 <script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/夜的钢琴曲1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
 </div>
 <div class=menu>
-<div class=menu-inner><a class=menu-item href=/en/posts/> Posts </a><a class=menu-item href=/en/tags/> Tags </a><a class=menu-item href=/en/categories/> Categories </a><a class=menu-item href=/en/categories/catch-the-cat/> Game </a><a class=menu-item href=/en/about/> About </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title="Select Language">English<i class="fas fa-chevron-right fa-fw"></i>
+<div class=menu-inner>
+<div class=dropdown>
+<a href=/en/posts/ class="menu-item menu-more dropbtn" title> Topic
+</a>
+<div class="menu-more-content dropdown-content"><a href=/en/categories/ title> Categories </a><a href=/en/cloudnative/ title> Cloud Native </a></div>
+</div>
+<a class=menu-item href=/en/tags/> Tags
+</a><a class=menu-item href=/en/categories/catch-the-cat/> Game
+</a><a class=menu-item href=/en/about/> About
+</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
+</a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title="Select Language">English<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/ selected>English</option><option value=/>简体中文</option><option value=/fr/>Français</option></select>
 </a><span class="menu-item search" id=search-desktop>
 <input type=text placeholder="Search titles or contents..." id=search-input-desktop>
@@ -78,7 +88,17 @@
 <a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
 Cancel
 </a>
-</div><a class=menu-item href=/en/posts/ title>Posts</a><a class=menu-item href=/en/tags/ title>Tags</a><a class=menu-item href=/en/categories/ title>Categories</a><a class=menu-item href=/en/categories/catch-the-cat/ title>Game</a><a class=menu-item href=/en/about/ title>About</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+</div>
+<div class=dropdown>
+<a href=/en/posts/ class="menu-item menu-more dropbtn" title> Topic
+</a>
+<div class="menu-more-content dropdown-content"><a href=/en/categories/ title> Categories </a><a href=/en/cloudnative/ title> Cloud Native </a></div>
+</div>
+<a class=menu-item href=/en/tags/> Tags
+</a><a class=menu-item href=/en/categories/catch-the-cat/> Game
+</a><a class=menu-item href=/en/about/> About
+</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
+</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
 <i class="fas fa-adjust fa-fw"></i>
 </a><a href=javascript:void(0); class=menu-item title="Select Language">English<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select onchange="location=this.value"><option value=/en/ selected>English</option><option value=/>简体中文</option><option value=/fr/>Français</option></select>
@@ -92,8 +112,15 @@ Cancel
 <div id=search-dropdown-mobile></div>
 </div>
 <main class=main>
-<div class=container><div class="page home" posts><div class=home-profile><div class=home-avatar><a href=/en/posts/ title=Posts><img class=lazyload src=/svg/loading.min.svg data-src=/images/new-selfie.jpeg data-srcset="/images/new-selfie.jpeg, /images/new-selfie.jpeg 1.5x, /images/new-selfie.jpeg 2x" data-sizes=auto alt=/images/new-selfie.jpeg title=/images/new-selfie.jpeg></a></div><h2 class=home-subtitle><div id=id-1 class=typeit></div></h2><div class=links><a href=https://github.com/peterliao96 title=GitHub target=_blank rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href=https://linkedin.com/in/peter-junqi-liao-431193128 title=LinkedIn target=_blank rel="noopener noreffer me"><i class="fab fa-linkedin fa-fw"></i></a><a href=https://www.instagram.com/junqi_liao title=Instagram target=_blank rel="noopener noreffer me"><i class="fab fa-instagram fa-fw"></i></a><a href=https://facebook.com/junqi.liao.3958 title=facebook target=_blank rel="noopener noreffer me"><i class="fab fa-facebook fa-fw"></i></a><a href=https://www.youtube.com/channel/UC5cKqUeZjjXcNlFIizNLzkw title=YouTube target=_blank rel="noopener noreffer me"><i class="fab fa-youtube fa-fw"></i></a><a href="https://weibo.com/7289413661/profile?topnav=1&wvr=6&is_all=1" title=微博 target=_blank rel="noopener noreffer me"><i class="fab fa-weibo fa-fw"></i></a><a href=https://mastodon.technology/@xxxx title=Mastodon target=_blank rel="noopener noreffer me"><i class="fab fa-mastodon fa-fw"></i></a><a href=mailto:j29liao@uwaterloo.ca title=Email rel=me><i class="far fa-envelope fa-fw"></i></a><a href=/en/index.xml title=RSS target=_blank rel="noopener noreffer me"><i class="fas fa-rss fa-fw"></i></a></div></div>
+<div class=container><div class="page home" posts><div class=home-profile><div class=home-avatar><a href=/en/posts/ title=Topic><img class=lazyload src=/svg/loading.min.svg data-src=/images/new-selfie.jpeg data-srcset="/images/new-selfie.jpeg, /images/new-selfie.jpeg 1.5x, /images/new-selfie.jpeg 2x" data-sizes=auto alt=/images/new-selfie.jpeg title=/images/new-selfie.jpeg></a></div><h2 class=home-subtitle><div id=id-1 class=typeit></div></h2><div class=links><a href=https://github.com/peterliao96 title=GitHub target=_blank rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href=https://linkedin.com/in/peter-junqi-liao-431193128 title=LinkedIn target=_blank rel="noopener noreffer me"><i class="fab fa-linkedin fa-fw"></i></a><a href=https://www.instagram.com/junqi_liao title=Instagram target=_blank rel="noopener noreffer me"><i class="fab fa-instagram fa-fw"></i></a><a href=https://facebook.com/junqi.liao.3958 title=facebook target=_blank rel="noopener noreffer me"><i class="fab fa-facebook fa-fw"></i></a><a href=https://www.youtube.com/channel/UC5cKqUeZjjXcNlFIizNLzkw title=YouTube target=_blank rel="noopener noreffer me"><i class="fab fa-youtube fa-fw"></i></a><a href="https://weibo.com/7289413661/profile?topnav=1&wvr=6&is_all=1" title=微博 target=_blank rel="noopener noreffer me"><i class="fab fa-weibo fa-fw"></i></a><a href=https://mastodon.technology/@xxxx title=Mastodon target=_blank rel="noopener noreffer me"><i class="fab fa-mastodon fa-fw"></i></a><a href=mailto:j29liao@uwaterloo.ca title=Email rel=me><i class="far fa-envelope fa-fw"></i></a><a href=/en/index.xml title=RSS target=_blank rel="noopener noreffer me"><i class="fas fa-rss fa-fw"></i></a></div></div>
 <article class="single summary" itemscope itemtype=http://schema.org/Article><div class=featured-image-preview>
+<a href=/en/waitgroup/><img class=lazyload src=/svg/loading.min.svg data-src=/en/waitgroup/featured-image.jpeg data-srcset="/en/waitgroup/featured-image.jpeg, /en/waitgroup/featured-image.jpeg 1.5x, /en/waitgroup/featured-image.jpeg 2x" data-sizes=auto alt=/en/waitgroup/featured-image.jpeg title="This article summarizes the basic of Golang, its application and the underlying architectures."></a>
+</div><h1 class=single-title itemprop="name headline">
+<a href=/en/waitgroup/>Go Basic and architectures</a>
+</h1><div class=post-meta><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-publish>published on <time datetime=2020-08-02>2020-08-02</time></span>&nbsp;<span class=post-category>included in <a href=/en/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div><div class=content><p>This article summarizes the basic of Golang, its application and the underlying architectures.</p></div><div class=post-footer>
+<a href=/en/waitgroup/>Read More</a><div class=post-tags>
+<i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/en/tags/golang/>Golang</a>,&nbsp;<a href=/en/tags/goroutine/>goroutine</a>,&nbsp;<a href=/en/tags/channel/>channel</a></div></div>
+</article><article class="single summary" itemscope itemtype=http://schema.org/Article><div class=featured-image-preview>
 <a href=/en/interface/><img class=lazyload src=/svg/loading.min.svg data-src=/en/interface/featured-image.jpeg data-srcset="/en/interface/featured-image.jpeg, /en/interface/featured-image.jpeg 1.5x, /en/interface/featured-image.jpeg 2x" data-sizes=auto alt=/en/interface/featured-image.jpeg title="This article summarizes the basic of Golang, its application and the underlying architectures."></a>
 </div><h1 class=single-title itemprop="name headline">
 <a href=/en/interface/>Golang Basic and architectures</a>
@@ -113,13 +140,6 @@ Cancel
 <a href=/en/slice/>Golang Basic and architectures</a>
 </h1><div class=post-meta><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-publish>published on <time datetime=2020-08-02>2020-08-02</time></span>&nbsp;<span class=post-category>included in <a href=/en/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div><div class=content><p>This article summarizes the basic of Golang, its application and the underlying architectures.</p></div><div class=post-footer>
 <a href=/en/slice/>Read More</a><div class=post-tags>
-<i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/en/tags/golang/>Golang</a>,&nbsp;<a href=/en/tags/goroutine/>goroutine</a>,&nbsp;<a href=/en/tags/channel/>channel</a></div></div>
-</article><article class="single summary" itemscope itemtype=http://schema.org/Article><div class=featured-image-preview>
-<a href=/en/waitgroup/><img class=lazyload src=/svg/loading.min.svg data-src=/en/waitgroup/featured-image.jpeg data-srcset="/en/waitgroup/featured-image.jpeg, /en/waitgroup/featured-image.jpeg 1.5x, /en/waitgroup/featured-image.jpeg 2x" data-sizes=auto alt=/en/waitgroup/featured-image.jpeg title="This article summarizes the basic of Golang, its application and the underlying architectures."></a>
-</div><h1 class=single-title itemprop="name headline">
-<a href=/en/waitgroup/>Golang Basic and architectures</a>
-</h1><div class=post-meta><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-publish>published on <time datetime=2020-08-02>2020-08-02</time></span>&nbsp;<span class=post-category>included in <a href=/en/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div><div class=content><p>This article summarizes the basic of Golang, its application and the underlying architectures.</p></div><div class=post-footer>
-<a href=/en/waitgroup/>Read More</a><div class=post-tags>
 <i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/en/tags/golang/>Golang</a>,&nbsp;<a href=/en/tags/goroutine/>goroutine</a>,&nbsp;<a href=/en/tags/channel/>channel</a></div></div>
 </article><ul class=pagination><li class=page-item>
 <span class=page-link>

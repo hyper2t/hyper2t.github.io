@@ -33,7 +33,17 @@
 <script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/夜的钢琴曲1.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
 </div>
 <div class=menu>
-<div class=menu-inner><a class=menu-item href=/posts/> 所有文章 </a><a class=menu-item href=/tags/> 标签 </a><a class=menu-item href=/categories/> 分类 </a><a class=menu-item href=/categories/catch-the-cat/> 趣味 </a><a class=menu-item href=/about/> 关于 </a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i> </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
+<div class=menu-inner>
+<div class=dropdown>
+<a href=/posts/ class="menu-item menu-more dropbtn" title> 专栏
+</a>
+<div class="menu-more-content dropdown-content"><a href=/categories/ title> 综合分类 </a><a href=/cloudnative/ title> 云原生 </a></div>
+</div>
+<a class=menu-item href=/tags/> 标签
+</a><a class=menu-item href=/categories/catch-the-cat/> 趣味
+</a><a class=menu-item href=/about/> 关于
+</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
+</a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/>English</option><option value=/ selected>简体中文</option><option value=/fr/>Français</option></select>
 </a><span class="menu-item search" id=search-desktop>
 <input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
@@ -78,7 +88,17 @@
 <a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
 取消
 </a>
-</div><a class=menu-item href=/posts/ title>所有文章</a><a class=menu-item href=/tags/ title>标签</a><a class=menu-item href=/categories/ title>分类</a><a class=menu-item href=/categories/catch-the-cat/ title>趣味</a><a class=menu-item href=/about/ title>关于</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i></a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
+</div>
+<div class=dropdown>
+<a href=/posts/ class="menu-item menu-more dropbtn" title> 专栏
+</a>
+<div class="menu-more-content dropdown-content"><a href=/categories/ title> 综合分类 </a><a href=/cloudnative/ title> 云原生 </a></div>
+</div>
+<a class=menu-item href=/tags/> 标签
+</a><a class=menu-item href=/categories/catch-the-cat/> 趣味
+</a><a class=menu-item href=/about/> 关于
+</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
+</a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
 <i class="fas fa-adjust fa-fw"></i>
 </a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
 <select class=language-select onchange="location=this.value"><option value=/en/>English</option><option value=/ selected>简体中文</option><option value=/fr/>Français</option></select>
@@ -92,7 +112,7 @@
 <div id=search-dropdown-mobile></div>
 </div>
 <main class=main>
-<div class=container><div class="page home" posts><div class=home-profile><div class=home-avatar><a href=/posts/ title=所有文章><img class=lazyload src=/svg/loading.min.svg data-src=/images/new-selfie.jpeg data-srcset="/images/new-selfie.jpeg, /images/new-selfie.jpeg 1.5x, /images/new-selfie.jpeg 2x" data-sizes=auto alt=/images/new-selfie.jpeg title=/images/new-selfie.jpeg></a></div><h2 class=home-subtitle><div id=id-1 class=typeit></div></h2><div class=links><a href=https://github.com/peterliao96 title=GitHub target=_blank rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href=https://linkedin.com/in/peter-junqi-liao-431193128 title=LinkedIn target=_blank rel="noopener noreffer me"><i class="fab fa-linkedin fa-fw"></i></a><a href=https://www.instagram.com/junqi_liao title=Instagram target=_blank rel="noopener noreffer me"><i class="fab fa-instagram fa-fw"></i></a><a href=https://www.youtube.com/channel/UC5cKqUeZjjXcNlFIizNLzkw title=YouTube target=_blank rel="noopener noreffer me"><i class="fab fa-youtube fa-fw"></i></a><a href="https://weibo.com/7289413661/profile?topnav=1&wvr=6&is_all=1" title=微博 target=_blank rel="noopener noreffer me"><i class="fab fa-weibo fa-fw"></i></a><a href=https://www.zhihu.com/people/xxxx title=知乎 target=_blank rel="noopener noreffer me"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/zhihu.svg></i></a><a href=https://space.bilibili.com/1365775573 title=bilibili target=_blank rel="noopener noreffer me"><i data-svg-src=/svg/icons/bilibili.min.svg></i></a><a href=mailto:j29liao@uwaterloo.ca title=Email rel=me><i class="far fa-envelope fa-fw"></i></a><a href=/index.xml title=RSS target=_blank rel="noopener noreffer me"><i class="fas fa-rss fa-fw"></i></a></div></div>
+<div class=container><div class="page home" posts><div class=home-profile><div class=home-avatar><a href=/posts/ title=专栏><img class=lazyload src=/svg/loading.min.svg data-src=/images/new-selfie.jpeg data-srcset="/images/new-selfie.jpeg, /images/new-selfie.jpeg 1.5x, /images/new-selfie.jpeg 2x" data-sizes=auto alt=/images/new-selfie.jpeg title=/images/new-selfie.jpeg></a></div><h2 class=home-subtitle><div id=id-1 class=typeit></div></h2><div class=links><a href=https://github.com/peterliao96 title=GitHub target=_blank rel="noopener noreffer me"><i class="fab fa-github-alt fa-fw"></i></a><a href=https://linkedin.com/in/peter-junqi-liao-431193128 title=LinkedIn target=_blank rel="noopener noreffer me"><i class="fab fa-linkedin fa-fw"></i></a><a href=https://www.instagram.com/junqi_liao title=Instagram target=_blank rel="noopener noreffer me"><i class="fab fa-instagram fa-fw"></i></a><a href=https://www.youtube.com/channel/UC5cKqUeZjjXcNlFIizNLzkw title=YouTube target=_blank rel="noopener noreffer me"><i class="fab fa-youtube fa-fw"></i></a><a href="https://weibo.com/7289413661/profile?topnav=1&wvr=6&is_all=1" title=微博 target=_blank rel="noopener noreffer me"><i class="fab fa-weibo fa-fw"></i></a><a href=https://www.zhihu.com/people/xxxx title=知乎 target=_blank rel="noopener noreffer me"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/zhihu.svg></i></a><a href=https://space.bilibili.com/1365775573 title=bilibili target=_blank rel="noopener noreffer me"><i data-svg-src=/svg/icons/bilibili.min.svg></i></a><a href=mailto:j29liao@uwaterloo.ca title=Email rel=me><i class="far fa-envelope fa-fw"></i></a><a href=/index.xml title=RSS target=_blank rel="noopener noreffer me"><i class="fas fa-rss fa-fw"></i></a></div></div>
 <article class="single summary" itemscope itemtype=http://schema.org/Article><div class=featured-image-preview>
 <a href=/crd/><img class=lazyload src=/svg/loading.min.svg data-src=/crd/featured-image.png data-srcset="/crd/featured-image.png, /crd/featured-image.png 1.5x, /crd/featured-image.png 2x" data-sizes=auto alt=/crd/featured-image.png title="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中的底层实现等等。"></a>
 </div><h1 class=single-title itemprop="name headline">
@@ -124,14 +144,14 @@
 </article><article class="single summary" itemscope itemtype=http://schema.org/Article><div class=featured-image-preview>
 <a href=/defer/><img class=lazyload src=/svg/loading.min.svg data-src=/defer/featured-image.jpeg data-srcset="/defer/featured-image.jpeg, /defer/featured-image.jpeg 1.5x, /defer/featured-image.jpeg 2x" data-sizes=auto alt=/defer/featured-image.jpeg title="这篇文章总结了 Golang 的知识体系 defer, panic 和 recover，包括其中的底层实现等等。"></a>
 </div><h1 class=single-title itemprop="name headline">
-<a href=/defer/>Golang 基础知识与框架体系 part 6: defer, panic 和 recover</a>
-</h1><div class=post-meta><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-publish>发布于 <time datetime=2020-07-07>2020-07-07</time></span>&nbsp;<span class=post-category>收录于 <a href=/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div><div class=content><p>这篇文章总结了 Golang 的知识体系 <code>defer</code>, <code>panic</code> 和 <code>recover</code>，包括其中的底层实现等等。</p></div><div class=post-footer>
+<a href=/defer/>Go 基础知识与框架体系 part 6: defer, panic 和 recover</a>
+</h1><div class=post-meta><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-publish>发布于 <time datetime=2020-07-07>2020-07-07</time></span>&nbsp;<span class=post-category>收录于 <a href=/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div><div class=content><p>这篇文章总结了 Go 的知识体系 <code>defer</code>, <code>panic</code> 和 <code>recover</code>，包括其中的底层实现等等。</p></div><div class=post-footer>
 <a href=/defer/>阅读全文</a><div class=post-tags>
 <i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a>,&nbsp;<a href=/tags/goroutine/>goroutine</a>,&nbsp;<a href=/tags/channel/>channel</a></div></div>
 </article><article class="single summary" itemscope itemtype=http://schema.org/Article><div class=featured-image-preview>
 <a href=/context/><img class=lazyload src=/svg/loading.min.svg data-src=/context/featured-image.jpeg data-srcset="/context/featured-image.jpeg, /context/featured-image.jpeg 1.5x, /context/featured-image.jpeg 2x" data-sizes=auto alt=/context/featured-image.jpeg title="这篇文章总结了 Go 的知识体系:context包，包括其中的底层实现等等。"></a>
 </div><h1 class=single-title itemprop="name headline">
-<a href=/context/>Golang 基础知识与框架体系 part 5: context包</a>
+<a href=/context/>Go 基础知识与框架体系 part 5: context包</a>
 </h1><div class=post-meta><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-publish>发布于 <time datetime=2020-07-06>2020-07-06</time></span>&nbsp;<span class=post-category>收录于 <a href=/categories/golang/><i class="far fa-folder fa-fw"></i>Golang</a></span></div><div class=content><p>这篇文章总结了 Go 的知识体系:context包，包括其中的底层实现等等。</p></div><div class=post-footer>
 <a href=/context/>阅读全文</a><div class=post-tags>
 <i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a>,&nbsp;<a href=/tags/goroutine/>goroutine</a>,&nbsp;<a href=/tags/channel/>channel</a></div></div>
