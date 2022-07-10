@@ -9,7 +9,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://hyper2t.github.io/en/mutex/"><meta property="og:image" content="https://hyper2t.github.io/en/mutex/featured-image.jpeg"><meta property="article:section" content="posts">
 <meta property="article:published_time" content="2020-08-02T21:57:40+08:00">
-<meta property="article:modified_time" content="2022-07-10T16:55:32+08:00">
+<meta property="article:modified_time" content="2022-07-10T21:51:11+08:00">
 <meta name=twitter:card content="summary_large_image">
 <meta name=twitter:image content="https://hyper2t.github.io/en/mutex/featured-image.jpeg">
 <meta name=twitter:title content="Golang Basic and architectures part 8: mutex">
@@ -17,7 +17,7 @@
 <meta name=application-name content="LoveIt">
 <meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
 <link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/en/mutex/><link rel=next href=https://hyper2t.github.io/en/interface/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Golang Basic and architectures part 8: mutex","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/en\/mutex\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/en\/mutex\/featured-image.jpeg","width":1200,"height":704}],"genre":"posts","keywords":"Golang, goroutine, channel","wordcount":13,"url":"https:\/\/hyper2t.github.io\/en\/mutex\/","datePublished":"2020-08-02T21:57:40+08:00","dateModified":"2022-07-10T16:55:32+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"This article summarizes the basic of Golang, its application and the underlying architectures."}</script></head>
+<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/en/mutex/><link rel=next href=https://hyper2t.github.io/en/interface/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Golang Basic and architectures part 8: mutex","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/en\/mutex\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/en\/mutex\/featured-image.jpeg","width":1200,"height":704}],"genre":"posts","keywords":"Golang, goroutine, channel","wordcount":13,"url":"https:\/\/hyper2t.github.io\/en\/mutex\/","datePublished":"2020-08-02T21:57:40+08:00","dateModified":"2022-07-10T21:51:11+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"This article summarizes the basic of Golang, its application and the underlying architectures."}</script></head>
 <body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
@@ -131,8 +131,8 @@ Cancel
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
-<span>Updated on 2022-07-10&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/7d8887cf4aa7048a3d32a12d884fc042cad02c11 target=_blank title="commit by hyper2t(1244240338@qq.com) 7d8887cf4aa7048a3d32a12d884fc042cad02c11: 更新英文标题">
-<i class="fas fa-hashtag fa-fw"></i>7d8887c</a></span>
+<span>Updated on 2022-07-10&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/cc57aa787ba7df64b2357ba243c6eb97277118c7 target=_blank title="commit by hyper2t(1244240338@qq.com) cc57aa787ba7df64b2357ba243c6eb97277118c7: 新加图片">
+<i class="fas fa-hashtag fa-fw"></i>cc57aa7</a></span>
 </div>
 <div class=post-info-license></div>
 </div>
