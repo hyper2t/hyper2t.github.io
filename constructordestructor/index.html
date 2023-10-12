@@ -1,210 +1,277 @@
-<!doctype html><html lang=zh-cn>
-<head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=robots content="noodp">
-<meta http-equiv=x-ua-compatible content="IE=edge, chrome=1">
-<title>C++ 面向对象编程知识体系 part 1: 构造函数与析构函数 - 嗨，皮特~</title><meta name=Description content="这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。"><meta property="og:title" content="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数">
-<meta property="og:description" content="这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://hyper2t.github.io/constructordestructor/"><meta property="og:image" content="https://hyper2t.github.io/constructordestructor/featured-image.png"><meta property="article:section" content="posts">
-<meta property="article:published_time" content="2020-08-11T21:57:40+08:00">
-<meta property="article:modified_time" content="2022-10-15T02:37:20+08:00">
-<meta name=twitter:card content="summary_large_image">
-<meta name=twitter:image content="https://hyper2t.github.io/constructordestructor/featured-image.png">
-<meta name=twitter:title content="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数">
-<meta name=twitter:description content="这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。">
-<meta name=application-name content="LoveIt">
-<meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
-<link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/constructordestructor/><link rel=prev href=https://hyper2t.github.io/semaphore/><link rel=next href=https://hyper2t.github.io/algorithms/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"C++ 面向对象编程知识体系 part 1: 构造函数与析构函数","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/constructordestructor\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/constructordestructor\/featured-image.png","width":1024,"height":341}],"genre":"posts","keywords":"C\u002b\u002b, 继承, 多态, 类","wordcount":2460,"url":"https:\/\/hyper2t.github.io\/constructordestructor\/","datePublished":"2020-08-11T21:57:40+08:00","dateModified":"2022-10-15T02:37:20+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。"}</script></head>
-<body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
-<div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
-<div class=header-wrapper>
-<div class=header-title>
-<a href=/ title=嗨，皮特~><span class=header-title-pre><i class="fas fa-home"></i></span>Hyperter～</a>
-</div>
-<div id=audioBox class=adBox>
-<div class=songRollingContainer>
-<a class=songRolling>
-<span id=songName></span>
-</a>
-</div>
-<script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
-</div>
-<div class=menu>
-<div class=menu-inner>
-<div class=dropdown>
-<a href=/posts/ class="menu-item menu-more dropbtn" title> 专栏
-</a>
-<div class="menu-more-content dropdown-content"><a href=/categories/ title> 综合分类 </a><a href=/notes/ title> 云原生 </a></div>
-</div>
-<a class=menu-item href=/tags/> 标签
-</a><a class=menu-item href=/categories/catch-the-cat/> 趣味
-</a><a class=menu-item href=/about/> 关于
-</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
-</a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
-<select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/constructordestructor/>English</option><option value=/constructordestructor/ selected>简体中文</option></select>
-</a><span class="menu-item search" id=search-desktop>
-<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
-<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索>
-<i class="fas fa-search fa-fw"></i>
-</a>
-<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空>
-<i class="fas fa-times-circle fa-fw"></i>
-</a>
-<span class="search-button search-loading" id=search-loading-desktop>
-<i class="fas fa-spinner fa-fw fa-spin"></i>
-</span>
-</span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
-<i class="fas fa-adjust fa-fw"></i>
-</a>
-</div>
-</div>
-</div>
-</header><header class=mobile id=header-mobile>
-<div class=header-container>
-<div class=header-wrapper>
-<div class=header-title>
-<a href=/ title=嗨，皮特~><span class=header-title-pre><i class="fas fa-home"></i></span>Hyperter～</a>
-</div>
-<div class=menu-toggle id=menu-toggle-mobile>
-<span></span><span></span><span></span>
-</div>
-</div>
-<div class=menu id=menu-mobile><div class=search-wrapper>
-<div class="search mobile" id=search-mobile>
-<input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
-<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索>
-<i class="fas fa-search fa-fw"></i>
-</a>
-<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空>
-<i class="fas fa-times-circle fa-fw"></i>
-</a>
-<span class="search-button search-loading" id=search-loading-mobile>
-<i class="fas fa-spinner fa-fw fa-spin"></i>
-</span>
-</div>
-<a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
-取消
-</a>
-</div>
-<div class=dropdown>
-<a href=/posts/ class="menu-item menu-more dropbtn" title> 专栏
-</a>
-<div class="menu-more-content dropdown-content"><a href=/categories/ title> 综合分类 </a><a href=/notes/ title> 云原生 </a></div>
-</div>
-<a class=menu-item href=/tags/> 标签
-</a><a class=menu-item href=/categories/catch-the-cat/> 趣味
-</a><a class=menu-item href=/about/> 关于
-</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
-</a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
-<i class="fas fa-adjust fa-fw"></i>
-</a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
-<select class=language-select onchange="location=this.value"><option value=/en/constructordestructor/>English</option><option value=/constructordestructor/ selected>简体中文</option></select>
-</a></div>
-</div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数 - 嗨，皮特~</title><meta name="Description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。"><meta property="og:title" content="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数" />
+<meta property="og:description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hyper2t.github.io/constructordestructor/" /><meta property="og:image" content="https://hyper2t.github.io/constructordestructor/featured-image.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-08-11T21:57:40+08:00" />
+<meta property="article:modified_time" content="2022-07-08T08:43:29+08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://hyper2t.github.io/constructordestructor/featured-image.png"/>
+<meta name="twitter:title" content="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数"/>
+<meta name="twitter:description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。"/>
+<meta name="application-name" content="LoveIt">
+<meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/twister-32x32.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/twister-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/twister-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://hyper2t.github.io/constructordestructor/" /><link rel="prev" href="https://hyper2t.github.io/semaphore/" /><link rel="next" href="https://hyper2t.github.io/algorithms/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "C++ 面向对象编程知识体系 part 1: 构造函数与析构函数",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/hyper2t.github.io\/constructordestructor\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/hyper2t.github.io\/constructordestructor\/featured-image.png",
+                            "width":  1024 ,
+                            "height":  341 
+                        }],"genre": "posts","keywords": "C\u002b\u002b, 继承, 多态, 类","wordcount":  2443 ,
+        "url": "https:\/\/hyper2t.github.io\/constructordestructor\/","datePublished": "2020-08-11T21:57:40+08:00","dateModified": "2022-07-08T08:43:29+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": {
+                    "@type": "ImageObject",
+                    "url": "https:\/\/hyper2t.github.io\/images\/selfie-modified.png",
+                    "width":  283 ,
+                    "height":  283 
+                }},"author": {
+                "@type": "Person",
+                "name": "Peter Liao"
+            },"description": "这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。"
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="嗨，皮特~"><span class="header-title-pre"><i class='fas fa-home'></i></span>皮特ᴾᵗ~</a>
+        </div>
+        <div id="audioBox" class="adBox">
+            <div class="songRollingContainer">
+                <a class="songRolling">
+                    <span id="songName"></span>
+                </a>
+            </div>
+            <script type="text/javascript">
+                window.onload = function(){
+                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3"];               
+                    var myAudio = new Audio();
+                    myAudio.preload = true;
+                    myAudio.controls = true;
+                    myAudio.controlsList = "noplaybackrate";
+                    myAudio.src = arr.pop();         
+                    arr.unshift(myAudio.src);
+                    myAudio.volume = 0.2
+                    myAudio.id = myAudio.src
+                    myAudio.addEventListener('ended', playEndedHandler, false);
+                    myAudio.play();
+                    document.getElementById("audioBox").appendChild(myAudio);
+                    myAudio.loop = false;
+                    function getSongName(src) {
+                        var slashIndex = src.lastIndexOf("/")
+                        return decodeURI(src.slice(slashIndex+1))
+                    }
+                    document.getElementById("songName").innerHTML = getSongName(myAudio.src)
+                    function playEndedHandler(){
+                        myAudio.src = arr.pop();
+                        arr.unshift(myAudio.src);
+                        myAudio.play();
+                        console.log(arr.length);
+                        !arr.length && myAudio.removeEventListener('ended',playEndedHandler,false);
+                        document.getElementById("songName").innerHTML = getSongName(myAudio.src)
+                    }
+                }
+            </script>
+        </div>
+
+        <div class="menu">
+            <div class="menu-inner">
+                <div class="dropdown">
+                    <a href="/posts/" class="menu-item menu-more dropbtn" title="" > 专栏 
+                    </a>
+                    <div class="menu-more-content dropdown-content"><a href="/categories/" title="" > 综合分类 </a><a href="/notes/" title="" > 云原生 </a></div>
+                </div>
+                <a class="menu-item" href="/tags/"> 标签 
+                </a><a class="menu-item" href="/categories/catch-the-cat/"> 趣味 
+                </a><a class="menu-item" href="/about/"> 关于 
+                </a><a class="menu-item" href="https://github.com/hyper2t/hyper2t.github.io" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw'></i>  
+                </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item language" title="选择语言">简体中文<i class="fas fa-chevron-right fa-fw"></i>
+                        <select class="language-select" id="language-select-desktop" onchange="location = this.value;"><option value="/en/constructordestructor/">English</option><option value="/constructordestructor/" selected>简体中文</option></select>
+                    </a><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="嗨，皮特~"><span class="header-title-pre"><i class='fas fa-home'></i></span>皮特ᴾᵗ~</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div>
+            <div class="dropdown">
+                <a href="/posts/" class="menu-item menu-more dropbtn" title="" > 专栏 
+                </a>
+                <div class="menu-more-content dropdown-content"><a href="/categories/" title="" > 综合分类 </a><a href="/notes/" title="" > 云原生 </a></div>
+            </div>
+            <a class="menu-item" href="/tags/"> 标签 
+            </a><a class="menu-item" href="/categories/catch-the-cat/"> 趣味 
+            </a><a class="menu-item" href="/about/"> 关于 
+            </a><a class="menu-item" href="https://github.com/hyper2t/hyper2t.github.io" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw'></i>  
+            </a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a><a href="javascript:void(0);" class="menu-item" title="选择语言">简体中文<i class="fas fa-chevron-right fa-fw"></i>
+                    <select class="language-select" onchange="location = this.value;"><option value="/en/constructordestructor/">English</option><option value="/constructordestructor/" selected>简体中文</option></select>
+                </a></div>
+    </div>
 </header>
 <div class="search-dropdown desktop">
-<div id=search-dropdown-desktop></div>
+    <div id="search-dropdown-desktop"></div>
 </div>
 <div class="search-dropdown mobile">
-<div id=search-dropdown-mobile></div>
+    <div id="search-dropdown-mobile"></div>
 </div>
-<main class=main>
-<div class=container><div class=toc id=toc-auto>
-<h2 class=toc-title>目录</h2>
-<div class=toc-content id=toc-content-auto></div>
-</div><article class="page single"><h1 class="single-title animated flipInX">C++ 面向对象编程知识体系 part 1: 构造函数与析构函数</h1><div class=post-meta>
-<div class=post-meta-line><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/c++/><i class="far fa-folder fa-fw"></i>C++</a></span></div>
-<div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-08-11>2020-08-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2460 字&nbsp;
-<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 5 分钟&nbsp;<span id=/constructordestructor/ class=leancloud_visitors data-flag-title="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数">
-<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
-</span>&nbsp;</div>
-</div><div class=featured-image><img class=lazyload src=/svg/loading.min.svg data-src=/constructordestructor/featured-image.png data-srcset="/constructordestructor/featured-image.png, /constructordestructor/featured-image.png 1.5x, /constructordestructor/featured-image.png 2x" data-sizes=auto alt=/constructordestructor/featured-image.png title="这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。"></div><div class="details toc" id=toc-static kept>
-<div class="details-summary toc-title">
-<span>目录</span>
-<span><i class="details-icon fas fa-angle-right"></i></span>
-</div>
-<div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents>
-<ul>
-<li><a href=#1-面向对象特性>1 面向对象特性</a>
-<ul>
-<li><a href=#1-类与对象>1. 类与对象</a>
-<ul>
-<li><a href=#类成员的访问控制><strong>类成员的访问控制</strong></a></li>
-</ul>
-</li>
-<li><a href=#2-类的构造与析构>2. 类的构造与析构</a>
-<ul>
-<li><a href=#构造函数><strong>构造函数</strong></a></li>
-<li><a href=#析构函数><strong>析构函数</strong></a></li>
-</ul>
-</li>
-<li><a href=#4-类的继承>4. 类的继承</a></li>
-<li><a href=#5-类的多态>5. 类的多态</a></li>
-<li><a href=#6-rtti-与抽象类>6. RTTI 与抽象类</a></li>
-</ul>
-</li>
-</ul>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://hyper2t.github.io" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/c++/"><i class="far fa-folder fa-fw"></i>C++</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-08-11">2020-08-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2443 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 5 分钟&nbsp;<span id="/constructordestructor/" class="leancloud_visitors" data-flag-title="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数">
+                        <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
+                    </span>&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/constructordestructor/featured-image.png"
+        data-srcset="/constructordestructor/featured-image.png, /constructordestructor/featured-image.png 1.5x, /constructordestructor/featured-image.png 2x"
+        data-sizes="auto"
+        alt="/constructordestructor/featured-image.png"
+        title="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。" /></div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-面向对象特性">1 面向对象特性</a>
+      <ul>
+        <li><a href="#1-类与对象">1. 类与对象</a>
+          <ul>
+            <li><a href="#类成员的访问控制"><strong>类成员的访问控制</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#2-类的构造与析构">2. 类的构造与析构</a>
+          <ul>
+            <li><a href="#构造函数"><strong>构造函数</strong></a></li>
+            <li><a href="#析构函数"><strong>析构函数</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#4-类的继承">4. 类的继承</a></li>
+        <li><a href="#5-类的多态">5. 类的多态</a></li>
+        <li><a href="#6-rtti-与抽象类">6. RTTI 与抽象类</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav></div>
-</div><div class=content id=content><p>这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。</p>
-<h2 id=1-面向对象特性>1 面向对象特性</h2>
-<h3 id=1-类与对象>1. 类与对象</h3>
+            </div><div class="content" id="content"><p>这篇文章总结了 C++ 中面向对象编程的知识体系：构造函数和析构函数，包括其中的底层实现等等。</p>
+<h2 id="1-面向对象特性">1 面向对象特性</h2>
+<h3 id="1-类与对象">1. 类与对象</h3>
 <div class="details admonition question open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-question-circle fa-fw"></i>问题<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content>什么是<strong>类与对象</strong>？</div>
-</div>
-</div>
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-question-circle fa-fw"></i>问题<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content">什么是<strong>类与对象</strong>？</div>
+        </div>
+    </div>
 <ul>
 <li><strong>对象</strong>是现实中的对象在程序中的模拟</li>
 <li><strong>类</strong>是同一类对象的抽象，<strong>对象</strong>是类的某一特定实体</li>
 <li><strong>类</strong>是一种用户自定义的类型，包含函数与数据的特殊结构体</li>
 </ul>
 <div class="details admonition example open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content><p>举一个简单的例子，</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
-</span><span class=lnt>12
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><p>举一个简单的例子，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Orange</span><span class=p>{</span>
-<span class=k>public</span><span class=o>:</span>
-  <span class=kt>int</span> <span class=n>GetOrangeDegree</span><span class=p>();</span> <span class=c1>// orange 的成员方法
-</span><span class=c1></span>  <span class=kt>int</span> <span class=nf>GetSourDegree</span><span class=p>();</span>
-  <span class=kt>int</span> <span class=nf>GetSweetDegree</span><span class=p>();</span>
-  <span class=kt>int</span> <span class=nf>GetWaterRatio</span><span class=p>();</span>
-<span class=k>private</span><span class=o>:</span>
-  <span class=kt>int</span> <span class=n>m_waterRatio</span><span class=p>;</span>
-  <span class=kt>int</span> <span class=n>m_orangeDegree</span><span class=p>;</span>
-  <span class=kt>int</span> <span class=n>m_sourDegree</span><span class=p>;</span>
-  <span class=kt>int</span> <span class=n>m_sweetDegree</span><span class=p>;</span>
-<span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Orange</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">GetOrangeDegree</span><span class="p">();</span> <span class="c1">// orange 的成员方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">int</span> <span class="nf">GetSourDegree</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="nf">GetSweetDegree</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="nf">GetWaterRatio</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">m_waterRatio</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">m_orangeDegree</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">m_sourDegree</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">m_sweetDegree</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></div>
-</div>
-</div>
+        </div>
+    </div>
 <p>这里所举的例子，<code>Orange</code>是类，但橙子有分不同个体，它们都有对应的酸度、甜度、水分和生长高度，所以不同的橙子个体代表着这一类橙子的不同对象。</p>
-<h4 id=类成员的访问控制><strong>类成员的访问控制</strong></h4>
+<h4 id="类成员的访问控制"><strong>类成员的访问控制</strong></h4>
 <ul>
 <li>访问权限分为公有类型<code>public</code>，保护类型<code>protected</code>，私有类型<code>private</code></li>
 <li>成员默认访问权限为<code>private</code></li>
@@ -212,85 +279,83 @@
 </ul>
 <p>来看一个例子：
 <div class="details admonition example open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content><div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
-</span><span class=lnt>12
-</span><span class=lnt>13
-</span><span class=lnt>14
-</span><span class=lnt>15
-</span><span class=lnt>16
-</span><span class=lnt>17
-</span><span class=lnt>18
-</span><span class=lnt>19
-</span><span class=lnt>20
-</span><span class=lnt>21
-</span><span class=lnt>22
-</span><span class=lnt>23
-</span><span class=lnt>24
-</span><span class=lnt>25
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Teacher</span><span class=p>;</span>
-<span class=k>class</span> <span class=nc>Student</span><span class=p>{</span>
-<span class=k>public</span><span class=o>:</span>
-  <span class=kt>void</span> <span class=n>SetId</span><span class=p>(</span><span class=kt>uint32_t</span> <span class=n>id</span><span class=p>){</span><span class=n>m_id</span> <span class=o>=</span> <span class=n>id</span><span class=p>;}</span>
-  <span class=kt>uint32_t</span> <span class=nf>GetId</span><span class=p>();</span>
-  <span class=k>friend</span> <span class=n>Teacher</span><span class=p>;</span>
-  <span class=k>friend</span> <span class=kt>void</span> <span class=nf>PrintStudentId</span><span class=p>(</span><span class=n>Student</span><span class=p>);</span>
-<span class=k>private</span><span class=o>:</span>
-  <span class=kt>uint32_t</span> <span class=n>m_id</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
-  <span class=kt>uint32_t</span> <span class=n>m_age</span> <span class=o>=</span> <span class=mi>18</span><span class=p>;</span>
-<span class=p>}</span>
-
-<span class=k>class</span> <span class=nc>Teacher</span><span class=p>{</span>
-<span class=k>public</span><span class=o>:</span>
-  <span class=kt>void</span> <span class=n>PrintStudentId</span><span class=p>(</span><span class=n>Student</span> <span class=n>stud</span><span class=p>)</span>
-  <span class=p>{</span>
-    <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>stud</span><span class=p>.</span><span class=n>m_id</span> <span class=o>&lt;&lt;</span> <span class=nl>std</span><span class=p>:</span><span class=n>endl</span><span class=p>;</span>
-  <span class=p>}</span>
-<span class=p>}</span>
-
-<span class=kt>void</span> <span class=nf>PrintStudentId</span><span class=p>(</span><span class=n>Student</span> <span class=n>stud</span><span class=p>)</span>
-<span class=p>{</span>
-  <span class=n>std</span><span class=o>::</span><span class=n>cout</span> <span class=o>&lt;&lt;</span> <span class=n>stud</span><span class=p>.</span><span class=n>m_id</span> <span class=o>&lt;&lt;</span> <span class=nl>std</span><span class=p>:</span><span class=n>endl</span><span class=p>;</span>
-<span class=p>}</span>
-
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Teacher</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Student</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">SetId</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id</span><span class="p">){</span><span class="n">m_id</span> <span class="o">=</span> <span class="n">id</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="nf">GetId</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">friend</span> <span class="n">Teacher</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">friend</span> <span class="kt">void</span> <span class="nf">PrintStudentId</span><span class="p">(</span><span class="n">Student</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">m_id</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">m_age</span> <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Teacher</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">PrintStudentId</span><span class="p">(</span><span class="n">Student</span> <span class="n">stud</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">stud</span><span class="p">.</span><span class="n">m_id</span> <span class="o">&lt;&lt;</span> <span class="nl">std</span><span class="p">:</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">PrintStudentId</span><span class="p">(</span><span class="n">Student</span> <span class="n">stud</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">stud</span><span class="p">.</span><span class="n">m_id</span> <span class="o">&lt;&lt;</span> <span class="nl">std</span><span class="p">:</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></div>
-</div>
-</div></p>
+        </div>
+    </div></p>
 <p>我们定义了 <code>class Teacher</code>, <code>Teacher</code>是<code>Student</code>的友元类，<code>PrintStudentId</code>是<code>Student</code>的友元函数，该函数可用于访问<code>Student</code>类的保护成员或者私有成员。</p>
 <p>例如：就像上面所写的，<code>Teacher</code>类里面定义的<code>PrintStudentId</code>函数可以访问<code>Student</code>类的私有成员<code>stud.m_id</code>。</p>
 <div class="details admonition warning open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-exclamation-triangle fa-fw"></i>警告<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content><ol>
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-exclamation-triangle fa-fw"></i>警告<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><ol>
 <li>友元函数是<strong>单向</strong>的： 打个比方，<code>Student</code>把<code>Teacher</code>当成朋友，而<code>Teacher</code>不把<code>Student</code>当朋友。就如上面的例子，<code>Teacher</code>是<code>Student</code>的友元，但是<code>Student</code>不是<code>Teacher</code>的友元，所以<code>Teacher</code>类的成员函数在没有<code>friend</code>的关键字作用下，不能访问<code>Teacher</code>类的保护成员或者私有成员。</li>
 <li>友元函数不是类的成员。</li>
 </ol>
 </div>
-</div>
-</div>
-<h3 id=2-类的构造与析构>2. 类的构造与析构</h3>
-<h4 id=构造函数><strong>构造函数</strong></h4>
+        </div>
+    </div>
+<h3 id="2-类的构造与析构">2. 类的构造与析构</h3>
+<h4 id="构造函数"><strong>构造函数</strong></h4>
 <ul>
 <li><strong>构造函数</strong>是用于构造函数的特殊函数，在对象被创建时被调用以初始化对象</li>
 <li>未定义<strong>构造函数</strong>时，编译器自动生成不带参数的默认版本</li>
@@ -304,128 +369,128 @@
 <li>为对象数据成员开辟内存空间；</li>
 <li>完成对象数据成员的初始化。</li>
 </ul>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=k>class</span> <span class=nc>Student</span><span class=p>{</span>
-<span class=k>public</span><span class=o>:</span>
-  <span class=n>Student</span><span class=p>();</span>
-  <span class=n>Student</span><span class=p>(</span><span class=kt>uint32_t</span> <span class=n>id</span><span class=p>);</span>
-  <span class=n>Student</span><span class=p>(</span><span class=kt>uint32_t</span> <span class=n>id</span><span class=p>,</span> <span class=kt>uint32_t</span> <span class=n>age</span><span class=p>);</span>
-  <span class=kt>void</span> <span class=nf>SetId</span><span class=p>(</span><span class=kt>uint32_t</span> <span class=n>id</span><span class=p>){</span><span class=n>m_id</span> <span class=o>=</span> <span class=n>id</span><span class=p>;}</span>
-  <span class=kt>uint32_t</span> <span class=nf>GetId</span><span class=p>(){</span><span class=k>return</span> <span class=n>m_id</span><span class=p>;}</span>
-<span class=k>private</span><span class=o>:</span>
-  <span class=kt>uint32_t</span> <span class=n>m_id</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
-  <span class=kt>uint32_t</span> <span class=n>m_age</span><span class=p>;</span>
-<span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Student</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Student</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Student</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">Student</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">age</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">SetId</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id</span><span class="p">){</span><span class="n">m_id</span> <span class="o">=</span> <span class="n">id</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="nf">GetId</span><span class="p">(){</span><span class="k">return</span> <span class="n">m_id</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">m_id</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">uint32_t</span> <span class="n">m_age</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>关于以上的<code>Student</code>类，我们声明了三个<code>Student</code>的构造函数。第一个构造函数<code>Student()</code>不带参数。三个构造函数的具体定义如下：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
-</span><span class=lnt>12
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>Student</span><span class=o>::</span><span class=n>Student</span><span class=p>(</span><span class=kt>uint32_t</span> <span class=n>id</span><span class=p>,</span> <span class=kt>uint32_t</span> <span class=n>age</span><span class=p>)</span><span class=o>:</span><span class=n>m_id</span><span class=p>(</span><span class=n>id</span><span class=p>),</span> <span class=n>m_age</span><span class=p>(</span><span class=n>age</span><span class=p>)</span>
-<span class=p>{</span>
-  <span class=c1>// do initialization
-</span><span class=c1></span><span class=p>}</span>
-<span class=n>Student</span><span class=o>::</span><span class=n>Student</span><span class=p>()</span><span class=o>:</span><span class=n>Student</span><span class=p>(</span><span class=mi>0</span><span class=p>,</span><span class=mi>18</span><span class=p>)</span>
-<span class=p>{</span>
-  <span class=c1>// do initialization
-</span><span class=c1></span><span class=p>}</span>
-<span class=n>Student</span><span class=o>::</span><span class=n>Student</span><span class=p>(</span><span class=kt>uint32_t</span> <span class=n>id</span><span class=p>)</span><span class=o>:</span><span class=n>Student</span><span class=p>(</span><span class=n>id</span><span class=p>,</span><span class=mi>18</span><span class=p>)</span>
-<span class=p>{</span>
-  <span class=c1>// do initialization
-</span><span class=c1></span><span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">Student</span><span class="o">::</span><span class="n">Student</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">age</span><span class="p">)</span><span class="o">:</span><span class="n">m_id</span><span class="p">(</span><span class="n">id</span><span class="p">),</span> <span class="n">m_age</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// do initialization
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">Student</span><span class="o">::</span><span class="n">Student</span><span class="p">()</span><span class="o">:</span><span class="n">Student</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// do initialization
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">Student</span><span class="o">::</span><span class="n">Student</span><span class="p">(</span><span class="kt">uint32_t</span> <span class="n">id</span><span class="p">)</span><span class="o">:</span><span class="n">Student</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// do initialization
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>按照上面的写法，我们可以使用初始化列表进行初始化字段。假设有一个类<code>C</code>，具有多个字段<code>X、Y、Z</code>等需要进行初始化，同理地，您可以使用上面的语法，只需要在不同的字段使用逗号进行分隔，如下所示：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span><span class=lnt>4
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>C</span><span class=o>::</span><span class=n>C</span><span class=p>(</span> <span class=kt>double</span> <span class=n>a</span><span class=p>,</span> <span class=kt>double</span> <span class=n>b</span><span class=p>,</span> <span class=kt>double</span> <span class=n>c</span><span class=p>)</span><span class=o>:</span> <span class=n>X</span><span class=p>(</span><span class=n>a</span><span class=p>),</span> <span class=n>Y</span><span class=p>(</span><span class=n>b</span><span class=p>),</span> <span class=n>Z</span><span class=p>(</span><span class=n>c</span><span class=p>)</span>
-<span class=p>{</span>
-  <span class=p>....</span>
-<span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">C</span><span class="o">::</span><span class="n">C</span><span class="p">(</span> <span class="kt">double</span> <span class="n">a</span><span class="p">,</span> <span class="kt">double</span> <span class="n">b</span><span class="p">,</span> <span class="kt">double</span> <span class="n">c</span><span class="p">)</span><span class="o">:</span> <span class="n">X</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">Y</span><span class="p">(</span><span class="n">b</span><span class="p">),</span> <span class="n">Z</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="p">....</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><div class="details admonition question open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-question-circle fa-fw"></i>问题<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content>既然构造函数允许被重载，构造函数是如何做到被重载呢？</div>
-</div>
-</div>
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-question-circle fa-fw"></i>问题<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content">既然构造函数允许被重载，构造函数是如何做到被重载呢？</div>
+        </div>
+    </div>
 <p>需要注意的是, 在进行构造函数的重载时要注意重载和参数默认的关系要处理好, 避免产生代码的二义性导致编译出错, 例如以下具有二义性的重载:</p>
 <div class="details admonition example open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content><div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>Point</span><span class=p>(</span><span class=kt>int</span> <span class=n>x</span> <span class=o>=</span> <span class=mi>0</span><span class=p>,</span> <span class=kt>int</span> <span class=n>y</span> <span class=o>=</span> <span class=mi>0</span><span class=p>)</span>     <span class=c1>//默认参数的构造函数
-</span><span class=c1></span><span class=p>{</span>
-  <span class=n>xPos</span> <span class=o>=</span> <span class=n>x</span><span class=p>;</span>
-  <span class=n>yPos</span> <span class=o>=</span> <span class=n>y</span><span class=p>;</span>
-<span class=p>}</span>
-
-<span class=n>Point</span><span class=p>()</span>     <span class=c1>//重载一个无参构造函数
-</span><span class=c1></span><span class=p>{</span>
-  <span class=n>xPos</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
-  <span class=n>yPos</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span>
-<span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">Point</span><span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>     <span class="c1">//默认参数的构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">xPos</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">yPos</span> <span class="o">=</span> <span class="n">y</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Point</span><span class="p">()</span>     <span class="c1">//重载一个无参构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">xPos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">yPos</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div></div>
-</div>
-</div>
+        </div>
+    </div>
 <p>在上面的重载中, 当尝试用<code>Point</code>类重载一个无参数传入的对象<code>M</code>时, <code>Point M</code>; 这时编译器就报一条<code>error: call of overloaded 'Point()' is ambiguous</code>的错误信息来告诉我们说 <code>Point</code> 函数具有二义性。</p>
 <p>这是因为<code>Point(int x = 0, int y = 0)</code>全部使用了默认参数, 即使我们不传入参数也不会出现错误, 但是在重载时又重载了一个不需要传入参数了构造函数<code>Point()</code>, 这样就造成了当创建对象都不传入参数时编译器就不知道到底该使用哪个构造函数了, 就造成了二义性。</p>
-<h4 id=析构函数><strong>析构函数</strong></h4>
+<h4 id="析构函数"><strong>析构函数</strong></h4>
 <p>与构造函数相反, <strong>析构函数</strong>是在对象被撤销时被自动调用, 用于对成员撤销时的一些清理工作, 例如在前面提到的手动释放使用<code>new</code>或<code>malloc</code>进行申请的内存空间。<strong>析构函数</strong>具有以下特点:</p>
 <ul>
 <li><strong>析构函数</strong>函数名与类名相同, 紧贴在名称前面用波浪号 ~ 与构造函数进行区分, 例如: <code>~Point()</code>;</li>
@@ -433,133 +498,198 @@
 <li>当对象被撤销时析构函数被自动调用, 与构造函数不同的是, <strong>析构函数</strong>可以被显式的调用, 以释放对象中动态申请的内存。</li>
 </ul>
 <p>某种意义上理解析构函数是回收间接资源的函数。</p>
-<p><figure><a class=lightgallery href=/%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png title=析构函数 data-thumbnail=/析构函数.png data-sub-html="<h2>图1：析构函数回收间接资源</h2><p>析构函数</p>">
-<img class=lazyload src=/svg/loading.min.svg data-src=/%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png data-srcset="/%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png, /%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png 1.5x, /%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png 2x" data-sizes=auto alt=/析构函数.png>
-</a><figcaption class=image-caption>图1：析构函数回收间接资源</figcaption>
-</figure></p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
-</span><span class=lnt>12
-</span><span class=lnt>13
-</span><span class=lnt>14
-</span><span class=lnt>15
-</span><span class=lnt>16
-</span><span class=lnt>17
-</span><span class=lnt>18
-</span><span class=lnt>19
-</span><span class=lnt>20
-</span><span class=lnt>21
-</span><span class=lnt>22
-</span><span class=lnt>23
-</span><span class=lnt>24
-</span><span class=lnt>25
-</span><span class=lnt>26
-</span><span class=lnt>27
-</span><span class=lnt>28
-</span><span class=lnt>29
-</span><span class=lnt>30
-</span><span class=lnt>31
+<p><figure><a class="lightgallery" href="/%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png" title="析构函数" data-thumbnail="/析构函数.png" data-sub-html="<h2>图1：析构函数回收间接资源</h2><p>析构函数</p>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png"
+            data-srcset="/%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png, /%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png 1.5x, /%e6%9e%90%e6%9e%84%e5%87%bd%e6%95%b0.png 2x"
+            data-sizes="auto"
+            alt="/析构函数.png" />
+    </a><figcaption class="image-caption">图1：析构函数回收间接资源</figcaption>
+    </figure></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=cp>#include</span> <span class=cpf>&lt;iostream&gt;</span><span class=cp>
-</span><span class=cp>#include</span> <span class=cpf>&lt;cstring&gt;</span><span class=cp>
-</span><span class=cp></span><span class=k>using</span> <span class=k>namespace</span> <span class=n>std</span><span class=p>;</span>
-
-<span class=k>class</span> <span class=nc>Book</span>
-<span class=p>{</span>
- <span class=k>public</span><span class=o>:</span>
-     <span class=n>Book</span><span class=p>(</span> <span class=k>const</span> <span class=kt>char</span> <span class=o>*</span><span class=n>name</span> <span class=p>)</span>      <span class=c1>//构造函数
-</span><span class=c1></span>    <span class=p>{</span>
-        <span class=n>bookName</span> <span class=o>=</span> <span class=k>new</span> <span class=kt>char</span><span class=p>[</span><span class=n>strlen</span><span class=p>(</span><span class=n>name</span><span class=p>)</span><span class=o>+</span><span class=mi>1</span><span class=p>];</span>
-        <span class=n>strcpy</span><span class=p>(</span><span class=n>bookName</span><span class=p>,</span> <span class=n>name</span><span class=p>);</span>
-    <span class=p>}</span>
-    <span class=o>~</span><span class=n>Book</span><span class=p>()</span>                 <span class=c1>//析构函数
-</span><span class=c1></span>    <span class=p>{</span>
-        <span class=n>cout</span><span class=o>&lt;&lt;</span><span class=s>&#34;析构函数被调用...</span><span class=se>\n</span><span class=s>&#34;</span><span class=p>;</span>
-        <span class=k>delete</span> <span class=p>[]</span><span class=n>bookName</span><span class=p>;</span>  <span class=c1>//释放通过new申请的空间
-</span><span class=c1></span>    <span class=p>}</span>
-    <span class=kt>void</span> <span class=nf>showName</span><span class=p>()</span> <span class=p>{</span> <span class=n>cout</span><span class=o>&lt;&lt;</span><span class=s>&#34;Book name: &#34;</span><span class=o>&lt;&lt;</span> <span class=n>bookName</span> <span class=o>&lt;&lt;</span><span class=n>endl</span><span class=p>;</span> <span class=p>}</span>
-
- <span class=k>private</span><span class=o>:</span>
-    <span class=kt>char</span> <span class=o>*</span><span class=n>bookName</span><span class=p>;</span>
-<span class=p>};</span>
-
-<span class=kt>int</span> <span class=nf>main</span><span class=p>()</span>
-<span class=p>{</span>
-    <span class=n>Book</span> <span class=n>CPP</span><span class=p>(</span><span class=s>&#34;C++ Primer&#34;</span><span class=p>);</span>
-    <span class=n>CPP</span><span class=p>.</span><span class=n>showName</span><span class=p>();</span>
-
-    <span class=k>return</span> <span class=mi>0</span><span class=p>;</span>
-
-<span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstring&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Book</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">     <span class="n">Book</span><span class="p">(</span> <span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">name</span> <span class="p">)</span>      <span class="c1">//构造函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">bookName</span> <span class="o">=</span> <span class="k">new</span> <span class="kt">char</span><span class="p">[</span><span class="n">strlen</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">strcpy</span><span class="p">(</span><span class="n">bookName</span><span class="p">,</span> <span class="n">name</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">Book</span><span class="p">()</span>                 <span class="c1">//析构函数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;析构函数被调用...</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">delete</span> <span class="p">[]</span><span class="n">bookName</span><span class="p">;</span>  <span class="c1">//释放通过new申请的空间
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">showName</span><span class="p">()</span> <span class="p">{</span> <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">&#34;Book name: &#34;</span><span class="o">&lt;&lt;</span> <span class="n">bookName</span> <span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">char</span> <span class="o">*</span><span class="n">bookName</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Book</span> <span class="n">CPP</span><span class="p">(</span><span class="s">&#34;C++ Primer&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">CPP</span><span class="p">.</span><span class="n">showName</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>代码中创建了一个<code>Book</code>类, 类的数据成员只有一个字符指针型的<code>bookName</code>, 在创建对象时系统会为该指针变量分配它所需内存, 但是此时该指针并没有被初始化所以不会再为其分配其他多余的内存单元。在构造函数中, 我们使用<code>new</code>申请了一块<code>strlen(name)+1</code>大小的空间, 也就是比传入进来的字符串长度多1的空间, 目的是让字符指针<code>bookName</code>指向它, 这样才能正常保存传入的字符串。</p>
-<p>在<code>main</code>函数中使用<code>Book</code>类创建了一个对象<code>CPP</code>, 初始化<code>bookName</code>属性为<code>"C++ Primer"</code>。从运行结果可以看到, 析构函数被调用了, 这时使用<code>new</code>所申请的空间就会被正常释放。</p>
+<p>在<code>main</code>函数中使用<code>Book</code>类创建了一个对象<code>CPP</code>, 初始化<code>bookName</code>属性为<code>&quot;C++ Primer&quot;</code>。从运行结果可以看到, 析构函数被调用了, 这时使用<code>new</code>所申请的空间就会被正常释放。</p>
 <p>自然状态下对象何时将被销毁取决于对象的生存周期, 例如全局对象是在程序运行结束时被销毁, 自动对象是在离开其作用域时被销毁。</p>
 <p>如果需要显式调用析构函数来释放对象中动态申请的空间只需要使用 对象名.析构函数名(); 即可, 例如上例中要显式调用析构函数来释放<code>bookName</code>所指向的空间只要:</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-cpp data-lang=cpp><span class=n>CPP</span><span class=p>.</span><span class=o>~</span><span class=n>Book</span><span class=p>();</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">CPP</span><span class="p">.</span><span class="o">~</span><span class="n">Book</span><span class="p">();</span>
+</span></span></code></pre></td></tr></table>
 </div>
-</div><h3 id=4-类的继承>4. 类的继承</h3>
-<h3 id=5-类的多态>5. 类的多态</h3>
-<h3 id=6-rtti-与抽象类>6. RTTI 与抽象类</h3></div><div class=post-footer id=post-footer>
-<div class=post-info>
-<div class=post-info-line>
-<div class=post-info-mod>
-<span>更新于 2022-10-15&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/2ef0e85f8676dd109592c4044e3ea1f18d8f6b7f target=_blank title="commit by hyper2t(1244240338@qq.com) 2ef0e85f8676dd109592c4044e3ea1f18d8f6b7f: Merge branch 'main' of https://github.com/hyper2t/hyper2t.github.io.source">
-<i class="fas fa-hashtag fa-fw"></i>2ef0e85</a></span>
+</div><h3 id="4-类的继承">4. 类的继承</h3>
+<h3 id="5-类的多态">5. 类的多态</h3>
+<h3 id="6-rtti-与抽象类">6. RTTI 与抽象类</h3></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2022-07-08&nbsp;<a class="git-hash" href="https://github.com/hyper2t/hyper2t.github.io/commit/7d7e70f9a0c7aede5d942895ea20f7fa2343cd61" target="_blank" title="commit by hyper2t(1244240338@qq.com) 7d7e70f9a0c7aede5d942895ea20f7fa2343cd61: split">
+                                    <i class="fas fa-hashtag fa-fw"></i>7d7e70f</a></span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/constructordestructor/index.md" target="_blank">阅读原始文档</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/constructordestructor/" data-title="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数" data-hashtags="C&#43;&#43;,继承,多态,类"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/constructordestructor/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/constructordestructor/" data-title="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://hyper2t.github.io/constructordestructor/" data-title="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/constructordestructor/" data-title="C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/c&#43;&#43;/">C&#43;&#43;</a>,&nbsp;<a href="/tags/%E7%BB%A7%E6%89%BF/">继承</a>,&nbsp;<a href="/tags/%E5%A4%9A%E6%80%81/">多态</a>,&nbsp;<a href="/tags/%E7%B1%BB/">类</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/semaphore/" class="prev" rel="prev" title="Golang 并发包 sync 系列"><i class="fas fa-angle-left fa-fw"></i>Golang 并发包 sync 系列</a>
+            <a href="/algorithms/" class="next" rel="next" title="刷 Leetcode 的算法总结">刷 Leetcode 的算法总结<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
-<div class=post-info-license></div>
-</div>
-<div class=post-info-line>
-<div class=post-info-md><span>
-<a class=link-to-markdown href=/constructordestructor/index.md target=_blank>阅读原始文档</a>
-</span></div>
-<div class=post-info-share>
-<span><a href=javascript:void(0); title="分享到 Twitter" data-sharer=twitter data-url=https://hyper2t.github.io/constructordestructor/ data-title="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数" data-hashtags=C++,继承,多态,类><i class="fab fa-twitter fa-fw"></i></a><a href=javascript:void(0); title="分享到 Facebook" data-sharer=facebook data-url=https://hyper2t.github.io/constructordestructor/ data-hashtag=C++><i class="fab fa-facebook-square fa-fw"></i></a><a href=javascript:void(0); title="分享到 Hacker News" data-sharer=hackernews data-url=https://hyper2t.github.io/constructordestructor/ data-title="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数"><i class="fab fa-hacker-news fa-fw"></i></a><a href=javascript:void(0); title="分享到 Line" data-sharer=line data-url=https://hyper2t.github.io/constructordestructor/ data-title="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg></i></a><a href=javascript:void(0); title="分享到 微博" data-sharer=weibo data-url=https://hyper2t.github.io/constructordestructor/ data-title="C++ 面向对象编程知识体系 part 1: 构造函数与析构函数" data-ralateuid="7289413661/profile?topnav=1&wvr=6&is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
-</div>
-</div>
-</div>
-<div class=post-info-more>
-<section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/c++/>C++</a>,&nbsp;<a href=/tags/%E7%BB%A7%E6%89%BF/>继承</a>,&nbsp;<a href=/tags/%E5%A4%9A%E6%80%81/>多态</a>,&nbsp;<a href=/tags/%E7%B1%BB/>类</a></section>
-<section>
-<span><a href=javascript:void(0); onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span>
-</section>
-</div>
-<div class=post-nav><a href=/semaphore/ class=prev rel=prev title="Golang 并发包 sync 系列"><i class="fas fa-angle-left fa-fw"></i>Golang 并发包 sync 系列</a>
-<a href=/algorithms/ class=next rel=next title="刷 Leetcode 的算法总结">刷 Leetcode 的算法总结<i class="fas fa-angle-right fa-fw"></i></a></div>
-</div>
-<div id=comments><div id=waline class=comment></div>
-<script src=https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js></script>
-<link href=https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.css rel=stylesheet>
-<script>window.onload=function(){loadComments()};function loadComments(){if(typeof $waline=='undefined'){var a=b=>{var a=document.createElement('script');a.defer=!0,a.crossOrigin='anonymous',Object.keys(b).forEach(c=>{a[c]=b[c]}),document.body.appendChild(a)};a({src:'https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js',onload:()=>{newWaline()}})}else newWaline()}function newWaline(){Waline.init({el:'#waline',meta:["nick","mail","link"],login:"enable",dark:"auto",serverURL:"https://waline-comment-psi.vercel.app/",avatarCDN:"https://sdn.geekzu.org/avatar/",requiredMeta:["nick","mail"],pageSize:10,avatar:"retro",lang:"zh-CN",pageview:!0,emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/norevi/waline-blobcatemojis@1.0/blobs"],highlighter:!0,locale:{placeholder:"提交评论较慢，请等待几秒~",level0:'炼体',level1:'炼气',level2:'筑基',level3:'金丹',level4:'元婴',level5:'化神'}}),Waline.pageviewCount({serverURL:"https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js",update:!0})}</script></div></article></div>
-</main><footer class=footer>
-<div class=footer-container><div class=footer-line>Powered by Hugo with LoveIt</div><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.90.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
-</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Hyperter</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div>
-</div>
-</footer></div>
-<div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部>
-<i class="fas fa-arrow-up fa-fw"></i>
-</a><a href=# id=view-comments class=fixed-button title=查看评论>
-<i class="fas fa-comment fa-fw"></i>
-</a>
-</div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:80},comment:{},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{algoliaAppID:"76RX3LJOIU",algoliaIndex:"dev_hyper2t",algoliaSearchKey:"0ddf3c3aad0b6d8b914d0f3d2305da67",highlightTag:"em",maxResultLength:10,noResultsFound:"没有找到结果",snippetLength:50,type:"algolia"}}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js></script>
-<script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery-backstretch@2.1.18/jquery.backstretch.min.js></script><script type=text/javascript src=/js/custom.js></script></body>
+<div id="comments"><div id="waline" class="comment"></div>
+        <script src='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+        <link href='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+
+        <script>
+            window.onload = function() {
+                loadComments();
+            }
+            function loadComments() {
+                if (typeof $waline === 'undefined') {
+                    var getScript = (options) => {
+                        var script = document.createElement('script');
+                        script.defer = true;
+                        script.crossOrigin = 'anonymous';
+                        Object.keys(options).forEach((key) => {
+                            script[key] = options[key];
+                        });
+                        document.body.appendChild(script);
+                    };
+                    getScript({
+                        src: 'https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js',
+                        onload: () => {
+                            newWaline();
+                        }
+                    });
+                } else {
+                    newWaline();
+                }
+            }
+            function newWaline() {
+                   Waline.init({
+                    el: '#waline',
+                    meta: ["nick","mail","link"],
+                    login: "enable",
+                    dark: "auto",
+                    serverURL: "https://waline-comment-psi.vercel.app/",
+                    avatarCDN: "https://sdn.geekzu.org/avatar/",
+                    requiredMeta: ["nick","mail"],
+                    pageSize:  10 ,
+                    avatar: "retro",
+                    lang: "zh-CN",
+                    pageview:  true ,
+                    emoji: ["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/norevi/waline-blobcatemojis@1.0/blobs"],
+                    highlighter:  true ,
+                    locale: {
+                        placeholder: "提交评论较慢，请等待几秒~",
+                        level0: '炼体',
+                            level1: '炼气',
+                            level2: '筑基',
+                            level3: '金丹',
+                            level4: '元婴',
+                            level5: '化神',
+                    }
+                });
+                Waline.pageviewCount({
+                    serverURL: "https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js",
+                update: true
+                });
+            }
+        </script></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by Hugo with LoveIt</div><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.104.3">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2020 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Hyperter</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":80},"comment":{},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"algoliaAppID":"76RX3LJOIU","algoliaIndex":"dev_hyper2t","algoliaSearchKey":"0ddf3c3aad0b6d8b914d0f3d2305da67","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery-backstretch@2.1.18/jquery.backstretch.min.js"></script><script type="text/javascript" src="/js/custom.js"></script></body>
 </html>

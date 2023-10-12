@@ -1,1 +1,80 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>嗨，皮特~</title><link>https://hyper2t.github.io/en/</link><description>About LoveIt Theme</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>j29liao@uwaterloo.ca (Hyperter)</managingEditor><webMaster>j29liao@uwaterloo.ca (Hyperter)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 02 Feb 2021 11:04:49 +0800</lastBuildDate><atom:link href="https://hyper2t.github.io/en/index.xml" rel="self" type="application/rss+xml"/><item><title>C++ Basic of Generic Programming</title><link>https://hyper2t.github.io/en/generic-template/</link><pubDate>Sat, 15 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/generic-template/</guid><description>This article summarizes the basic of generic programming in C++, its application and the underlying architectures.</description></item><item><title>Summary on Leetcode Algorithm Problems</title><link>https://hyper2t.github.io/en/algorithms/</link><pubDate>Thu, 13 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/algorithms/</guid><description>&lt;p>This article summarizes the template of algorithms when I working on Leetcode problems.&lt;/p></description></item><item><title>C++ Basic of Object-Oriented Programming</title><link>https://hyper2t.github.io/en/constructordestructor/</link><pubDate>Tue, 11 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/constructordestructor/</guid><description>&lt;p>This article summarizes the basic of Object-Oriented programming in C++, its application and the underlying architectures.&lt;/p></description></item><item><title>C++ Basic of Object-Oriented Programming</title><link>https://hyper2t.github.io/en/inheritance/</link><pubDate>Tue, 11 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/inheritance/</guid><description>&lt;p>This article summarizes the basic of Object-Oriented programming in C++, its application and the underlying architectures.&lt;/p></description></item><item><title>Golang Concurrency package: 'sync'</title><link>https://hyper2t.github.io/en/semaphore/</link><pubDate>Sun, 09 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/semaphore/</guid><description><![CDATA[<p>This article summarizes the concurrency package <code>sync</code> in golang and the underlying architectures using <code>semaphore</code>.</p>]]></description></item><item><title>Kubernetes kubectl command summary</title><link>https://hyper2t.github.io/en/kubectl/</link><pubDate>Thu, 06 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/kubectl/</guid><description>&lt;p>This article summarizes the basic use of kubectl command.&lt;/p></description></item><item><title>Kubernetes CRD Operator Development</title><link>https://hyper2t.github.io/en/crd-introduction/</link><pubDate>Tue, 04 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/crd-introduction/</guid><description>&lt;p>This article summarizes the development of CRD Operator and the underlying architectures in Kubernetes.&lt;/p></description></item><item><title>Go Basic and architectures part 2: gorountine</title><link>https://hyper2t.github.io/en/goroutine/</link><pubDate>Sun, 02 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/goroutine/</guid><description>&lt;p>This article summarizes the basic of Golang, its application and the underlying architectures.&lt;/p></description></item><item><title>Go Basic and architectures part 3: channel</title><link>https://hyper2t.github.io/en/channel/</link><pubDate>Sun, 02 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/channel/</guid><description>&lt;p>This article summarizes the basic of Golang, its application and the underlying architectures.&lt;/p></description></item><item><title>Go Basic and architectures part 4: waitGroup</title><link>https://hyper2t.github.io/en/waitgroup/</link><pubDate>Sun, 02 Aug 2020 21:57:40 +0800</pubDate><author>Author</author><guid>https://hyper2t.github.io/en/waitgroup/</guid><description>&lt;p>This article summarizes the basic of Golang, its application and the underlying architectures.&lt;/p></description></item></channel></rss>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+    <channel>
+        <title>嗨，皮特~</title>
+        <link>https://hyper2t.github.io/en/</link>
+        <description>About LoveIt Theme</description>
+        <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>j29liao@uwaterloo.ca (Hyperter)</managingEditor>
+            <webMaster>j29liao@uwaterloo.ca (Hyperter)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Tue, 02 Feb 2021 11:04:49 &#43;0800</lastBuildDate>
+            <atom:link href="https://hyper2t.github.io/en/index.xml" rel="self" type="application/rss+xml" />
+        <item>
+    <title>C&#43;&#43; Basic of Generic Programming</title>
+    <link>https://hyper2t.github.io/en/generic-template/</link>
+    <pubDate>Sat, 15 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/generic-template/</guid>
+    <description><![CDATA[This article summarizes the basic of generic programming in C++, its application and the underlying architectures.]]></description>
+</item><item>
+    <title>Summary on Leetcode Algorithm Problems</title>
+    <link>https://hyper2t.github.io/en/algorithms/</link>
+    <pubDate>Thu, 13 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/algorithms/</guid>
+    <description><![CDATA[<p>This article summarizes the template of algorithms when I working on Leetcode problems.</p>]]></description>
+</item><item>
+    <title>C&#43;&#43; Basic of Object-Oriented Programming</title>
+    <link>https://hyper2t.github.io/en/constructordestructor/</link>
+    <pubDate>Tue, 11 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/constructordestructor/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Object-Oriented programming in C++, its application and the underlying architectures.</p>]]></description>
+</item><item>
+    <title>C&#43;&#43; Basic of Object-Oriented Programming</title>
+    <link>https://hyper2t.github.io/en/inheritance/</link>
+    <pubDate>Tue, 11 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/inheritance/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Object-Oriented programming in C++, its application and the underlying architectures.</p>]]></description>
+</item><item>
+    <title>Golang Concurrency package: &#39;sync&#39;</title>
+    <link>https://hyper2t.github.io/en/semaphore/</link>
+    <pubDate>Sun, 09 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/semaphore/</guid>
+    <description><![CDATA[<p>This article summarizes the concurrency package <code>sync</code> in golang and the underlying architectures using <code>semaphore</code>.</p>]]></description>
+</item><item>
+    <title>Kubernetes kubectl command summary</title>
+    <link>https://hyper2t.github.io/en/kubectl/</link>
+    <pubDate>Thu, 06 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/kubectl/</guid>
+    <description><![CDATA[<p>This article summarizes the basic use of kubectl command.</p>]]></description>
+</item><item>
+    <title>Kubernetes CRD Operator Development</title>
+    <link>https://hyper2t.github.io/en/crd-introduction/</link>
+    <pubDate>Tue, 04 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/crd-introduction/</guid>
+    <description><![CDATA[<p>This article summarizes the development of CRD Operator and the underlying architectures in Kubernetes.</p>]]></description>
+</item><item>
+    <title>Go Basic and architectures part 2: gorountine</title>
+    <link>https://hyper2t.github.io/en/goroutine/</link>
+    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/goroutine/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
+</item><item>
+    <title>Go Basic and architectures part 3: channel</title>
+    <link>https://hyper2t.github.io/en/channel/</link>
+    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/channel/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
+</item><item>
+    <title>Go Basic and architectures part 4: waitGroup</title>
+    <link>https://hyper2t.github.io/en/waitgroup/</link>
+    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/waitgroup/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
+</item></channel>
+</rss>

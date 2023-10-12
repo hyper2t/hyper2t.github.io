@@ -1,456 +1,529 @@
-<!doctype html><html lang=zh-cn>
-<head>
-<meta charset=utf-8>
-<meta name=viewport content="width=device-width,initial-scale=1">
-<meta name=robots content="noodp">
-<meta http-equiv=x-ua-compatible content="IE=edge, chrome=1">
-<title>Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍 - 嗨，皮特~</title><meta name=Description content="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。"><meta property="og:title" content="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍">
-<meta property="og:description" content="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://hyper2t.github.io/crd-introduction/"><meta property="og:image" content="https://hyper2t.github.io/crd-introduction/featured-image.png"><meta property="article:section" content="posts">
-<meta property="article:published_time" content="2020-08-04T21:57:40+08:00">
-<meta property="article:modified_time" content="2022-10-15T02:37:20+08:00">
-<meta name=twitter:card content="summary_large_image">
-<meta name=twitter:image content="https://hyper2t.github.io/crd-introduction/featured-image.png">
-<meta name=twitter:title content="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍">
-<meta name=twitter:description content="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。">
-<meta name=application-name content="LoveIt">
-<meta name=apple-mobile-web-app-title content="LoveIt"><meta name=theme-color content="#ffffff"><meta name=msapplication-TileColor content="#da532c"><link rel="shortcut icon" type=image/x-icon href=/twister-32x32.ico>
-<link rel=icon type=image/png sizes=32x32 href=/twister-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/twister-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://hyper2t.github.io/crd-introduction/><link rel=prev href=https://hyper2t.github.io/hashmap/><link rel=next href=https://hyper2t.github.io/kubectl/><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍","inLanguage":"zh-CN","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/hyper2t.github.io\/crd-introduction\/"},"image":[{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/crd-introduction\/featured-image.png","width":1420,"height":708}],"genre":"posts","keywords":"Golang, Kubernetes, CRD","wordcount":2701,"url":"https:\/\/hyper2t.github.io\/crd-introduction\/","datePublished":"2020-08-04T21:57:40+08:00","dateModified":"2022-10-15T02:37:20+08:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"xxxx","logo":{"@type":"ImageObject","url":"https:\/\/hyper2t.github.io\/images\/selfie-modified.png","width":283,"height":283}},"author":{"@type":"Person","name":"Peter Liao"},"description":"这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。"}</script></head>
-<body header-desktop=fixed header-mobile=auto><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':'dark'==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:'dark'==='dark')&&document.body.setAttribute('theme','dark')</script>
-<div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
-<div class=header-wrapper>
-<div class=header-title>
-<a href=/ title=嗨，皮特~><span class=header-title-pre><i class="fas fa-home"></i></span>Hyperter～</a>
-</div>
-<div id=audioBox class=adBox>
-<div class=songRollingContainer>
-<a class=songRolling>
-<span id=songName></span>
-</a>
-</div>
-<script type=text/javascript>window.onload=function(){var b=["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3"],a=new Audio;a.preload=!0,a.controls=!0,a.controlsList="noplaybackrate",a.src=b.pop(),b.unshift(a.src),a.volume=.07,a.id=a.src,a.addEventListener('ended',d,!1),a.play(),document.getElementById("audioBox").appendChild(a),a.loop=!1;function c(a){var b=a.lastIndexOf("/");return decodeURI(a.slice(b+1))}document.getElementById("songName").innerHTML=c(a.src);function d(){a.src=b.pop(),b.unshift(a.src),a.play(),console.log(b.length),!b.length&&a.removeEventListener('ended',d,!1),document.getElementById("songName").innerHTML=c(a.src)}}</script>
-</div>
-<div class=menu>
-<div class=menu-inner>
-<div class=dropdown>
-<a href=/posts/ class="menu-item menu-more dropbtn" title> 专栏
-</a>
-<div class="menu-more-content dropdown-content"><a href=/categories/ title> 综合分类 </a><a href=/notes/ title> 云原生 </a></div>
-</div>
-<a class=menu-item href=/tags/> 标签
-</a><a class=menu-item href=/categories/catch-the-cat/> 趣味
-</a><a class=menu-item href=/about/> 关于
-</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
-</a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item language" title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
-<select class=language-select id=language-select-desktop onchange="location=this.value"><option value=/en/crd-introduction/>English</option><option value=/crd-introduction/ selected>简体中文</option></select>
-</a><span class="menu-item search" id=search-desktop>
-<input type=text placeholder=搜索文章标题或内容... id=search-input-desktop>
-<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-desktop title=搜索>
-<i class="fas fa-search fa-fw"></i>
-</a>
-<a href=javascript:void(0); class="search-button search-clear" id=search-clear-desktop title=清空>
-<i class="fas fa-times-circle fa-fw"></i>
-</a>
-<span class="search-button search-loading" id=search-loading-desktop>
-<i class="fas fa-spinner fa-fw fa-spin"></i>
-</span>
-</span><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
-<i class="fas fa-adjust fa-fw"></i>
-</a>
-</div>
-</div>
-</div>
-</header><header class=mobile id=header-mobile>
-<div class=header-container>
-<div class=header-wrapper>
-<div class=header-title>
-<a href=/ title=嗨，皮特~><span class=header-title-pre><i class="fas fa-home"></i></span>Hyperter～</a>
-</div>
-<div class=menu-toggle id=menu-toggle-mobile>
-<span></span><span></span><span></span>
-</div>
-</div>
-<div class=menu id=menu-mobile><div class=search-wrapper>
-<div class="search mobile" id=search-mobile>
-<input type=text placeholder=搜索文章标题或内容... id=search-input-mobile>
-<a href=javascript:void(0); class="search-button search-toggle" id=search-toggle-mobile title=搜索>
-<i class="fas fa-search fa-fw"></i>
-</a>
-<a href=javascript:void(0); class="search-button search-clear" id=search-clear-mobile title=清空>
-<i class="fas fa-times-circle fa-fw"></i>
-</a>
-<span class="search-button search-loading" id=search-loading-mobile>
-<i class="fas fa-spinner fa-fw fa-spin"></i>
-</span>
-</div>
-<a href=javascript:void(0); class=search-cancel id=search-cancel-mobile>
-取消
-</a>
-</div>
-<div class=dropdown>
-<a href=/posts/ class="menu-item menu-more dropbtn" title> 专栏
-</a>
-<div class="menu-more-content dropdown-content"><a href=/categories/ title> 综合分类 </a><a href=/notes/ title> 云原生 </a></div>
-</div>
-<a class=menu-item href=/tags/> 标签
-</a><a class=menu-item href=/categories/catch-the-cat/> 趣味
-</a><a class=menu-item href=/about/> 关于
-</a><a class=menu-item href=https://github.com/hyper2t/hyper2t.github.io title=GitHub rel="noopener noreffer" target=_blank><i class="fab fa-github fa-fw"></i>
-</a><a href=javascript:void(0); class="menu-item theme-switch" title=切换主题>
-<i class="fas fa-adjust fa-fw"></i>
-</a><a href=javascript:void(0); class=menu-item title=选择语言>简体中文<i class="fas fa-chevron-right fa-fw"></i>
-<select class=language-select onchange="location=this.value"><option value=/en/crd-introduction/>English</option><option value=/crd-introduction/ selected>简体中文</option></select>
-</a></div>
-</div>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <title>Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍 - 嗨，皮特~</title><meta name="Description" content="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。"><meta property="og:title" content="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍" />
+<meta property="og:description" content="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://hyper2t.github.io/crd-introduction/" /><meta property="og:image" content="https://hyper2t.github.io/crd-introduction/featured-image.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2020-08-04T21:57:40+08:00" />
+<meta property="article:modified_time" content="2022-08-22T01:59:25+08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://hyper2t.github.io/crd-introduction/featured-image.png"/>
+<meta name="twitter:title" content="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍"/>
+<meta name="twitter:description" content="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。"/>
+<meta name="application-name" content="LoveIt">
+<meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/twister-32x32.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/twister-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="/twister-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://hyper2t.github.io/crd-introduction/" /><link rel="prev" href="https://hyper2t.github.io/hashmap/" /><link rel="next" href="https://hyper2t.github.io/kubectl/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css"><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍",
+        "inLanguage": "zh-CN",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/hyper2t.github.io\/crd-introduction\/"
+        },"image": [{
+                            "@type": "ImageObject",
+                            "url": "https:\/\/hyper2t.github.io\/crd-introduction\/featured-image.png",
+                            "width":  1420 ,
+                            "height":  708 
+                        }],"genre": "posts","keywords": "Golang, Kubernetes, CRD","wordcount":  2703 ,
+        "url": "https:\/\/hyper2t.github.io\/crd-introduction\/","datePublished": "2020-08-04T21:57:40+08:00","dateModified": "2022-08-22T01:59:25+08:00","license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher": {
+            "@type": "Organization",
+            "name": "xxxx","logo": {
+                    "@type": "ImageObject",
+                    "url": "https:\/\/hyper2t.github.io\/images\/selfie-modified.png",
+                    "width":  283 ,
+                    "height":  283 
+                }},"author": {
+                "@type": "Person",
+                "name": "Peter Liao"
+            },"description": "这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。"
+    }
+    </script></head>
+    <body header-desktop="fixed" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('dark' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'dark' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="/" title="嗨，皮特~"><span class="header-title-pre"><i class='fas fa-home'></i></span>皮特ᴾᵗ~</a>
+        </div>
+        <div id="audioBox" class="adBox">
+            <div class="songRollingContainer">
+                <a class="songRolling">
+                    <span id="songName"></span>
+                </a>
+            </div>
+            <script type="text/javascript">
+                window.onload = function(){
+                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3"];               
+                    var myAudio = new Audio();
+                    myAudio.preload = true;
+                    myAudio.controls = true;
+                    myAudio.controlsList = "noplaybackrate";
+                    myAudio.src = arr.pop();         
+                    arr.unshift(myAudio.src);
+                    myAudio.volume = 0.2
+                    myAudio.id = myAudio.src
+                    myAudio.addEventListener('ended', playEndedHandler, false);
+                    myAudio.play();
+                    document.getElementById("audioBox").appendChild(myAudio);
+                    myAudio.loop = false;
+                    function getSongName(src) {
+                        var slashIndex = src.lastIndexOf("/")
+                        return decodeURI(src.slice(slashIndex+1))
+                    }
+                    document.getElementById("songName").innerHTML = getSongName(myAudio.src)
+                    function playEndedHandler(){
+                        myAudio.src = arr.pop();
+                        arr.unshift(myAudio.src);
+                        myAudio.play();
+                        console.log(arr.length);
+                        !arr.length && myAudio.removeEventListener('ended',playEndedHandler,false);
+                        document.getElementById("songName").innerHTML = getSongName(myAudio.src)
+                    }
+                }
+            </script>
+        </div>
+
+        <div class="menu">
+            <div class="menu-inner">
+                <div class="dropdown">
+                    <a href="/posts/" class="menu-item menu-more dropbtn" title="" > 专栏 
+                    </a>
+                    <div class="menu-more-content dropdown-content"><a href="/categories/" title="" > 综合分类 </a><a href="/notes/" title="" > 云原生 </a></div>
+                </div>
+                <a class="menu-item" href="/tags/"> 标签 
+                </a><a class="menu-item" href="/categories/catch-the-cat/"> 趣味 
+                </a><a class="menu-item" href="/about/"> 关于 
+                </a><a class="menu-item" href="https://github.com/hyper2t/hyper2t.github.io" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw'></i>  
+                </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item language" title="选择语言">简体中文<i class="fas fa-chevron-right fa-fw"></i>
+                        <select class="language-select" id="language-select-desktop" onchange="location = this.value;"><option value="/en/crd-introduction/">English</option><option value="/crd-introduction/" selected>简体中文</option></select>
+                    </a><span class="menu-item search" id="search-desktop">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-desktop">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-desktop">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </span><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                    <i class="fas fa-adjust fa-fw"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="/" title="嗨，皮特~"><span class="header-title-pre"><i class='fas fa-home'></i></span>皮特ᴾᵗ~</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><div class="search-wrapper">
+                    <div class="search mobile" id="search-mobile">
+                        <input type="text" placeholder="搜索文章标题或内容..." id="search-input-mobile">
+                        <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                            <i class="fas fa-search fa-fw"></i>
+                        </a>
+                        <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                            <i class="fas fa-times-circle fa-fw"></i>
+                        </a>
+                        <span class="search-button search-loading" id="search-loading-mobile">
+                            <i class="fas fa-spinner fa-fw fa-spin"></i>
+                        </span>
+                    </div>
+                    <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+                        取消
+                    </a>
+                </div>
+            <div class="dropdown">
+                <a href="/posts/" class="menu-item menu-more dropbtn" title="" > 专栏 
+                </a>
+                <div class="menu-more-content dropdown-content"><a href="/categories/" title="" > 综合分类 </a><a href="/notes/" title="" > 云原生 </a></div>
+            </div>
+            <a class="menu-item" href="/tags/"> 标签 
+            </a><a class="menu-item" href="/categories/catch-the-cat/"> 趣味 
+            </a><a class="menu-item" href="/about/"> 关于 
+            </a><a class="menu-item" href="https://github.com/hyper2t/hyper2t.github.io" title="GitHub" rel="noopener noreffer" target="_blank"><i class='fab fa-github fa-fw'></i>  
+            </a><a href="javascript:void(0);" class="menu-item theme-switch" title="切换主题">
+                <i class="fas fa-adjust fa-fw"></i>
+            </a><a href="javascript:void(0);" class="menu-item" title="选择语言">简体中文<i class="fas fa-chevron-right fa-fw"></i>
+                    <select class="language-select" onchange="location = this.value;"><option value="/en/crd-introduction/">English</option><option value="/crd-introduction/" selected>简体中文</option></select>
+                </a></div>
+    </div>
 </header>
 <div class="search-dropdown desktop">
-<div id=search-dropdown-desktop></div>
+    <div id="search-dropdown-desktop"></div>
 </div>
 <div class="search-dropdown mobile">
-<div id=search-dropdown-mobile></div>
+    <div id="search-dropdown-mobile"></div>
 </div>
-<main class=main>
-<div class=container><div class=toc id=toc-auto>
-<h2 class=toc-title>目录</h2>
-<div class=toc-content id=toc-content-auto></div>
-</div><article class="page single"><h1 class="single-title animated flipInX">Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍</h1><div class=post-meta>
-<div class=post-meta-line><span class=post-author><a href=https://hyper2t.github.io title=Author target=_blank rel="noopener noreffer author" class=author><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class=post-category>收录于 <a href=/categories/kubernetes/><i class="far fa-folder fa-fw"></i>Kubernetes</a></span></div>
-<div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2020-08-04>2020-08-04</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2701 字&nbsp;
-<i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;<span id=/crd-introduction/ class=leancloud_visitors data-flag-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍">
-<i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
-</span>&nbsp;</div>
-</div><div class=featured-image><img class=lazyload src=/svg/loading.min.svg data-src=/crd-introduction/featured-image.png data-srcset="/crd-introduction/featured-image.png, /crd-introduction/featured-image.png 1.5x, /crd-introduction/featured-image.png 2x" data-sizes=auto alt=/crd-introduction/featured-image.png title="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。"></div><div class="details toc" id=toc-static kept>
-<div class="details-summary toc-title">
-<span>目录</span>
-<span><i class="details-icon fas fa-angle-right"></i></span>
-</div>
-<div class="details-content toc-content" id=toc-content-static><nav id=TableOfContents>
-<ul>
-<li><a href=#1-初识-crd-和-operator-框架>1 初识 CRD 和 Operator 框架</a>
-<ul>
-<li><a href=#1custom-resource-define>1.Custom Resource Define</a></li>
-<li><a href=#2yaml-文件格式>2.YAML 文件格式</a></li>
-<li><a href=#3kubebuilder-脚手架使用>3.kubebuilder 脚手架使用</a></li>
-</ul>
-</li>
-<li><a href=#2-client-go-实现原理>2 client-go 实现原理</a>
-<ul>
-<li><a href=#1-组件介绍>1. 组件介绍</a></li>
-<li><a href=#2-自定义-controller-的控制流>2. 自定义 Controller 的控制流</a></li>
-</ul>
-</li>
-</ul>
+<main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+            <h2 class="toc-title">目录</h2>
+            <div class="toc-content" id="toc-content-auto"></div>
+        </div><article class="page single"><h1 class="single-title animated flipInX">Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍</h1><div class="post-meta">
+            <div class="post-meta-line"><span class="post-author"><a href="https://hyper2t.github.io" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/kubernetes/"><i class="far fa-folder fa-fw"></i>Kubernetes</a></span></div>
+            <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-08-04">2020-08-04</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2703 字&nbsp;
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 6 分钟&nbsp;<span id="/crd-introduction/" class="leancloud_visitors" data-flag-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍">
+                        <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
+                    </span>&nbsp;</div>
+        </div><div class="featured-image"><img
+        class="lazyload"
+        src="/svg/loading.min.svg"
+        data-src="/crd-introduction/featured-image.png"
+        data-srcset="/crd-introduction/featured-image.png, /crd-introduction/featured-image.png 1.5x, /crd-introduction/featured-image.png 2x"
+        data-sizes="auto"
+        alt="/crd-introduction/featured-image.png"
+        title="这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。" /></div><div class="details toc" id="toc-static"  kept="">
+                <div class="details-summary toc-title">
+                    <span>目录</span>
+                    <span><i class="details-icon fas fa-angle-right"></i></span>
+                </div>
+                <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-初识-crd-和-operator-框架">1 初识 CRD 和 Operator 框架</a>
+      <ul>
+        <li><a href="#1custom-resource-define">1.Custom Resource Define</a></li>
+        <li><a href="#2yaml-文件格式">2.YAML 文件格式</a></li>
+        <li><a href="#3kubebuilder-脚手架使用">3.kubebuilder 脚手架使用</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-client-go-实现原理">2 client-go 实现原理</a>
+      <ul>
+        <li><a href="#1-组件介绍">1. 组件介绍</a></li>
+        <li><a href="#2-自定义-controller-的控制流">2. 自定义 Controller 的控制流</a></li>
+      </ul>
+    </li>
+  </ul>
 </nav></div>
-</div><div class=content id=content><p>这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。</p>
-<h2 id=1-初识-crd-和-operator-框架>1 初识 CRD 和 Operator 框架</h2>
-<h3 id=1custom-resource-define>1.Custom Resource Define</h3>
+            </div><div class="content" id="content"><p>这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。</p>
+<h2 id="1-初识-crd-和-operator-框架">1 初识 CRD 和 Operator 框架</h2>
+<h3 id="1custom-resource-define">1.Custom Resource Define</h3>
 <p><code>Custom Resource Define</code> 简称 CRD，是 Kubernetes（v1.7+）为提高可扩展性，让开发者去自定义资源的一种方式。CRD 资源可以动态注册到集群中，注册完毕后，用户可以通过 kubectl 来创建访问这个自定义的资源对象，类似于操作 Pod 一样。不过需要注意的是 CRD 仅仅是资源的定义而已，需要一个对应的控制器去监听 CRD 的各种事件来添加自定义的业务逻辑。</p>
-<h3 id=2yaml-文件格式>2.YAML 文件格式</h3>
+<h3 id="2yaml-文件格式">2.YAML 文件格式</h3>
 <p>我们可以定义一个如下所示的 CRD 资源清单文件：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
-</span><span class=lnt>12
-</span><span class=lnt>13
-</span><span class=lnt>14
-</span><span class=lnt>15
-</span><span class=lnt>16
-</span><span class=lnt>17
-</span><span class=lnt>18
-</span><span class=lnt>19
-</span><span class=lnt>20
-</span><span class=lnt>21
-</span><span class=lnt>22
-</span><span class=lnt>23
-</span><span class=lnt>24
-</span><span class=lnt>25
-</span><span class=lnt>26
-</span><span class=lnt>27
-</span><span class=lnt>28
-</span><span class=lnt>29
-</span><span class=lnt>30
-</span><span class=lnt>31
-</span><span class=lnt>32
-</span><span class=lnt>33
-</span><span class=lnt>34
-</span><span class=lnt>35
-</span><span class=lnt>36
-</span><span class=lnt>37
-</span><span class=lnt>38
-</span><span class=lnt>39
-</span><span class=lnt>40
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=c># crd-demo.yaml</span><span class=w>
-</span><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>apiextensions.k8s.io/v1</span><span class=w>
-</span><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>CustomResourceDefinition</span><span class=w>
-</span><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=c># name 必须匹配下面的spec字段：&lt;plural&gt;.&lt;group&gt;  </span><span class=w>
-</span><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>crontabs.stable.example.com</span><span class=w>
-</span><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=c># group 名用于 REST API 中的定义：/apis/&lt;group&gt;/&lt;version&gt;  </span><span class=w>
-</span><span class=w>  </span><span class=nt>group</span><span class=p>:</span><span class=w> </span><span class=l>stable.example.com</span><span class=w>
-</span><span class=w>  </span><span class=c># 列出自定义资源的所有 API 版本  </span><span class=w>
-</span><span class=w>  </span><span class=nt>versions</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>v1beta1 </span><span class=w> </span><span class=c># 版本名称，比如 v1、v2beta1 等等    </span><span class=w>
-</span><span class=w>    </span><span class=nt>served</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w>  </span><span class=c># 是否开启通过 REST APIs 访问 `/apis/&lt;group&gt;/&lt;version&gt;/...`    </span><span class=w>
-</span><span class=w>    </span><span class=nt>storage</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=w> </span><span class=c># 必须将一个且只有一个版本标记为存储版本    </span><span class=w>
-</span><span class=w>    </span><span class=nt>schema</span><span class=p>:</span><span class=w>  </span><span class=c># 定义自定义对象的声明规范      </span><span class=w>
-</span><span class=w>      </span><span class=nt>openAPIV3Schema</span><span class=p>:</span><span class=w>
-</span><span class=w>        </span><span class=nt>description</span><span class=p>:</span><span class=w> </span><span class=l>Define CronTab YAML Spec</span><span class=w>
-</span><span class=w>        </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>object</span><span class=w>
-</span><span class=w>        </span><span class=nt>properties</span><span class=p>:</span><span class=w>
-</span><span class=w>          </span><span class=nt>spec</span><span class=p>:</span><span class=w>
-</span><span class=w>            </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>object</span><span class=w>
-</span><span class=w>            </span><span class=nt>properties</span><span class=p>:</span><span class=w>
-</span><span class=w>              </span><span class=nt>cronSpec</span><span class=p>:</span><span class=w>
-</span><span class=w>                </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>string</span><span class=w>
-</span><span class=w>              </span><span class=nt>image</span><span class=p>:</span><span class=w>
-</span><span class=w>                </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>string</span><span class=w>
-</span><span class=w>              </span><span class=nt>replicas</span><span class=p>:</span><span class=w>
-</span><span class=w>                </span><span class=nt>type</span><span class=p>:</span><span class=w> </span><span class=l>integer</span><span class=w>
-</span><span class=w>  </span><span class=c># 定义作用范围：Namespaced（命名空间级别）或者 Cluster（整个集群）  </span><span class=w>
-</span><span class=w>  </span><span class=nt>scope</span><span class=p>:</span><span class=w> </span><span class=l>Namespaced</span><span class=w>
-</span><span class=w>  </span><span class=nt>names</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span><span class=c># kind 是 singular 的一个驼峰形式定义，在资源清单中会使用    </span><span class=w>
-</span><span class=w>    </span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>CronTab</span><span class=w>
-</span><span class=w>    </span><span class=c># plural 名字用于 REST API 中的定义：/apis/&lt;group&gt;/&lt;version&gt;/&lt;plural&gt;    </span><span class=w>
-</span><span class=w>    </span><span class=nt>plural</span><span class=p>:</span><span class=w> </span><span class=l>crontabs</span><span class=w>
-</span><span class=w>    </span><span class=c># singular 名称用于 CLI 操作或显示的一个别名    </span><span class=w>
-</span><span class=w>    </span><span class=nt>singular</span><span class=p>:</span><span class=w> </span><span class=l>crontab</span><span class=w>
-</span><span class=w>    </span><span class=c># shortNames 相当于缩写形式    </span><span class=w>
-</span><span class=w>    </span><span class=nt>shortNames</span><span class=p>:</span><span class=w>
-</span><span class=w>    </span>- <span class=l>ct</span><span class=w>
-</span></code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># crd-demo.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apiextensions.k8s.io/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CustomResourceDefinition</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># name 必须匹配下面的spec字段：&lt;plural&gt;.&lt;group&gt;  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">crontabs.stable.example.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># group 名用于 REST API 中的定义：/apis/&lt;group&gt;/&lt;version&gt;  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">group</span><span class="p">:</span><span class="w"> </span><span class="l">stable.example.com</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># 列出自定义资源的所有 API 版本  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">versions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">v1beta1 </span><span class="w"> </span><span class="c"># 版本名称，比如 v1、v2beta1 等等    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">served</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">  </span><span class="c"># 是否开启通过 REST APIs 访问 `/apis/&lt;group&gt;/&lt;version&gt;/...`    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">storage</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="c"># 必须将一个且只有一个版本标记为存储版本    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">schema</span><span class="p">:</span><span class="w">  </span><span class="c"># 定义自定义对象的声明规范      </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">openAPIV3Schema</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l">Define CronTab YAML Spec</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">object</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">properties</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">object</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nt">properties</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">cronSpec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">string</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">image</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">string</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="nt">replicas</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">integer</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="c"># 定义作用范围：Namespaced（命名空间级别）或者 Cluster（整个集群）  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">scope</span><span class="p">:</span><span class="w"> </span><span class="l">Namespaced</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">names</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># kind 是 singular 的一个驼峰形式定义，在资源清单中会使用    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CronTab</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># plural 名字用于 REST API 中的定义：/apis/&lt;group&gt;/&lt;version&gt;/&lt;plural&gt;    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">plural</span><span class="p">:</span><span class="w"> </span><span class="l">crontabs</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># singular 名称用于 CLI 操作或显示的一个别名    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">singular</span><span class="p">:</span><span class="w"> </span><span class="l">crontab</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># shortNames 相当于缩写形式    </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">shortNames</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">ct</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
 </div>
-</div><p>我们在创建资源的时候，肯定不是任由我们随意去编写 YAML 文件的，当我们把上面的 CRD 文件提交给 Kubernetes 之后，Kubernetes 会对我们提交的声明文件进行校验，从定义可以看出 CRD 是基于 <a href=https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#schemaObject target=_blank rel="noopener noreffer">OpenAPI v3 schem</a> 进行规范的。</p>
+</div><p>我们在创建资源的时候，肯定不是任由我们随意去编写 YAML 文件的，当我们把上面的 CRD 文件提交给 Kubernetes 之后，Kubernetes 会对我们提交的声明文件进行校验，从定义可以看出 CRD 是基于 <a href="https://github.com/OAI/OpenAPI-Specification/blob/main/versions/3.0.0.md#schemaObject" target="_blank" rel="noopener noreffer">OpenAPI v3 schem</a> 进行规范的。</p>
 <p>使用 <code>kubectl</code> 来创建这个 CRD 资源清单：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-Shell data-lang=Shell><span class=o>[</span>root@master ~<span class=o>]</span><span class=c1># kubectl apply -f crd-demo.yaml</span>
-customresourcedefinition.apiextensions.k8s.io/crontabs.stable.example.com created
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-Shell" data-lang="Shell"><span class="line"><span class="cl"><span class="o">[</span>root@master ~<span class="o">]</span><span class="c1"># kubectl apply -f crd-demo.yaml</span>
+</span></span><span class="line"><span class="cl">customresourcedefinition.apiextensions.k8s.io/crontabs.stable.example.com created
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>然后我们就可以使用这个 API 端点来创建和管理自定义的对象，这些对象的类型就是上面创建的 CRD 对象规范中的 <code>CronTab</code>。
 现在在 Kubernetes 集群中我们就多了一种新的资源叫 <code>crontabs.stable.example.com</code>，我们就可以使用它来定义一个 <code>CronTab</code> 资源对象了，这个自定义资源对象里面可以包含的字段我们在定义的时候通过 <code>schema</code> 进行了规范，比如现在我们来创建一个如下所示的资源清单：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span><span class=lnt>4
-</span><span class=lnt>5
-</span><span class=lnt>6
-</span><span class=lnt>7
-</span><span class=lnt>8
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=c># crd-crontab-demo.yaml</span><span class=w>
-</span><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;stable.example.com/v1beta1&#34;</span><span class=w>
-</span><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>CronTab</span><span class=w>
-</span><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>my-new-cron-object</span><span class=w>
-</span><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
-</span><span class=w>  </span><span class=nt>cronSpec</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;* * * * */5&#34;</span><span class=w>
-</span><span class=w>  </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>my-awesome-cron-image</span><span class=w>
-</span></code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># crd-crontab-demo.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;stable.example.com/v1beta1&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">CronTab</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-new-cron-object</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">cronSpec</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;* * * * */5&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">my-awesome-cron-image</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>直接创建这个对象：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=o>[</span>root@master ~<span class=o>]</span><span class=c1># kubectl apply -f crd-crontab-demo.yaml</span>
-crontab.stable.example.com/my-new-cron-object created
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>root@master ~<span class="o">]</span><span class="c1"># kubectl apply -f crd-crontab-demo.yaml</span>
+</span></span><span class="line"><span class="cl">crontab.stable.example.com/my-new-cron-object created
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>我们就可以用 <code>kubectl</code> 来管理我们这里创建 <code>CronTab</code> 对象了，比如：</p>
 <div class="details admonition example open">
-<div class="details-summary admonition-title">
-<i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
-</div>
-<div class=details-content>
-<div class=admonition-content><div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span><span class=lnt>4
-</span><span class=lnt>5
-</span><span class=lnt>6
+        <div class="details-summary admonition-title">
+            <i class="icon fas fa-list-ol fa-fw"></i>示例<i class="details-icon fas fa-angle-right fa-fw"></i>
+        </div>
+        <div class="details-content">
+            <div class="admonition-content"><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell><span class=o>[</span>root@master ~<span class=o>]</span><span class=c1># kubectl get ct  # 简写</span>
-NAME                 AGE
-my-new-cron-object   42s
-<span class=o>[</span>root@master ~<span class=o>]</span><span class=c1># kubectl get crontab</span>
-NAME                 AGE
-my-new-cron-object   88s
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="o">[</span>root@master ~<span class="o">]</span><span class="c1"># kubectl get ct  # 简写</span>
+</span></span><span class="line"><span class="cl">NAME                 AGE
+</span></span><span class="line"><span class="cl">my-new-cron-object   42s
+</span></span><span class="line"><span class="cl"><span class="o">[</span>root@master ~<span class="o">]</span><span class="c1"># kubectl get crontab</span>
+</span></span><span class="line"><span class="cl">NAME                 AGE
+</span></span><span class="line"><span class="cl">my-new-cron-object   88s
+</span></span></code></pre></td></tr></table>
 </div>
 </div></div>
-</div>
-</div>
-<h3 id=3kubebuilder-脚手架使用>3.kubebuilder 脚手架使用</h3>
+        </div>
+    </div>
+<h3 id="3kubebuilder-脚手架使用">3.kubebuilder 脚手架使用</h3>
 <p>创建一个目录，然后在里面运行 <code>kubebuilder init</code> 命令，初始化一个新项目。</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt>1
-</span><span class=lnt>2
-</span><span class=lnt>3
-</span><span class=lnt>4
-</span><span class=lnt>5
-</span><span class=lnt>6
-</span><span class=lnt>7
-</span><span class=lnt>8
-</span><span class=lnt>9
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-shell data-lang=shell>$ <span class=nb>cd</span> go/src/github.com/peterliao96
-$ mkdir builder-demo
-$ <span class=nb>cd</span> builder-demo
-<span class=c1># 开启 go modules</span>
-$ <span class=nb>export</span> <span class=nv>GO111MODULE</span><span class=o>=</span>on
-$ <span class=nb>export</span> <span class=nv>GOPROXY</span><span class=o>=</span>https://goproxy.cn
-$ kubebuilder init --domain ydzs.io --owner peterliao96 --repo github.com/peterliao96/builder-demo
-<span class=c1># 创建一个新的 API（组/版本）为 “webapp/v1”，并在上面创建新的 Kind(CRD) “Guestbook”</span>
-$ kubebuilder create api --group webapp --version v1 --kind Guestbook
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">$ <span class="nb">cd</span> go/src/github.com/peterliao96
+</span></span><span class="line"><span class="cl">$ mkdir builder-demo
+</span></span><span class="line"><span class="cl">$ <span class="nb">cd</span> builder-demo
+</span></span><span class="line"><span class="cl"><span class="c1"># 开启 go modules</span>
+</span></span><span class="line"><span class="cl">$ <span class="nb">export</span> <span class="nv">GO111MODULE</span><span class="o">=</span>on
+</span></span><span class="line"><span class="cl">$ <span class="nb">export</span> <span class="nv">GOPROXY</span><span class="o">=</span>https://goproxy.cn
+</span></span><span class="line"><span class="cl">$ kubebuilder init --domain ydzs.io --owner peterliao96 --repo github.com/peterliao96/builder-demo
+</span></span><span class="line"><span class="cl"><span class="c1"># 创建一个新的 API（组/版本）为 “webapp/v1”，并在上面创建新的 Kind(CRD) “Guestbook”</span>
+</span></span><span class="line"><span class="cl">$ kubebuilder create api --group webapp --version v1 --kind Guestbook
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>上面的命令会创建文件 <code>api/v1/guestbook_types.go</code>，该文件中定义相关 API ，而针对于这一类型 (CRD) 的业务逻辑生成在 <code>controller/guestbook_controller.go</code> 文件中。
 我们可以根据自己的需求去修改资源对象的定义结构，修改 <code>api/v1/guestbook_types.go</code> 文件：</p>
-<div class=highlight><div class=chroma>
-<table class=lntable><tr><td class=lntd>
-<pre tabindex=0 class=chroma><code><span class=lnt> 1
-</span><span class=lnt> 2
-</span><span class=lnt> 3
-</span><span class=lnt> 4
-</span><span class=lnt> 5
-</span><span class=lnt> 6
-</span><span class=lnt> 7
-</span><span class=lnt> 8
-</span><span class=lnt> 9
-</span><span class=lnt>10
-</span><span class=lnt>11
-</span><span class=lnt>12
-</span><span class=lnt>13
-</span><span class=lnt>14
-</span><span class=lnt>15
-</span><span class=lnt>16
-</span><span class=lnt>17
-</span><span class=lnt>18
-</span><span class=lnt>19
-</span><span class=lnt>20
-</span><span class=lnt>21
-</span><span class=lnt>22
-</span><span class=lnt>23
-</span><span class=lnt>24
-</span><span class=lnt>25
-</span><span class=lnt>26
-</span><span class=lnt>27
-</span><span class=lnt>28
-</span><span class=lnt>29
-</span><span class=lnt>30
-</span><span class=lnt>31
-</span><span class=lnt>32
-</span><span class=lnt>33
-</span><span class=lnt>34
-</span><span class=lnt>35
-</span><span class=lnt>36
-</span><span class=lnt>37
-</span><span class=lnt>38
-</span><span class=lnt>39
-</span><span class=lnt>40
-</span><span class=lnt>41
-</span><span class=lnt>42
-</span><span class=lnt>43
-</span><span class=lnt>44
-</span><span class=lnt>45
-</span><span class=lnt>46
-</span><span class=lnt>47
-</span><span class=lnt>48
-</span><span class=lnt>49
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
 </span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=c1>// api/v1/guestbook_types.go
-</span><span class=c1></span><span class=kn>package</span> <span class=nx>v1</span>
-
-<span class=kn>import</span> <span class=p>(</span>
-	<span class=nx>metav1</span> <span class=s>&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
-<span class=p>)</span>
-
-<span class=c1>// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-</span><span class=c1>// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-</span><span class=c1></span>
-<span class=c1>// GuestbookSpec defines the desired state of Guestbook
-</span><span class=c1></span><span class=kd>type</span> <span class=nx>GuestbookSpec</span> <span class=kd>struct</span> <span class=p>{</span>
-	<span class=c1>// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-</span><span class=c1></span>	<span class=c1>// Important: Run &#34;make&#34; to regenerate code after modifying this file
-</span><span class=c1></span>
-	<span class=c1>// Foo is an example field of Guestbook. Edit guestbook_types.go to remove/update
-</span><span class=c1></span>	<span class=nx>Foo</span> <span class=kt>string</span> <span class=s>`json:&#34;foo,omitempty&#34;`</span>
-<span class=p>}</span>
-
-<span class=c1>// GuestbookStatus defines the observed state of Guestbook
-</span><span class=c1></span><span class=kd>type</span> <span class=nx>GuestbookStatus</span> <span class=kd>struct</span> <span class=p>{</span>
-	<span class=c1>// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-</span><span class=c1></span>	<span class=c1>// Important: Run &#34;make&#34; to regenerate code after modifying this file
-</span><span class=c1></span><span class=p>}</span>
-
-<span class=c1>//+kubebuilder:object:root=true
-</span><span class=c1>//+kubebuilder:subresource:status
-</span><span class=c1></span>
-<span class=c1>// Guestbook is the Schema for the guestbooks API
-</span><span class=c1></span><span class=kd>type</span> <span class=nx>Guestbook</span> <span class=kd>struct</span> <span class=p>{</span>
-	<span class=nx>metav1</span><span class=p>.</span><span class=nx>TypeMeta</span>   <span class=s>`json:&#34;,inline&#34;`</span>
-	<span class=nx>metav1</span><span class=p>.</span><span class=nx>ObjectMeta</span> <span class=s>`json:&#34;metadata,omitempty&#34;`</span>
-
-	<span class=nx>Spec</span>   <span class=nx>GuestbookSpec</span>   <span class=s>`json:&#34;spec,omitempty&#34;`</span>
-	<span class=nx>Status</span> <span class=nx>GuestbookStatus</span> <span class=s>`json:&#34;status,omitempty&#34;`</span>
-<span class=p>}</span>
-
-<span class=c1>//+kubebuilder:object:root=true
-</span><span class=c1></span>
-<span class=c1>// GuestbookList contains a list of Guestbook
-</span><span class=c1></span><span class=kd>type</span> <span class=nx>GuestbookList</span> <span class=kd>struct</span> <span class=p>{</span>
-	<span class=nx>metav1</span><span class=p>.</span><span class=nx>TypeMeta</span> <span class=s>`json:&#34;,inline&#34;`</span>
-	<span class=nx>metav1</span><span class=p>.</span><span class=nx>ListMeta</span> <span class=s>`json:&#34;metadata,omitempty&#34;`</span>
-	<span class=nx>Items</span>           <span class=p>[]</span><span class=nx>Guestbook</span> <span class=s>`json:&#34;items&#34;`</span>
-<span class=p>}</span>
-
-<span class=kd>func</span> <span class=nf>init</span><span class=p>()</span> <span class=p>{</span>
-	<span class=nx>SchemeBuilder</span><span class=p>.</span><span class=nf>Register</span><span class=p>(</span><span class=o>&amp;</span><span class=nx>Guestbook</span><span class=p>{},</span> <span class=o>&amp;</span><span class=nx>GuestbookList</span><span class=p>{})</span>
-<span class=p>}</span>
-</code></pre></td></tr></table>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// api/v1/guestbook_types.go
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kn">package</span> <span class="nx">v1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="p">(</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">metav1</span> <span class="s">&#34;k8s.io/apimachinery/pkg/apis/meta/v1&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+</span></span></span><span class="line"><span class="cl"><span class="c1">// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// GuestbookSpec defines the desired state of Guestbook
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">GuestbookSpec</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Important: Run &#34;make&#34; to regenerate code after modifying this file
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Foo is an example field of Guestbook. Edit guestbook_types.go to remove/update
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">Foo</span> <span class="kt">string</span> <span class="s">`json:&#34;foo,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// GuestbookStatus defines the observed state of Guestbook
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">GuestbookStatus</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// Important: Run &#34;make&#34; to regenerate code after modifying this file
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//+kubebuilder:object:root=true
+</span></span></span><span class="line"><span class="cl"><span class="c1">//+kubebuilder:subresource:status
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// Guestbook is the Schema for the guestbooks API
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Guestbook</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span>   <span class="s">`json:&#34;,inline&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">metav1</span><span class="p">.</span><span class="nx">ObjectMeta</span> <span class="s">`json:&#34;metadata,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="nx">Spec</span>   <span class="nx">GuestbookSpec</span>   <span class="s">`json:&#34;spec,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Status</span> <span class="nx">GuestbookStatus</span> <span class="s">`json:&#34;status,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//+kubebuilder:object:root=true
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// GuestbookList contains a list of Guestbook
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">GuestbookList</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">metav1</span><span class="p">.</span><span class="nx">TypeMeta</span> <span class="s">`json:&#34;,inline&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">metav1</span><span class="p">.</span><span class="nx">ListMeta</span> <span class="s">`json:&#34;metadata,omitempty&#34;`</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">Items</span>           <span class="p">[]</span><span class="nx">Guestbook</span> <span class="s">`json:&#34;items&#34;`</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">init</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">SchemeBuilder</span><span class="p">.</span><span class="nf">Register</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">Guestbook</span><span class="p">{},</span> <span class="o">&amp;</span><span class="nx">GuestbookList</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
-</div><p>本部分摘录于 Kubernetes 开发课文档中的 <a href=https://www.notion.so/CRD-133b377c4b5e408ea2ede4d40bb31108 target=_blank rel="noopener noreffer">CRD介绍</a> 和 <a href=https://www.notion.so/kubebuilder-3cbdc53796044a939a58eaaba67f415b target=_blank rel="noopener noreffer">kubebuilder 介绍</a>。</p>
-<h2 id=2-client-go-实现原理>2 client-go 实现原理</h2>
+</div><p>本部分摘录于 Kubernetes 开发课文档中的 <a href="https://www.notion.so/CRD-133b377c4b5e408ea2ede4d40bb31108" target="_blank" rel="noopener noreffer">CRD介绍</a> 和 <a href="https://www.notion.so/kubebuilder-3cbdc53796044a939a58eaaba67f415b" target="_blank" rel="noopener noreffer">kubebuilder 介绍</a>。</p>
+<h2 id="2-client-go-实现原理">2 client-go 实现原理</h2>
 <p>我们自定义的资源 CRD 创建完成以后，其实如果没有一个 controller 运行它的话，它并没有起到任何用处。于是，我们需要通过创建 controller 来运行 CRD。
 要想了解 controller 的实现原理和方式，我们就需要了解下 <code>client-go</code> 这个库的实现，Kubernetes 部分代码也是基于这个库实现的，也包含了开发自定义控制器时可以使用的各种机制。
 下图显示了 <code>client-go</code> 中的各个组件是如何公众的以及与我们要编写的自定义控制器代码的交互入口：</p>
-<p><figure><a class=lightgallery href=/client-go-controller-interaction.jpeg title="controller interaction" data-thumbnail=/client-go-controller-interaction.jpeg data-sub-html="<h2>图1:client-go 实现流程图</h2><p>controller interaction</p>">
-<img class=lazyload src=/svg/loading.min.svg data-src=/client-go-controller-interaction.jpeg data-srcset="/client-go-controller-interaction.jpeg, /client-go-controller-interaction.jpeg 1.5x, /client-go-controller-interaction.jpeg 2x" data-sizes=auto alt=/client-go-controller-interaction.jpeg>
-</a><figcaption class=image-caption>图1:client-go 实现流程图</figcaption>
-</figure></p>
-<h3 id=1-组件介绍>1. 组件介绍</h3>
+<p><figure><a class="lightgallery" href="/client-go-controller-interaction.jpeg" title="controller interaction" data-thumbnail="/client-go-controller-interaction.jpeg" data-sub-html="<h2>图1:client-go 实现流程图</h2><p>controller interaction</p>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/client-go-controller-interaction.jpeg"
+            data-srcset="/client-go-controller-interaction.jpeg, /client-go-controller-interaction.jpeg 1.5x, /client-go-controller-interaction.jpeg 2x"
+            data-sizes="auto"
+            alt="/client-go-controller-interaction.jpeg" />
+    </a><figcaption class="image-caption">图1:client-go 实现流程图</figcaption>
+    </figure></p>
+<h3 id="1-组件介绍">1. 组件介绍</h3>
 <p><code>client-go</code> 组件：</p>
 <ul>
 <li><code>Reflector</code>：通过 Kubernetes API 监控 Kubernetes 的资源类型 采用 List/Watch 机制, 可以 Watch 任何资源包括 CRD 添加 object 对象到 FIFO 队列，然后 Informer 会从队列里面取数据</li>
@@ -465,11 +538,17 @@ $ kubebuilder create api --group webapp --version v1 --kind Guestbook
 <li><code>Work queue</code>: Resource Event Handlers 被回调后将 key 写到工作队列，这里的 key 相当于事件通知，后面根据取出事件后，做后续的处理</li>
 <li><code>Process Item</code>：从工作队列中取出 key 后进行后续处理，具体处理可以通过 Indexer reference controller 可以直接创建上述两个引用对象去处理，也可以采用工厂模式，官方都有相关示例</li>
 </ul>
-<h3 id=2-自定义-controller-的控制流>2. 自定义 Controller 的控制流</h3>
-<p><figure><a class=lightgallery href=/client-go-controller-workflow.png title="controller workflow" data-thumbnail=/client-go-controller-workflow.png data-sub-html="<h2>图2：controller 工作流</h2><p>controller workflow</p>">
-<img class=lazyload src=/svg/loading.min.svg data-src=/client-go-controller-workflow.png data-srcset="/client-go-controller-workflow.png, /client-go-controller-workflow.png 1.5x, /client-go-controller-workflow.png 2x" data-sizes=auto alt=/client-go-controller-workflow.png>
-</a><figcaption class=image-caption>图2：controller 工作流</figcaption>
-</figure></p>
+<h3 id="2-自定义-controller-的控制流">2. 自定义 Controller 的控制流</h3>
+<p><figure><a class="lightgallery" href="/client-go-controller-workflow.png" title="controller workflow" data-thumbnail="/client-go-controller-workflow.png" data-sub-html="<h2>图2：controller 工作流</h2><p>controller workflow</p>">
+        <img
+            class="lazyload"
+            src="/svg/loading.min.svg"
+            data-src="/client-go-controller-workflow.png"
+            data-srcset="/client-go-controller-workflow.png, /client-go-controller-workflow.png 1.5x, /client-go-controller-workflow.png 2x"
+            data-sizes="auto"
+            alt="/client-go-controller-workflow.png" />
+    </a><figcaption class="image-caption">图2：controller 工作流</figcaption>
+    </figure></p>
 <p>如上图所示主要有两个部分，一个是发生在 <code>SharedIndexInformer</code> 中，另外一个是在自定义控制器中。</p>
 <ul>
 <li><code>Reflector</code> 通过 Kubernetes APIServer 执行对象（比如 Pod）的 <code>ListAndWatch</code> 查询，记录和对象相关的三种事件类型 <code>Added、Updated、Deleted</code>，然后将它们传递到 <code>DeltaFIFO</code> 中去。</li>
@@ -479,47 +558,106 @@ $ kubebuilder create api --group webapp --version v1 --kind Guestbook
 <li>已注册的事件处理器通过添加或更新时间的 <code>MetaNamespaceKeyFunc()</code> 或删除事件的 <code>DeletionHandingMetaNamespaceKeyFunc()</code> 将对象转换为格式为 <code>namespace/name</code> 或只是 <code>name</code> 的 <code>key</code>，然后将这个 <code>key</code> 添加到自定义控制器的 <code>workqueue</code> 中，<code>workqueues</code> 的实现可以在 <code>util/workqueue</code> 中找到。</li>
 <li>自定义的控制器通过调用定义的 <code>handlers</code> 处理器从 <code>workqueue</code> 中 <code>pop</code> 一个 <code>key</code> 出来进行处理，<code>handlers</code> 将调用 <code>indexer</code> 的 <code>GetByKey()</code> 从线程安全的 <code>store</code> 中获取对象，我们的业务逻辑就是在这个 <code>handlers</code> 里面实现。</li>
 </ul>
-<p>本部分摘录于 Kubernetes 文档中的 <a href=https://www.qikqiak.com/k3s/controller/crd/#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3 target=_blank rel="noopener noreffer">CRD controller 原理实现</a>。</p></div><div class=post-footer id=post-footer>
-<div class=post-info>
-<div class=post-info-line>
-<div class=post-info-mod>
-<span>更新于 2022-10-15&nbsp;<a class=git-hash href=https://github.com/hyper2t/hyper2t.github.io/commit/2ef0e85f8676dd109592c4044e3ea1f18d8f6b7f target=_blank title="commit by hyper2t(1244240338@qq.com) 2ef0e85f8676dd109592c4044e3ea1f18d8f6b7f: Merge branch 'main' of https://github.com/hyper2t/hyper2t.github.io.source">
-<i class="fas fa-hashtag fa-fw"></i>2ef0e85</a></span>
+<p>本部分摘录于 Kubernetes 文档中的 <a href="https://www.qikqiak.com/k3s/controller/crd/#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3" target="_blank" rel="noopener noreffer">CRD controller 原理实现</a>。</p></div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>更新于 2022-08-22&nbsp;<a class="git-hash" href="https://github.com/hyper2t/hyper2t.github.io/commit/1e6394cfd45be76e7eb60c9cff8732741fef0fc0" target="_blank" title="commit by hyper2t(1244240338@qq.com) 1e6394cfd45be76e7eb60c9cff8732741fef0fc0: 添加歌曲">
+                                    <i class="fas fa-hashtag fa-fw"></i>1e6394c</a></span>
+            </div>
+            <div class="post-info-license"></div>
+        </div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="/crd-introduction/index.md" target="_blank">阅读原始文档</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/crd-introduction/" data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍" data-hashtags="Golang,Kubernetes,CRD"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/crd-introduction/" data-hashtag="Golang"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/crd-introduction/" data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://hyper2t.github.io/crd-introduction/" data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/crd-introduction/" data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"><i class="fas fa-tags fa-fw"></i>&nbsp;<a href="/tags/golang/">Golang</a>,&nbsp;<a href="/tags/kubernetes/">Kubernetes</a>,&nbsp;<a href="/tags/crd/">CRD</a></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="/hashmap/" class="prev" rel="prev" title="Go 基础知识与框架体系 part 9: hashmap"><i class="fas fa-angle-left fa-fw"></i>Go 基础知识与框架体系 part 9: hashmap</a>
+            <a href="/kubectl/" class="next" rel="next" title="Kubernetes kubectl 命令行总结">Kubernetes kubectl 命令行总结<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
-<div class=post-info-license></div>
-</div>
-<div class=post-info-line>
-<div class=post-info-md><span>
-<a class=link-to-markdown href=/crd-introduction/index.md target=_blank>阅读原始文档</a>
-</span></div>
-<div class=post-info-share>
-<span><a href=javascript:void(0); title="分享到 Twitter" data-sharer=twitter data-url=https://hyper2t.github.io/crd-introduction/ data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍" data-hashtags=Golang,Kubernetes,CRD><i class="fab fa-twitter fa-fw"></i></a><a href=javascript:void(0); title="分享到 Facebook" data-sharer=facebook data-url=https://hyper2t.github.io/crd-introduction/ data-hashtag=Golang><i class="fab fa-facebook-square fa-fw"></i></a><a href=javascript:void(0); title="分享到 Hacker News" data-sharer=hackernews data-url=https://hyper2t.github.io/crd-introduction/ data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍"><i class="fab fa-hacker-news fa-fw"></i></a><a href=javascript:void(0); title="分享到 Line" data-sharer=line data-url=https://hyper2t.github.io/crd-introduction/ data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍"><i data-svg-src=https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg></i></a><a href=javascript:void(0); title="分享到 微博" data-sharer=weibo data-url=https://hyper2t.github.io/crd-introduction/ data-title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍" data-ralateuid="7289413661/profile?topnav=1&wvr=6&is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
-</div>
-</div>
-</div>
-<div class=post-info-more>
-<section class=post-tags><i class="fas fa-tags fa-fw"></i>&nbsp;<a href=/tags/golang/>Golang</a>,&nbsp;<a href=/tags/kubernetes/>Kubernetes</a>,&nbsp;<a href=/tags/crd/>CRD</a></section>
-<section>
-<span><a href=javascript:void(0); onclick=window.history.back()>返回</a></span>&nbsp;|&nbsp;<span><a href=/>主页</a></span>
-</section>
-</div>
-<div class=post-nav><a href=/hashmap/ class=prev rel=prev title="Go 基础知识与框架体系 part 9: hashmap"><i class="fas fa-angle-left fa-fw"></i>Go 基础知识与框架体系 part 9: hashmap</a>
-<a href=/kubectl/ class=next rel=next title="Kubernetes kubectl 命令行总结">Kubernetes kubectl 命令行总结<i class="fas fa-angle-right fa-fw"></i></a></div>
-</div>
-<div id=comments><div id=waline class=comment></div>
-<script src=https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js></script>
-<link href=https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.css rel=stylesheet>
-<script>window.onload=function(){loadComments()};function loadComments(){if(typeof $waline=='undefined'){var a=b=>{var a=document.createElement('script');a.defer=!0,a.crossOrigin='anonymous',Object.keys(b).forEach(c=>{a[c]=b[c]}),document.body.appendChild(a)};a({src:'https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js',onload:()=>{newWaline()}})}else newWaline()}function newWaline(){Waline.init({el:'#waline',meta:["nick","mail","link"],login:"enable",dark:"auto",serverURL:"https://waline-comment-psi.vercel.app/",avatarCDN:"https://sdn.geekzu.org/avatar/",requiredMeta:["nick","mail"],pageSize:10,avatar:"retro",lang:"zh-CN",pageview:!0,emoji:["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/norevi/waline-blobcatemojis@1.0/blobs"],highlighter:!0,locale:{placeholder:"提交评论较慢，请等待几秒~",level0:'炼体',level1:'炼气',level2:'筑基',level3:'金丹',level4:'元婴',level5:'化神'}}),Waline.pageviewCount({serverURL:"https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js",update:!0})}</script></div></article></div>
-</main><footer class=footer>
-<div class=footer-container><div class=footer-line>Powered by Hugo with LoveIt</div><div class=footer-line>由 <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.90.0">Hugo</a> 强力驱动 | 主题 - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
-</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2020 - 2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Hyperter</a></span>&nbsp;|&nbsp;<span class=license><a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div>
-</div>
-</footer></div>
-<div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title=回到顶部>
-<i class="fas fa-arrow-up fa-fw"></i>
-</a><a href=# id=view-comments class=fixed-button title=查看评论>
-<i class="fas fa-comment fa-fw"></i>
-</a>
-</div><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.css><script type=text/javascript src=https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"复制到剪贴板",maxShownLines:80},comment:{},lightGallery:{actualSize:!1,exThumbImage:"data-thumbnail",hideBarsDelay:2e3,selector:".lightgallery",speed:400,thumbContHeight:80,thumbWidth:80,thumbnail:!0},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1},search:{algoliaAppID:"76RX3LJOIU",algoliaIndex:"dev_hyper2t",algoliaSearchKey:"0ddf3c3aad0b6d8b914d0f3d2305da67",highlightTag:"em",maxResultLength:10,noResultsFound:"没有找到结果",snippetLength:50,type:"algolia"}}</script><script type=text/javascript src=/js/theme.min.js></script><script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js></script>
-<script type=text/javascript src=https://cdn.jsdelivr.net/npm/jquery-backstretch@2.1.18/jquery.backstretch.min.js></script><script type=text/javascript src=/js/custom.js></script></body>
+<div id="comments"><div id="waline" class="comment"></div>
+        <script src='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>
+        <link href='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.css' rel='stylesheet' />
+
+        <script>
+            window.onload = function() {
+                loadComments();
+            }
+            function loadComments() {
+                if (typeof $waline === 'undefined') {
+                    var getScript = (options) => {
+                        var script = document.createElement('script');
+                        script.defer = true;
+                        script.crossOrigin = 'anonymous';
+                        Object.keys(options).forEach((key) => {
+                            script[key] = options[key];
+                        });
+                        document.body.appendChild(script);
+                    };
+                    getScript({
+                        src: 'https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js',
+                        onload: () => {
+                            newWaline();
+                        }
+                    });
+                } else {
+                    newWaline();
+                }
+            }
+            function newWaline() {
+                   Waline.init({
+                    el: '#waline',
+                    meta: ["nick","mail","link"],
+                    login: "enable",
+                    dark: "auto",
+                    serverURL: "https://waline-comment-psi.vercel.app/",
+                    avatarCDN: "https://sdn.geekzu.org/avatar/",
+                    requiredMeta: ["nick","mail"],
+                    pageSize:  10 ,
+                    avatar: "retro",
+                    lang: "zh-CN",
+                    pageview:  true ,
+                    emoji: ["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo","https://cdn.jsdelivr.net/gh/norevi/waline-blobcatemojis@1.0/blobs"],
+                    highlighter:  true ,
+                    locale: {
+                        placeholder: "提交评论较慢，请等待几秒~",
+                        level0: '炼体',
+                            level1: '炼气',
+                            level2: '筑基',
+                            level3: '金丹',
+                            level4: '元婴',
+                            level5: '化神',
+                    }
+                });
+                Waline.pageviewCount({
+                    serverURL: "https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js",
+                update: true
+                });
+            }
+        </script></div></article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line">Powered by Hugo with LoveIt</div><div class="footer-line">由 <a href="https://gohugo.io/" target="_blank" rel="noopener noreffer" title="Hugo 0.104.3">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+                </div><div class="footer-line"><i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2020 - 2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="/" target="_blank">Hyperter</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+                <i class="fas fa-arrow-up fa-fw"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+                <i class="fas fa-comment fa-fw"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/smooth-scroll@16.1.3/dist/smooth-scroll.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/autocomplete.js@0.37.1/dist/autocomplete.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/algoliasearch@4.2.0/dist/algoliasearch-lite.umd.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.2.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lightgallery.js@1.2.0/dist/js/lightgallery.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lg-thumbnail.js@1.2.0/dist/lg-thumbnail.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lg-zoom.js@1.2.0/dist/lg-zoom.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/sharer.js@0.4.0/sharer.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.11.1/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","maxShownLines":80},"comment":{},"lightGallery":{"actualSize":false,"exThumbImage":"data-thumbnail","hideBarsDelay":2000,"selector":".lightgallery","speed":400,"thumbContHeight":80,"thumbWidth":80,"thumbnail":true},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"algoliaAppID":"76RX3LJOIU","algoliaIndex":"dev_hyper2t","algoliaSearchKey":"0ddf3c3aad0b6d8b914d0f3d2305da67","highlightTag":"em","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"algolia"}};</script><script type="text/javascript" src="/js/theme.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery@2.1.3/dist/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jquery-backstretch@2.1.18/jquery.backstretch.min.js"></script><script type="text/javascript" src="/js/custom.js"></script></body>
 </html>

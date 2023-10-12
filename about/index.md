@@ -1,4 +1,4 @@
-# 关于 星夜君麒 🌃
+# 关于 Hyperter的博客 🌃
 
 
 {{< style "img { height: 1.25rem; }" >}}
@@ -9,7 +9,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/dillonzq/LoveIt?style=social)](https://github.com/dillonzq/LoveIt/fork)
 {{< /style >}}
 
-> [星夜君麒](https://hyper2t.github.io) 是一个由 [Peter (廖隽祺)](https://github.com/peterliao96) 利用**简洁**、**优雅**且**高效**的 [Hugo](https://gohugo.io/) 框架开发的技术博客。
+> [Hyperter](https://hyper2t.github.io) 是一个由 [皮特ᴾᵗ](https://github.com/peterliao96) 利用**简洁**、**优雅**且**高效**的 [Hugo](https://gohugo.io/) 框架开发的技术博客。
 >
 > 博主会不定时的分享关于各种热门技术，主要偏向后端开发、云原生以及其他热门技术栈等等。
 
@@ -26,7 +26,7 @@
 感谢 Dillon 为 hugo 社区提供了这么棒的博客主题。 关于 [LoveIt](https://github.com/dillonzq/LoveIt) 的更多信息请查看 [LICENSE 文件](https://github.com/dillonzq/LoveIt/blob/master/LICENSE)。
 
 {{< friend name="Dillon" url="https://github.com/dillonzq/" logo="https://avatars0.githubusercontent.com/u/30786232?s=460&u=5fc878f67c869ce6628cf65121b8d73e1733f941&v=4" word="LoveIt主题作者" >}}
-{{< friend name="Hyper2t" url="https://github.com/hyper2t/" logo="https://www.ymlx8.com/uploads/5f51b993dfe9d61013bc11d037e51eb2.jpg" word="extremely hot 的数学编程专家" >}}
-
+{{< friend name="Hyper2t" url="https://github.com/hyper2t/" logo="https://avatars.githubusercontent.com/u/96337721?v=4" word="extremely hot 的数学编程专家" >}}
+{{< friend name="Hyper2t" url="https://github.com/ikubevirt/" logo="https://avatars.githubusercontent.com/u/142135635?v=4" word="extremely hot 的云原生虚拟化专家" >}}
 
 
