@@ -92,7 +92,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/interface/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/defer/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/defer/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/defer/"
@@ -146,9 +146,9 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/slice/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/categories/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://hyper2t.github.io/categories/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url><url>
             <loc>https://hyper2t.github.io/categories/catch-the-cat/</loc><lastmod>2022-05-04T19:39:27&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://hyper2t.github.io/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/"
@@ -179,7 +179,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/categories/c&#43;&#43;/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/categories/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/categories/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/categories/"
@@ -192,7 +192,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/categories/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/posts/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/posts/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/posts/"
@@ -201,7 +201,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/posts/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/tags/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/tags/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/tags/"
@@ -234,7 +234,7 @@
             <loc>https://hyper2t.github.io/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/</loc><lastmod>2022-02-14T02:20:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://hyper2t.github.io/tags/%E4%BA%8C%E5%88%86%E6%B3%95/</loc><lastmod>2022-02-14T02:20:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://hyper2t.github.io/categories/%E7%AE%97%E6%B3%95/</loc><lastmod>2022-02-14T02:20:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://hyper2t.github.io/tags/golang/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/tags/golang/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/tags/golang/"
@@ -243,7 +243,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/tags/golang/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/categories/golang/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/categories/golang/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/categories/golang/"
@@ -315,7 +315,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/tags/crd/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/about/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/about/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/about/"
@@ -328,7 +328,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/about/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/tags/channel/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/tags/channel/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/tags/channel/"
@@ -337,7 +337,7 @@
                     hreflang="zh-cn"
                     href="https://hyper2t.github.io/tags/channel/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/tags/goroutine/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority><xhtml:link
+            <loc>https://hyper2t.github.io/tags/goroutine/</loc><lastmod>2023-10-09T19:05:12&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.8</priority><xhtml:link
                         rel="alternate"
                         hreflang="en"
                         href="https://hyper2t.github.io/en/tags/goroutine/"
