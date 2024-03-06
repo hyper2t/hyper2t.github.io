@@ -11,12 +11,5 @@
     <author>Author</author>
     <guid>https://hyper2t.github.io/en/generic-template/</guid>
     <description><![CDATA[This article summarizes the basic of generic programming in C++, its application and the underlying architectures.]]></description>
-</item><item>
-    <title>Summary on Leetcode Algorithm Problems</title>
-    <link>https://hyper2t.github.io/en/algorithms/</link>
-    <pubDate>Thu, 13 Aug 2020 21:57:40 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://hyper2t.github.io/en/algorithms/</guid>
-    <description><![CDATA[<p>This article summarizes the template of algorithms when I working on Leetcode problems.</p>]]></description>
 </item></channel>
 </rss>

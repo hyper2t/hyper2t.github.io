@@ -19,13 +19,6 @@
     <guid>https://hyper2t.github.io/generic-template/</guid>
     <description><![CDATA[<p>这篇文章初步介绍了 C++ 中泛型编程的知识体系，主要讲解了什么是模板。</p>]]></description>
 </item><item>
-    <title>刷 Leetcode 的算法总结</title>
-    <link>https://hyper2t.github.io/algorithms/</link>
-    <pubDate>Thu, 13 Aug 2020 21:57:40 &#43;0800</pubDate>
-    <author>作者</author>
-    <guid>https://hyper2t.github.io/algorithms/</guid>
-    <description><![CDATA[<p>这篇文章总结了我刷 Leetcode 时候用到的算法模板，包括回溯算法，二分法用到的双指针，动态规划等等。</p>]]></description>
-</item><item>
     <title>C&#43;&#43; 面向对象编程知识体系 part 1: 构造函数与析构函数</title>
     <link>https://hyper2t.github.io/constructordestructor/</link>
     <pubDate>Tue, 11 Aug 2020 21:57:40 &#43;0800</pubDate>
@@ -74,5 +67,12 @@
     <author>作者</author>
     <guid>https://hyper2t.github.io/interface/</guid>
     <description><![CDATA[<p>这篇文章总结了 Golang 的知识体系: interface，包括其中的底层实现等等。</p>]]></description>
+</item><item>
+    <title>Go 基础知识与框架体系 part 6: defer, panic 和 recover</title>
+    <link>https://hyper2t.github.io/defer/</link>
+    <pubDate>Tue, 07 Jul 2020 21:57:40 &#43;0800</pubDate>
+    <author>作者</author>
+    <guid>https://hyper2t.github.io/defer/</guid>
+    <description><![CDATA[<p>这篇文章总结了 Go 的知识体系 <code>defer</code>, <code>panic</code> 和 <code>recover</code>，包括其中的底层实现等等。</p>]]></description>
 </item></channel>
 </rss>

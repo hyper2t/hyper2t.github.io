@@ -11,15 +11,6 @@
                     hreflang="en"
                     href="https://hyper2t.github.io/en/generic-template/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/en/algorithms/</loc><lastmod>2022-01-30T00:44:36&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority><xhtml:link
-                        rel="alternate"
-                        hreflang="zh-cn"
-                        href="https://hyper2t.github.io/algorithms/"
-                        /><xhtml:link
-                    rel="alternate"
-                    hreflang="en"
-                    href="https://hyper2t.github.io/en/algorithms/"
-                    /></url><url>
             <loc>https://hyper2t.github.io/en/constructordestructor/</loc><lastmod>2022-07-08T08:43:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority><xhtml:link
                         rel="alternate"
                         hreflang="zh-cn"
@@ -234,9 +225,6 @@
                     /></url><url>
             <loc>https://hyper2t.github.io/en/tags/template/</loc><lastmod>2022-08-22T01:59:25&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://hyper2t.github.io/en/tags/type-traits/</loc><lastmod>2022-08-22T01:59:25&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://hyper2t.github.io/en/categories/algorithms/</loc><lastmod>2022-01-30T00:44:36&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://hyper2t.github.io/en/tags/binary-search/</loc><lastmod>2022-01-30T00:44:36&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-            <loc>https://hyper2t.github.io/en/tags/dynamic-programming/</loc><lastmod>2022-01-30T00:44:36&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://hyper2t.github.io/en/tags/class/</loc><lastmod>2022-07-08T08:43:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://hyper2t.github.io/en/tags/inheritance/</loc><lastmod>2022-07-08T08:43:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://hyper2t.github.io/en/tags/polymorphisms/</loc><lastmod>2022-07-08T08:43:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
