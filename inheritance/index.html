@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
-        <title>C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承 - 嗨，皮特~</title><meta name="Description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：类的继承，包括其中的底层实现等等。"><meta property="og:title" content="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承" />
+        <title>C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承 - 嗨，皮特~</title><meta name="Description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：类的继承，包括其中的底层实现等等。"><meta property="og:title" content="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承" />
 <meta property="og:description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：类的继承，包括其中的底层实现等等。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hyper2t.github.io/inheritance/" /><meta property="og:image" content="https://hyper2t.github.io/inheritance/featured-image.jpeg"/><meta property="article:section" content="posts" />
@@ -14,16 +14,16 @@
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://hyper2t.github.io/inheritance/featured-image.jpeg"/>
-<meta name="twitter:title" content="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承"/>
+<meta name="twitter:title" content="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承"/>
 <meta name="twitter:description" content="这篇文章总结了 C&#43;&#43; 中面向对象编程的知识体系：类的继承，包括其中的底层实现等等。"/>
 <meta name="application-name" content="LoveIt">
 <meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/twister-32x32.ico" />
         <link rel="icon" type="image/png" sizes="32x32" href="/twister-32x32.png">
-        <link rel="icon" type="image/png" sizes="16x16" href="/twister-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://hyper2t.github.io/inheritance/" /><link rel="prev" href="https://hyper2t.github.io/generic-template/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css"><script type="application/ld+json">
+        <link rel="icon" type="image/png" sizes="16x16" href="/twister-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://hyper2t.github.io/inheritance/" /><link rel="prev" href="https://hyper2t.github.io/generic-template/" /><link rel="next" href="https://hyper2t.github.io/bgp-theory-bird-with-cilium/" /><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.13.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.7.2/animate.min.css"><script type="application/ld+json">
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "C++ 面向对象编程知识体系 part 2: 类的继承",
+        "headline": "C++ 面向对象编程知识体系 系列二: 类的继承",
         "inLanguage": "zh-CN",
         "mainEntityOfPage": {
             "@type": "WebPage",
@@ -62,7 +62,7 @@
             </div>
             <script type="text/javascript">
                 window.onload = function(){
-                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3"];               
+                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3", "/mp3/一起看星星.mp3"];               
                     var myAudio = new Audio();
                     myAudio.preload = true;
                     myAudio.controls = true;
@@ -175,10 +175,10 @@
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">目录</h2>
             <div class="toc-content" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animated flipInX">C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animated flipInX">C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://hyper2t.github.io" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/c++/"><i class="far fa-folder fa-fw"></i>C++</a></span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-08-19">2020-08-19</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 464 字&nbsp;
-                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 1 分钟&nbsp;<span id="/inheritance/" class="leancloud_visitors" data-flag-title="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承">
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 1 分钟&nbsp;<span id="/inheritance/" class="leancloud_visitors" data-flag-title="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承">
                         <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
                     </span>&nbsp;</div>
         </div><div class="featured-image"><img
@@ -326,7 +326,7 @@
                             <a class="link-to-markdown" href="/inheritance/index.md" target="_blank">阅读原始文档</a>
                         </span></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承" data-hashtags="C&#43;&#43;,继承,多态,类"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/inheritance/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 part 2: 类的继承" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承" data-hashtags="C&#43;&#43;,继承,多态,类"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/inheritance/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/inheritance/" data-title="C&#43;&#43; 面向对象编程知识体系 系列二: 类的继承" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
             </div>
         </div>
     </div>
@@ -338,7 +338,8 @@
         </section>
     </div>
 
-    <div class="post-nav"><a href="/generic-template/" class="prev" rel="prev" title="C&#43;&#43; 泛型编程知识体系 part 1: 什么是模板"><i class="fas fa-angle-left fa-fw"></i>C&#43;&#43; 泛型编程知识体系 part 1: 什么是模板</a></div>
+    <div class="post-nav"><a href="/generic-template/" class="prev" rel="prev" title="C&#43;&#43; 泛型编程知识体系 系列一: 什么是模板"><i class="fas fa-angle-left fa-fw"></i>C&#43;&#43; 泛型编程知识体系 系列一: 什么是模板</a>
+            <a href="/bgp-theory-bird-with-cilium/" class="next" rel="next" title="Cilium 系列一: 使用bird和cilium部署BGP模式的k8s集群">Cilium 系列一: 使用bird和cilium部署BGP模式的k8s集群<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"><div id="waline" class="comment"></div>
         <script src='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>

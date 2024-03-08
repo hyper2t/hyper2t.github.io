@@ -47,13 +47,6 @@
     <guid>https://hyper2t.github.io/en/hashmap/</guid>
     <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
 </item><item>
-    <title>Golang Basic and architectures part 2: array &amp; slices</title>
-    <link>https://hyper2t.github.io/en/slice/</link>
-    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://hyper2t.github.io/en/slice/</guid>
-    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
-</item><item>
     <title>Golang Basic and architectures part 7: interface</title>
     <link>https://hyper2t.github.io/en/interface/</link>
     <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
@@ -66,6 +59,13 @@
     <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://hyper2t.github.io/en/mutex/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
+</item><item>
+    <title>Golang Basic and architectures part1: array &amp; slices</title>
+    <link>https://hyper2t.github.io/en/slice/</link>
+    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/slice/</guid>
     <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
 </item></channel>
 </rss>

@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
-        <title>Kubernetes CRD Operator Development - 嗨，皮特~</title><meta name="Description" content="This article summarizes the development of CRD Operator and the underlying architectures in Kubernetes."><meta property="og:title" content="Kubernetes CRD Operator Development" />
+        <title>Kubernetes CRD Operator Development part1：Architecture of client-go - 嗨，皮特~</title><meta name="Description" content="This article summarizes the development of CRD Operator and the underlying architectures in Kubernetes."><meta property="og:title" content="Kubernetes CRD Operator Development part1：Architecture of client-go" />
 <meta property="og:description" content="This article summarizes the development of CRD Operator and the underlying architectures in Kubernetes." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hyper2t.github.io/en/crd-introduction/" /><meta property="og:image" content="https://hyper2t.github.io/en/crd-introduction/featured-image.png"/><meta property="article:section" content="posts" />
@@ -14,7 +14,7 @@
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://hyper2t.github.io/en/crd-introduction/featured-image.png"/>
-<meta name="twitter:title" content="Kubernetes CRD Operator Development"/>
+<meta name="twitter:title" content="Kubernetes CRD Operator Development part1：Architecture of client-go"/>
 <meta name="twitter:description" content="This article summarizes the development of CRD Operator and the underlying architectures in Kubernetes."/>
 <meta name="application-name" content="LoveIt">
 <meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/twister-32x32.ico" />
@@ -23,7 +23,7 @@
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "Kubernetes CRD Operator Development",
+        "headline": "Kubernetes CRD Operator Development part1：Architecture of client-go",
         "inLanguage": "en",
         "mainEntityOfPage": {
             "@type": "WebPage",
@@ -62,7 +62,7 @@
             </div>
             <script type="text/javascript">
                 window.onload = function(){
-                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3"];               
+                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3", "/mp3/一起看星星.mp3"];               
                     var myAudio = new Audio();
                     myAudio.preload = true;
                     myAudio.controls = true;
@@ -175,10 +175,10 @@
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">Contents</h2>
             <div class="toc-content" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animated flipInX">Kubernetes CRD Operator Development</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animated flipInX">Kubernetes CRD Operator Development part1：Architecture of client-go</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://hyper2t.github.io" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class="post-category">included in <a href="/en/categories/kubernetes/"><i class="far fa-folder fa-fw"></i>Kubernetes</a></span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-08-04">2020-08-04</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;14 words&nbsp;
-                <i class="far fa-clock fa-fw"></i>&nbsp;One minute&nbsp;<span id="/en/crd-introduction/" class="leancloud_visitors" data-flag-title="Kubernetes CRD Operator Development">
+                <i class="far fa-clock fa-fw"></i>&nbsp;One minute&nbsp;<span id="/en/crd-introduction/" class="leancloud_visitors" data-flag-title="Kubernetes CRD Operator Development part1：Architecture of client-go">
                         <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;&lt;no value&gt; views
                     </span>&nbsp;</div>
         </div><div class="featured-image"><img
@@ -208,7 +208,7 @@
                             <a class="link-to-markdown" href="/en/crd-introduction/index.md" target="_blank">Read Markdown</a>
                         </span></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development" data-hashtags="Golang,Kubernetes,CRD"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/en/crd-introduction/" data-hashtag="Golang"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development part1：Architecture of client-go" data-hashtags="Golang,Kubernetes,CRD"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/en/crd-introduction/" data-hashtag="Golang"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development part1：Architecture of client-go"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development part1：Architecture of client-go"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/en/crd-introduction/" data-title="Kubernetes CRD Operator Development part1：Architecture of client-go" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
             </div>
         </div>
     </div>

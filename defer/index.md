@@ -1,4 +1,4 @@
-# Go 基础知识与框架体系 part 6: defer, panic 和 recover
+# Go 基础知识与框架体系 系列六: defer, panic 和 recover
 
 
 这篇文章总结了 Go 的知识体系 `defer`, `panic` 和 `recover`，包括其中的底层实现等等。

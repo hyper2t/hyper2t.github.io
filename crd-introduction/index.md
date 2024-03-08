@@ -1,4 +1,4 @@
-# Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍
+# Kubernetes CRD Operator 开发 系列一: client-go框架介绍
 
 
 这篇文章总结了 Kubernetes 中 CRD 的知识体系和其中client-go的框架实现等等。

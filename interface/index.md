@@ -1,4 +1,4 @@
-# Go 基础知识与框架体系 part 7: interface
+# Go 基础知识与框架体系 系列七: interface
 
 
 这篇文章总结了 Golang 的知识体系: interface，包括其中的底层实现等等。

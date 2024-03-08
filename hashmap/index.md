@@ -1,4 +1,4 @@
-# Go 基础知识与框架体系 part 9: hashmap
+# Go 基础知识与框架体系 系列九: hashmap
 
 
 这篇文章总结了 Go 的知识体系: hashmap，包括其中的底层实现等等。

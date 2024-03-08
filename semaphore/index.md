@@ -1,4 +1,4 @@
-# Golang 并发包 sync 系列
+# Go 基础知识与框架体系 系列十：Golang 并发包 sync 系列
 
 
 这篇文章总结了 Golang 的`sync`包，包括`sync.Map`、`sync.Once`、`sync.Pool`、其中`sync.Mutex`的底层通过`semaphore`机制实现等等。

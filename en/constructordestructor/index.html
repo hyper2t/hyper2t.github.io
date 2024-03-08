@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
-        <title>C&#43;&#43; Basic of Object-Oriented Programming - 嗨，皮特~</title><meta name="Description" content="This article summarizes the basic of C&#43;&#43;, its application and the underlying architectures."><meta property="og:title" content="C&#43;&#43; Basic of Object-Oriented Programming" />
+        <title>C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor - 嗨，皮特~</title><meta name="Description" content="This article summarizes the basic of C&#43;&#43;, its application and the underlying architectures."><meta property="og:title" content="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor" />
 <meta property="og:description" content="This article summarizes the basic of C&#43;&#43;, its application and the underlying architectures." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hyper2t.github.io/en/constructordestructor/" /><meta property="og:image" content="https://hyper2t.github.io/en/constructordestructor/featured-image.png"/><meta property="article:section" content="posts" />
@@ -14,7 +14,7 @@
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://hyper2t.github.io/en/constructordestructor/featured-image.png"/>
-<meta name="twitter:title" content="C&#43;&#43; Basic of Object-Oriented Programming"/>
+<meta name="twitter:title" content="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor"/>
 <meta name="twitter:description" content="This article summarizes the basic of C&#43;&#43;, its application and the underlying architectures."/>
 <meta name="application-name" content="LoveIt">
 <meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/twister-32x32.ico" />
@@ -23,7 +23,7 @@
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "C++ Basic of Object-Oriented Programming",
+        "headline": "C++ Basic of Object-Oriented Programming part 1: Constructor \u0026 Destructor",
         "inLanguage": "en",
         "mainEntityOfPage": {
             "@type": "WebPage",
@@ -62,7 +62,7 @@
             </div>
             <script type="text/javascript">
                 window.onload = function(){
-                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3"];               
+                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3", "/mp3/一起看星星.mp3"];               
                     var myAudio = new Audio();
                     myAudio.preload = true;
                     myAudio.controls = true;
@@ -175,10 +175,10 @@
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">Contents</h2>
             <div class="toc-content" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animated flipInX">C&#43;&#43; Basic of Object-Oriented Programming</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animated flipInX">C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://hyper2t.github.io" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class="post-category">included in <a href="/en/categories/c++/"><i class="far fa-folder fa-fw"></i>C++</a></span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-08-11">2020-08-11</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;16 words&nbsp;
-                <i class="far fa-clock fa-fw"></i>&nbsp;One minute&nbsp;<span id="/en/constructordestructor/" class="leancloud_visitors" data-flag-title="C&#43;&#43; Basic of Object-Oriented Programming">
+                <i class="far fa-clock fa-fw"></i>&nbsp;One minute&nbsp;<span id="/en/constructordestructor/" class="leancloud_visitors" data-flag-title="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor">
                         <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;&lt;no value&gt; views
                     </span>&nbsp;</div>
         </div><div class="featured-image"><img
@@ -208,7 +208,7 @@
                             <a class="link-to-markdown" href="/en/constructordestructor/index.md" target="_blank">Read Markdown</a>
                         </span></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming" data-hashtags="C&#43;&#43;,STL,inheritance,polymorphisms,class"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/en/constructordestructor/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+                <span><a href="javascript:void(0);" title="Share on Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor" data-hashtags="C&#43;&#43;,STL,inheritance,polymorphisms,class"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="Share on Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/en/constructordestructor/" data-hashtag="C&#43;&#43;"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="Share on Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="Share on Line" data-sharer="line" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="Share on 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/en/constructordestructor/" data-title="C&#43;&#43; Basic of Object-Oriented Programming part 1: Constructor &amp; Destructor" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
             </div>
         </div>
     </div>
@@ -220,8 +220,8 @@
         </section>
     </div>
 
-    <div class="post-nav"><a href="/en/inheritance/" class="prev" rel="prev" title="C&#43;&#43; Basic of Object-Oriented Programming"><i class="fas fa-angle-left fa-fw"></i>C&#43;&#43; Basic of Object-Oriented Programming</a>
-            <a href="/en/generic-template/" class="next" rel="next" title="C&#43;&#43; Basic of Generic Programming">C&#43;&#43; Basic of Generic Programming<i class="fas fa-angle-right fa-fw"></i></a></div>
+    <div class="post-nav"><a href="/en/inheritance/" class="prev" rel="prev" title="C&#43;&#43; Basic of Object-Oriented Programming part2：Inheritance"><i class="fas fa-angle-left fa-fw"></i>C&#43;&#43; Basic of Object-Oriented Programming part2：Inheritance</a>
+            <a href="/en/generic-template/" class="next" rel="next" title="C&#43;&#43; Basic of Generic Programming part 1: What is template?">C&#43;&#43; Basic of Generic Programming part 1: What is template?<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"><div id="waline" class="comment"></div>
         <script src='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>

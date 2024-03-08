@@ -12,7 +12,7 @@
     <guid>https://hyper2t.github.io/en/kubectl/</guid>
     <description><![CDATA[<p>This article summarizes the basic use of kubectl command.</p>]]></description>
 </item><item>
-    <title>Kubernetes CRD Operator Development</title>
+    <title>Kubernetes CRD Operator Development part1：Architecture of client-go</title>
     <link>https://hyper2t.github.io/en/crd-introduction/</link>
     <pubDate>Tue, 04 Aug 2020 21:57:40 &#43;0800</pubDate>
     <author>Author</author>

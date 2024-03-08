@@ -110,15 +110,6 @@
                     hreflang="en"
                     href="https://hyper2t.github.io/en/hashmap/"
                     /></url><url>
-            <loc>https://hyper2t.github.io/en/slice/</loc><lastmod>2022-07-10T16:55:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority><xhtml:link
-                        rel="alternate"
-                        hreflang="zh-cn"
-                        href="https://hyper2t.github.io/slice/"
-                        /><xhtml:link
-                    rel="alternate"
-                    hreflang="en"
-                    href="https://hyper2t.github.io/en/slice/"
-                    /></url><url>
             <loc>https://hyper2t.github.io/en/interface/</loc><lastmod>2022-07-10T16:55:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority><xhtml:link
                         rel="alternate"
                         hreflang="zh-cn"
@@ -136,6 +127,15 @@
                     rel="alternate"
                     hreflang="en"
                     href="https://hyper2t.github.io/en/mutex/"
+                    /></url><url>
+            <loc>https://hyper2t.github.io/en/slice/</loc><lastmod>2022-07-10T16:55:32&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority><xhtml:link
+                        rel="alternate"
+                        hreflang="zh-cn"
+                        href="https://hyper2t.github.io/slice/"
+                        /><xhtml:link
+                    rel="alternate"
+                    hreflang="en"
+                    href="https://hyper2t.github.io/en/slice/"
                     /></url><url>
             <loc>https://hyper2t.github.io/en/categories/catch-the-cat/</loc><lastmod>2022-05-04T19:39:27&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority><xhtml:link
                         rel="alternate"

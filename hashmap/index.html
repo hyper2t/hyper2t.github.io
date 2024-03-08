@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="robots" content="noodp" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
-        <title>Go 基础知识与框架体系 part 9: hashmap - 嗨，皮特~</title><meta name="Description" content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。"><meta property="og:title" content="Go 基础知识与框架体系 part 9: hashmap" />
+        <title>Go 基础知识与框架体系 系列九: hashmap - 嗨，皮特~</title><meta name="Description" content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。"><meta property="og:title" content="Go 基础知识与框架体系 系列九: hashmap" />
 <meta property="og:description" content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://hyper2t.github.io/hashmap/" /><meta property="og:image" content="https://hyper2t.github.io/hashmap/featured-image.jpeg"/><meta property="article:section" content="posts" />
@@ -14,7 +14,7 @@
 
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:image" content="https://hyper2t.github.io/hashmap/featured-image.jpeg"/>
-<meta name="twitter:title" content="Go 基础知识与框架体系 part 9: hashmap"/>
+<meta name="twitter:title" content="Go 基础知识与框架体系 系列九: hashmap"/>
 <meta name="twitter:description" content="这篇文章总结了 Go 的知识体系：hashmap，包括其中的底层实现等等。"/>
 <meta name="application-name" content="LoveIt">
 <meta name="apple-mobile-web-app-title" content="LoveIt"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/twister-32x32.ico" />
@@ -23,7 +23,7 @@
     {
         "@context": "http://schema.org",
         "@type": "BlogPosting",
-        "headline": "Go 基础知识与框架体系 part 9: hashmap",
+        "headline": "Go 基础知识与框架体系 系列九: hashmap",
         "inLanguage": "zh-CN",
         "mainEntityOfPage": {
             "@type": "WebPage",
@@ -62,7 +62,7 @@
             </div>
             <script type="text/javascript">
                 window.onload = function(){
-                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3"];               
+                    var arr = ["/mp3/烟花易冷.mp3","/mp3/将故事写成我们.mp3","/mp3/瞬间的永恒.mp3","/mp3/此夜断相思MT1990.mp3","/mp3/点星MT1990.mp3","/mp3/顺滑MT1990-MappleZS.mp3","/mp3/安静思考.mp3", "/mp3/一起看星星.mp3"];               
                     var myAudio = new Audio();
                     myAudio.preload = true;
                     myAudio.controls = true;
@@ -175,10 +175,10 @@
                 <div class="container"><div class="toc" id="toc-auto">
             <h2 class="toc-title">目录</h2>
             <div class="toc-content" id="toc-content-auto"></div>
-        </div><article class="page single"><h1 class="single-title animated flipInX">Go 基础知识与框架体系 part 9: hashmap</h1><div class="post-meta">
+        </div><article class="page single"><h1 class="single-title animated flipInX">Go 基础知识与框架体系 系列九: hashmap</h1><div class="post-meta">
             <div class="post-meta-line"><span class="post-author"><a href="https://hyper2t.github.io" title="Author" target="_blank" rel="noopener noreffer author" class="author"><i class="fas fa-user-circle fa-fw"></i>Peter Liao</a></span>&nbsp;<span class="post-category">收录于 <a href="/categories/golang/"><i class="far fa-folder fa-fw"></i>Golang</a></span></div>
             <div class="post-meta-line"><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2020-07-10">2020-07-10</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;约 2241 字&nbsp;
-                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 5 分钟&nbsp;<span id="/hashmap/" class="leancloud_visitors" data-flag-title="Go 基础知识与框架体系 part 9: hashmap">
+                <i class="far fa-clock fa-fw"></i>&nbsp;预计阅读 5 分钟&nbsp;<span id="/hashmap/" class="leancloud_visitors" data-flag-title="Go 基础知识与框架体系 系列九: hashmap">
                         <i class="far fa-eye fa-fw"></i>&nbsp;<span class=leancloud-visitors-count></span>&nbsp;
                     </span>&nbsp;</div>
         </div><div class="featured-image"><img
@@ -525,7 +525,7 @@
                             <a class="link-to-markdown" href="/hashmap/index.md" target="_blank">阅读原始文档</a>
                         </span></div>
             <div class="post-info-share">
-                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 part 9: hashmap" data-hashtags="Golang,goroutine,channel"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/hashmap/" data-hashtag="Golang"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 part 9: hashmap"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 part 9: hashmap"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 part 9: hashmap" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
+                <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 系列九: hashmap" data-hashtags="Golang,goroutine,channel"><i class="fab fa-twitter fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://hyper2t.github.io/hashmap/" data-hashtag="Golang"><i class="fab fa-facebook-square fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Hacker News" data-sharer="hackernews" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 系列九: hashmap"><i class="fab fa-hacker-news fa-fw"></i></a><a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 系列九: hashmap"><i data-svg-src="https://cdn.jsdelivr.net/npm/simple-icons@2.14.0/icons/line.svg"></i></a><a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://hyper2t.github.io/hashmap/" data-title="Go 基础知识与框架体系 系列九: hashmap" data-ralateuid="7289413661/profile?topnav=1&amp;wvr=6&amp;is_all=1"><i class="fab fa-weibo fa-fw"></i></a></span>
             </div>
         </div>
     </div>
@@ -537,8 +537,8 @@
         </section>
     </div>
 
-    <div class="post-nav"><a href="/mutex/" class="prev" rel="prev" title="Go 基础知识与框架体系 part 8: mutex 互斥锁"><i class="fas fa-angle-left fa-fw"></i>Go 基础知识与框架体系 part 8: mutex 互斥锁</a>
-            <a href="/crd-introduction/" class="next" rel="next" title="Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍">Kubernetes CRD Operator 开发系列 part 1: client-go框架介绍<i class="fas fa-angle-right fa-fw"></i></a></div>
+    <div class="post-nav"><a href="/mutex/" class="prev" rel="prev" title="Go 基础知识与框架体系 系列八: mutex 互斥锁"><i class="fas fa-angle-left fa-fw"></i>Go 基础知识与框架体系 系列八: mutex 互斥锁</a>
+            <a href="/crd-introduction/" class="next" rel="next" title="Kubernetes CRD Operator 开发 系列一: client-go框架介绍">Kubernetes CRD Operator 开发 系列一: client-go框架介绍<i class="fas fa-angle-right fa-fw"></i></a></div>
 </div>
 <div id="comments"><div id="waline" class="comment"></div>
         <script src='https://cdn.jsdelivr.net/npm/@waline/client@v2/dist/waline.js'></script>

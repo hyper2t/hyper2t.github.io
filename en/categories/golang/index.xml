@@ -5,7 +5,7 @@
         <description>Golang - Category - 嗨，皮特~</description>
         <generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>j29liao@uwaterloo.ca (Hyperter)</managingEditor>
             <webMaster>j29liao@uwaterloo.ca (Hyperter)</webMaster><copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright><lastBuildDate>Sun, 09 Aug 2020 21:57:40 &#43;0800</lastBuildDate><atom:link href="https://hyper2t.github.io/en/categories/golang/" rel="self" type="application/rss+xml" /><item>
-    <title>Golang Concurrency package: &#39;sync&#39;</title>
+    <title>Go Basic and architectures part 10：Golang Concurrency package &#39;sync&#39;</title>
     <link>https://hyper2t.github.io/en/semaphore/</link>
     <pubDate>Sun, 09 Aug 2020 21:57:40 &#43;0800</pubDate>
     <author>Author</author>
@@ -54,13 +54,6 @@
     <guid>https://hyper2t.github.io/en/hashmap/</guid>
     <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
 </item><item>
-    <title>Golang Basic and architectures part 2: array &amp; slices</title>
-    <link>https://hyper2t.github.io/en/slice/</link>
-    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
-    <author>Author</author>
-    <guid>https://hyper2t.github.io/en/slice/</guid>
-    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
-</item><item>
     <title>Golang Basic and architectures part 7: interface</title>
     <link>https://hyper2t.github.io/en/interface/</link>
     <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
@@ -73,6 +66,13 @@
     <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
     <author>Author</author>
     <guid>https://hyper2t.github.io/en/mutex/</guid>
+    <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
+</item><item>
+    <title>Golang Basic and architectures part1: array &amp; slices</title>
+    <link>https://hyper2t.github.io/en/slice/</link>
+    <pubDate>Sun, 02 Aug 2020 21:57:40 &#43;0800</pubDate>
+    <author>Author</author>
+    <guid>https://hyper2t.github.io/en/slice/</guid>
     <description><![CDATA[<p>This article summarizes the basic of Golang, its application and the underlying architectures.</p>]]></description>
 </item></channel>
 </rss>
